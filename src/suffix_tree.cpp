@@ -911,7 +911,7 @@ SUFFIX_TREE* ST_CreateTree(const char* str, DBL_WORD length)
       return 0;
 
    /* Allocating the tree */
-   tree = malloc(sizeof(SUFFIX_TREE));
+   tree = new SUFFIX_TREE;
    if(tree == 0)
    {
       printf("\nOut of memory.\n");
@@ -921,10 +921,9 @@ SUFFIX_TREE* ST_CreateTree(const char* str, DBL_WORD length)
 
    /* Calculating string length (with an ending $ sign) */
    tree->length         = length+1;
-   ST_ERROR            = length+10;
    
    /* Allocating the only real string of the tree */
-   tree->tree_string = malloc((tree->length+1)*sizeof(char));
+   tree->tree_string = static_cast<char*>( malloc((tree->length+1)*sizeof(char)) );
    if(tree->tree_string == 0)
    {
       printf("\nOut of memory.\n");
