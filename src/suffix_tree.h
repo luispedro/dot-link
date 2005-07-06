@@ -21,11 +21,11 @@ This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 *******************************************************************************/
 
-/* A type definition for a 32 bits variable - a double word. */
-#define     DBL_WORD      unsigned long   
+#include <stdint.h>
+typedef uint32_t DBL_WORD;
 
 /* Error return value for some functions. Initialized  in ST_CreateTree. */
-DBL_WORD    ST_ERROR;
+const DBL_WORD    ST_ERROR = static_cast<DBL_WORD>( -1 );
 
 /******************************************************************************/
 /*                           DATA STRUCTURES                                  */
