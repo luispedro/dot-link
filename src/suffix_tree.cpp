@@ -72,6 +72,12 @@ of (1) points only to (2).
 #include "stdio.h"
 #include "string.h"
 #include "suffix_tree.h"
+#include <iostream>
+#include <string>
+#include <vector>
+#include <boost/format.hpp>
+
+using namespace std;
 
 /* See function body */
 void ST_PrintTree(SUFFIX_TREE* tree);
@@ -1086,23 +1092,6 @@ void ST_PrintFullNode(SUFFIX_TREE* tree, NODE* node)
 
 /******************************************************************************/
 /*
-   ST_PrintTree :
-   This function prints the tree. It simply starts the recoursive function 
-   ST_PrintNode with depth 0 (the root).
-
-   Input : The tree to be printed.
-  
-   Output: A print out of the tree to the screen.
-*/
-
-void ST_PrintTree(SUFFIX_TREE* tree)
-{
-   printf("\nroot\n");
-   ST_PrintNode(tree, tree->root, 0);
-}
-
-/******************************************************************************/
-/*
    ST_SelfTest :
    Self test of the tree - search for all substrings of the main string. See 
    testing paragraph in the readme.txt file.
@@ -1144,5 +1133,53 @@ DBL_WORD ST_SelfTest(SUFFIX_TREE* tree)
    /* If we are here no search has failed and the test passed successfuly */
    printf("\n\nTest Results: Success.\n\n");
    return 1;
+}
+
+vector<int> ST_DFSGetChildren( NODE* node ) {
+	vector<int> res;
+	if ( node->sons ) {
+		for ( NODE* cur = node->sons; cur; cur = cur->right_sibling ) {
+			vector<int> now = ST_DFSGetChildren( cur );
+			res.insert( res.end(), now.begin(), now.end() );
+		}
+	} else {
+		res.push_back( node->path_position );
+	}
+	return res;
+}
+
+std::string to_string( SUFFIX_TREE* tree, vector<int> v ) {
+	string res;
+	for ( vector<int>::const_iterator first = v.begin(), past = v.end(); first != past; ++first ) {
+		res += ( boost::format( "%s{%s} " ) % *first % static_cast<char*>( tree->tree_string + *first ) ).str();
+	}
+	return res;
+}
+
+void ST_DFSPrintNode( SUFFIX_TREE* tree, NODE* node, string str ) {
+	std::cout << boost::format( "node[\"%s\"]: %s\n" ) % str % to_string( tree, ST_DFSGetChildren( node ) );
+	for ( NODE* cur = node->sons; cur; cur = cur->right_sibling )
+		ST_DFSPrintNode( tree, cur, 
+				str + string( tree->tree_string + cur->edge_label_start, get_node_label_length( tree, cur ) ) );
+
+}
+void ST_DFSPrint( SUFFIX_TREE* tree ) {
+	ST_DFSPrintNode( tree, tree->root, "" );
+}
+
+/******************************************************************************/
+/*
+   ST_PrintTree :
+   This function prints the tree. It simply starts the recoursive function 
+   ST_PrintNode with depth 0 (the root).
+
+   Input : The tree to be printed.
+  
+   Output: A print out of the tree to the screen.
+*/
+
+void ST_PrintTree(SUFFIX_TREE* tree)
+{
+	ST_DFSPrintNode( tree, tree->root, "" );
 }
 
