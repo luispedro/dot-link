@@ -544,7 +544,7 @@ DBL_WORD ST_FindSubstring(
                       /* The suffix array */
                       SUFFIX_TREE*    tree,      
                       /* The substring to find */
-                      char*  W,         
+                      const char*  W,         
                       /* The length of W */
                       DBL_WORD        P)         
 {
@@ -1007,7 +1007,8 @@ void ST_DeleteTree(SUFFIX_TREE* tree)
    if(tree == 0)
       return;
    ST_DeleteSubTree(tree->root);
-   free(tree);
+   free( tree->tree_string );
+   delete tree; 
 }
 
 /******************************************************************************/
