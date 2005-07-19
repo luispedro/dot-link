@@ -4,13 +4,13 @@ CXXFLAGS = -c -I/sw/include/
 OFLAGS = -o
 EXECNAME = suffixtree
 
-suffixtree:	main.o suffix_tree.o
+suffixtree: main.o suffix_tree.o
 	${COMPILER} ${DFLAGS} main.o suffix_tree.o ${OFLAGS} ${EXECNAME}
 
 suffix_tree.o:	suffix_tree.cpp suffix_tree.h
 	${COMPILER} ${DFLAGS} ${CXXFLAGS} suffix_tree.cpp
 
-main.cpp:	suffix_tree.h 
+main.o:	suffix_tree.h 
 	${COMPILER} ${DFLAGS} ${CXXFLAGS} main.cpp
 
 clean: 

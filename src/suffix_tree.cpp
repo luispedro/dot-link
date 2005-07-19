@@ -102,6 +102,12 @@ NODE*    suffixless;
 
 typedef struct SUFFIXTREEPATH
 {
+   SUFFIXTREEPATH( DBL_WORD b, DBL_WORD e ): 
+	   begin( b ),
+	   end( e )
+   {
+   }
+   SUFFIXTREEPATH() { }
    DBL_WORD   begin;
    DBL_WORD   end;
 } PATH;
@@ -142,12 +148,7 @@ typedef struct SUFFIXTREEPOS
 NODE* create_node(NODE* father, DBL_WORD start, DBL_WORD end, DBL_WORD position)
 {
    /*Allocate a node.*/
-   NODE* node   = (NODE*)malloc(sizeof(NODE));
-   if(node == 0)
-   {
-      printf("\nOut of memory.\n");
-      exit(0);
-   }
+   NODE* node   = new NODE;
 
 #ifdef STATISTICS
    heap+=sizeof(NODE);
@@ -155,10 +156,6 @@ NODE* create_node(NODE* father, DBL_WORD start, DBL_WORD end, DBL_WORD position)
 
    /* Initialize node fields. For detailed description of the fields see
       suffix_tree.h */
-   node->sons             = 0;
-   node->right_sibling    = 0;
-   node->left_sibling     = 0;
-   node->suffix_link      = 0;
    node->father           = father;
    node->path_position    = position;
    node->edge_label_start = start;
@@ -236,7 +233,7 @@ DBL_WORD get_node_label_length(SUFFIX_TREE* tree, NODE* node)
 /******************************************************************************/
 /*
    is_last_char_in_edge :
-   Returns 1 if edge_pos is the last position in node's incoming edge.
+   Returns true if edge_pos is the last position in node's incoming edge.
 
    Input : The tree, the node to be checked and the position in its incoming
            edge.
@@ -244,11 +241,8 @@ DBL_WORD get_node_label_length(SUFFIX_TREE* tree, NODE* node)
    Output: the length of that node.
 */
 
-char is_last_char_in_edge(SUFFIX_TREE* tree, NODE* node, DBL_WORD edge_pos)
-{
-   if(edge_pos == get_node_label_length(tree,node)-1)
-      return 1;
-   return 0;
+bool is_last_char_in_edge(SUFFIX_TREE* tree, POS* pos ) {
+       return pos->edge_pos == get_node_label_length( tree, pos->node ) - 1;
 }
 
 /******************************************************************************/
@@ -355,9 +349,10 @@ NODE* apply_extension_rule_2(
    node->left_sibling = 0;
 
    /* Connect (3) with (1)'s father */
-   if(new_internal->father->sons == node)            
+   if(new_internal->father->sons == node)
       new_internal->father->sons = new_internal;
-   
+
+
    /* Connect new_leaf (2) and node (1) as sons of new_internal (3) */
    new_internal->sons = node;
    node->father = new_internal;
@@ -397,13 +392,13 @@ NODE* trace_single_edge(
                       /* Skip or no_skip*/
                       SKIP_TYPE       type,          
                       /* 1 if search is done, 0 if not */
-                      int*            search_done)   
+                      bool*            search_done)   
 {
    NODE*      cont_node;
    DBL_WORD   length,str_len;
 
    /* Set default return values */
-   *search_done = 1;
+   *search_done = true;
    *edge_pos    = 0;
 
    /* Search for the first character of the string in the outcoming edge of
@@ -432,7 +427,7 @@ NODE* trace_single_edge(
          (*chars_found)   = length;
          (*edge_pos)      = length-1;
          if(length < str_len)
-            *search_done  = 0;
+            *search_done  = false;
       }
       else
       {
@@ -474,7 +469,7 @@ NODE* trace_single_edge(
 
    if((*chars_found) < str_len)
       /* Search is not done yet */
-      *search_done = 0;
+      *search_done = false;
 
    return node;
 }
@@ -515,18 +510,14 @@ NODE* trace_string(
 {
    /* This variable will be 1 when search is done.
       It is a return value from function trace_single_edge */
-   int      search_done = 0;
-
-   /* This variable will hold the number of matching characters found in the
-      current edge. It is a return value from function trace_single_edge */
-   DBL_WORD edge_chars_found;
-
+   bool search_done = false;
    *chars_found = 0;
-
-   while(search_done == 0)
+   while(!search_done)
    {
       *edge_pos        = 0;
-      edge_chars_found = 0;
+   /* This variable will hold the number of matching characters found in the
+      current edge. It is a return value from function trace_single_edge */
+      DBL_WORD edge_chars_found = 0;
       node = trace_single_edge(tree, node, str, edge_pos, &edge_chars_found, type, &search_done);
       str.begin       += edge_chars_found;
       *chars_found    += edge_chars_found;
@@ -572,17 +563,11 @@ DBL_WORD ST_FindSubstring(
       }
       
       /* Checking which of the stopping conditions are true */
-      if(j == P)
-      {
-         /* W was found - it is a substring. Return its path starting index */
+      if(j == P) { // W was found - it is a substring. Return its path starting index */
          return node->path_position;
-      }
-      else if(k > node_label_end)
-         /* Current edge is found to match, continue to next edge */
+      } else if(k > node_label_end) { // Current edge is found to match, continue to next edge 
          node = find_son(tree, node, W[j]);
-      else
-      {
-         /* One non-matching symbols is found - W is not a substring */
+      } else { // One non-matching symbols is found - W is not a substring
          return ST_ERROR;
       }
    }
@@ -619,9 +604,9 @@ void follow_suffix_link(SUFFIX_TREE* tree, POS* pos)
       link (it must have one by Ukkonen's lemma). After following, trace down 
       gama - it must exist in the tree (and thus can use the skip trick - see 
       trace_string function description) */
-   if(pos->node->suffix_link == 0 || is_last_char_in_edge(tree,pos->node,pos->edge_pos) == 0)
+   if(!pos->node->suffix_link || !is_last_char_in_edge(tree,pos))
    {
-      /* If the node's father is the root, than no use following it's link (it 
+      /* If the node's father is the root, than no use following its link (it 
          is linked to itself). Tracing from the root (like in the naive 
          algorithm) is required and is done by the calling function SEA uppon 
          recieving a return value of tree->root from this function */
@@ -711,15 +696,15 @@ void SEA(
 #endif
 
    /* Follow suffix link only if it's not the first extension after rule 3 was applied */
-   if(after_rule_3 == 0)
+   if(!after_rule_3)
       follow_suffix_link(tree, pos);
 
 #ifdef DEBUG   
 #ifdef STATISTICS
-   if(after_rule_3 == 0)
-      printf("to (%lu,%lu | %lu). counter: %lu\n", pos->node->edge_label_start, get_node_label_end(tree,pos->node),pos->edge_pos,counter);
-   else
+   if(after_rule_3)
       printf(". counter: %lu\n", counter);
+   else
+      printf("to (%lu,%lu | %lu). counter: %lu\n", pos->node->edge_label_start, get_node_label_end(tree,pos->node),pos->edge_pos,counter);
 #endif
 #endif
 
@@ -735,7 +720,7 @@ void SEA(
 
       /* Consider 2 cases:
          1. last character matched is the last of its edge */
-      if(is_last_char_in_edge(tree,pos->node,pos->edge_pos))
+      if(is_last_char_in_edge(tree,pos))
       {
          /* Trace only last symbol of str, search in the  NEXT edge (node) */
          tmp = find_son(tree, pos->node, tree->tree_string[str.end]);
@@ -765,7 +750,7 @@ void SEA(
       /* If there is an internal node that has no suffix link yet (only one may 
          exist) - create a suffix link from it to the father-node of the 
          current position in the tree (pos) */
-      if(suffixless != 0)
+      if(suffixless)
       {
          create_suffix_link(suffixless, pos->node->father);
          /* Marks that no internal node with no suffix link exists */
@@ -780,10 +765,10 @@ void SEA(
    
    /* If last char found is the last char of an edge - add a character at the 
       next edge */
-   if(is_last_char_in_edge(tree,pos->node,pos->edge_pos) || pos->node == tree->root)
+   if(is_last_char_in_edge(tree,pos) || pos->node == tree->root)
    {
       /* Decide whether to apply rule 2 (new_son) or rule 1 */
-      if(pos->node->sons != 0)
+      if(pos->node->sons)
       {
          /* Apply extension rule 2 new son - a new leaf is created and returned 
             by apply_extension_rule_2 */
@@ -792,12 +777,14 @@ void SEA(
          /* If there is an internal node that has no suffix link yet (only one 
             may exist) - create a suffix link from it to the father-node of the 
             current position in the tree (pos) */
-         if(suffixless != 0)
+         if(suffixless)
          {
             create_suffix_link(suffixless, pos->node);
             /* Marks that no internal node with no suffix link exists */
             suffixless = 0;
          }
+      } else {
+	      printf( "Shit, this shouldn't have happened!!!!\n" );
       }
    }
    else
@@ -805,8 +792,7 @@ void SEA(
       /* Apply extension rule 2 split - a new node is created and returned by 
          apply_extension_rule_2 */
       tmp = apply_extension_rule_2(pos->node, str.begin+chars_found, str.end, path_pos, pos->edge_pos, split);
-      if(suffixless != 0)
-         create_suffix_link(suffixless, tmp);
+      if(suffixless) create_suffix_link(suffixless, tmp);
       /* Link root's sons with a single character to the root */
       if(get_node_label_length(tree,tmp) == 1 && tmp->father == tree->root)
       {
@@ -876,10 +862,10 @@ void SPA(
       {
          /* Signaling that the next phase's first extension will not follow a 
             suffix link because same extension is repeated */
-         *repeated_extension = 1;
-         break;
+         *repeated_extension = true;
+	 return;
       }
-      *repeated_extension = 0;
+      *repeated_extension = false;
       (*extension)++;
    }
    return;
@@ -909,7 +895,7 @@ void SPA(
 SUFFIX_TREE* ST_CreateTree(const char* str, DBL_WORD length)
 {
    SUFFIX_TREE*  tree;
-   DBL_WORD      phase , extension;
+   DBL_WORD      extension;
    char          repeated_extension = 0;
    POS           pos;
 
@@ -918,12 +904,6 @@ SUFFIX_TREE* ST_CreateTree(const char* str, DBL_WORD length)
 
    /* Allocating the tree */
    tree = new SUFFIX_TREE;
-   if(tree == 0)
-   {
-      printf("\nOut of memory.\n");
-      exit(0);
-   }
-   heap+=sizeof(SUFFIX_TREE);
 
    /* Calculating string length (with an ending $ sign) */
    tree->length         = length+1;
@@ -942,12 +922,11 @@ SUFFIX_TREE* ST_CreateTree(const char* str, DBL_WORD length)
    tree->tree_string[tree->length] = '$';
    
    /* Allocating the tree root node */
-   tree->root            = create_node(0, 0, 0, 0);
+   tree->root = create_node(0, 0, 0, 0);
    tree->root->suffix_link = 0;
 
    /* Initializing algorithm parameters */
    extension = 2;
-   phase = 2;
    
    /* Allocating first node, son of the root (phase 0), the longest path node */
    tree->root->sons = create_node(tree->root, 1, tree->length, 1);
@@ -956,7 +935,7 @@ SUFFIX_TREE* ST_CreateTree(const char* str, DBL_WORD length)
    pos.edge_pos     = 0;
 
    /* Ukkonen's algorithm begins here */
-   for(; phase < tree->length; phase++)
+   for(unsigned int phase = 2; phase < tree->length; phase++)
    {
       /* Perform Single Phase Algorithm */
       SPA(tree, &pos, phase, &extension, &repeated_extension);
@@ -1149,23 +1128,34 @@ vector<int> ST_DFSGetChildren( NODE* node ) {
 	return res;
 }
 
-std::string to_string( SUFFIX_TREE* tree, vector<int> v ) {
-	string res;
-	for ( vector<int>::const_iterator first = v.begin(), past = v.end(); first != past; ++first ) {
-		res += ( boost::format( "%s{%s} " ) % *first % static_cast<char*>( tree->tree_string + *first ) ).str();
+void ST_DFSVisitNode( SUFFIX_TREE* tree, NODE* node, string str, int depth ) {
+	vector<int> children_pos = ST_DFSGetChildren( node );
+	NODE* dot_link = node->dot_link = create_node( node, 0, 0, 0 );
+	for ( vector<int>::const_iterator first = children_pos.begin(), past = children_pos.end(); first != past; ++first ) {
+		DBL_WORD nfound;
+		POS pos;
+		PATH path = PATH( *first + depth + 1, tree->length );
+		pos.node = trace_string( tree, dot_link, path, &( pos.edge_pos ), &nfound, no_skip );
+		RULE_2_TYPE s = ( is_last_char_in_edge( tree, &pos ) ? new_son : split );
+		DBL_WORD edge_pos = ( is_last_char_in_edge( tree, &pos ) ? 0 : pos.edge_pos );
+		apply_extension_rule_2( pos.node, *first + depth + nfound, tree->length, *first, edge_pos, s );
 	}
-	return res;
+	for ( NODE* cur = node->sons; cur; cur = cur->right_sibling ) {
+		int len = get_node_label_length( tree, cur );
+		ST_DFSVisitNode( tree,
+				cur,
+				str + string( tree->tree_string + cur->edge_label_start, len ),
+				depth + len );
+	}
+
 }
 
 void ST_DFSPrintNode( SUFFIX_TREE* tree, NODE* node, string str ) {
-	std::cout << boost::format( "node[\"%s\"]: %s\n" ) % str % to_string( tree, ST_DFSGetChildren( node ) );
+	std::cout << boost::format( "node[\"%s\"]\n" ) % str;
 	for ( NODE* cur = node->sons; cur; cur = cur->right_sibling )
 		ST_DFSPrintNode( tree, cur, 
 				str + string( tree->tree_string + cur->edge_label_start, get_node_label_length( tree, cur ) ) );
 
-}
-void ST_DFSPrint( SUFFIX_TREE* tree ) {
-	ST_DFSPrintNode( tree, tree->root, "" );
 }
 
 /******************************************************************************/
@@ -1183,4 +1173,5 @@ void ST_PrintTree(SUFFIX_TREE* tree)
 {
 	ST_DFSPrintNode( tree, tree->root, "" );
 }
+
 

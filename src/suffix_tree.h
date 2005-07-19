@@ -31,26 +31,43 @@ const DBL_WORD    ST_ERROR = static_cast<DBL_WORD>( -1 );
 /*                           DATA STRUCTURES                                  */
 /******************************************************************************/
 /* This structure describes a node and its incoming edge */
-typedef struct SUFFIXTREENODE
+struct SUFFIXTREENODE
 {
+   SUFFIXTREENODE():
+	   sons( 0 ),
+	   right_sibling( 0 ),
+	   left_sibling( 0 ),
+	   father( 0 ),
+	   suffix_link( 0 ),
+	   dot_link( 0 ),
+	   path_position( 0 ),
+	   edge_label_start( 0 ),
+	   edge_label_end( 0 )
+   {
+   }
+
    /* A linked list of sons of that node */
-   struct SUFFIXTREENODE*   sons;
+   SUFFIXTREENODE*   sons;
    /* A linked list of right siblings of that node */
-   struct SUFFIXTREENODE*   right_sibling;
+   SUFFIXTREENODE*   right_sibling;
    /* A linked list of left siblings of that node */
-   struct SUFFIXTREENODE*   left_sibling;
+   SUFFIXTREENODE*   left_sibling;
    /* A pointer to that node's father */
-   struct SUFFIXTREENODE*   father;
+   SUFFIXTREENODE*   father;
    /* A pointer to the node that represents the largest 
    suffix of the current node */
-   struct SUFFIXTREENODE*   suffix_link;
+   SUFFIXTREENODE*   suffix_link;
+   /* Pointer to the "error" subtree */
+   SUFFIXTREENODE*   dot_link;
    /* Index of the start position of the node's path */
    DBL_WORD                 path_position;
    /* Start index of the incoming edge */
    DBL_WORD                 edge_label_start;
    /* End index of the incoming edge */
    DBL_WORD                 edge_label_end;
-} NODE;
+};
+
+typedef SUFFIXTREENODE NODE;
 
 /* This structure describes a suffix tree */
 typedef struct SUFFIXTREE
@@ -112,7 +129,7 @@ SUFFIX_TREE* ST_CreateTree(const char*   str, DBL_WORD length);
 */
 
 DBL_WORD ST_FindSubstring(SUFFIX_TREE*      tree,   /* The suffix array */
-                          char*    W,      /* The substring to find */
+                          const char*    W,      /* The substring to find */
                           DBL_WORD          P);     /* The length of W */
 
 /******************************************************************************/
