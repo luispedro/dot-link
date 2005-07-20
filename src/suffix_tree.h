@@ -177,3 +177,6 @@ void ST_DeleteTree(SUFFIX_TREE* tree);
 */
 
 DBL_WORD ST_SelfTest(SUFFIX_TREE* tree);
+
+
+unsigned ST_CountNodes( SUFFIX_TREE* tree, bool follow_dot_links );

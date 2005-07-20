@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <iostream>
+#include <boost/format.hpp>
 
 /**************************************************************************************************/
 /**************************************************************************************************/
@@ -145,7 +147,11 @@ int main(int argc, char* argv[])
 		if(i == ST_ERROR)
 			printf("\nResults:      String is not a substring.\n\n");
 		else
-			printf("\nResults:      Substring exists in position %lu.\n\n",i);
+			std::cout << boost::format( "\nResults:      Substring exists in position %s.\n\n" ) % i;
+
+		std::cout << boost::format( "String size: %s \n" ) % tree->length;
+		std::cout << boost::format( "Nodes without dot links: %s \n" ) % ST_CountNodes( tree, false );
+		std::cout << boost::format( "Nodes with dot links: %s \n" ) % ST_CountNodes( tree, true );
 	}
 
 	/*Delete the temporary string.*/

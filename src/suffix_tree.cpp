@@ -73,6 +73,7 @@ of (1) points only to (2).
 #include "string.h"
 #include "suffix_tree.h"
 #include <iostream>
+#include <algorithm>
 #include <string>
 #include <vector>
 #include <boost/format.hpp>
@@ -1229,6 +1230,7 @@ void ST_DFSVisitNode( SUFFIX_TREE* tree, NODE* node, string str, int depth ) {
 	if ( node != tree->root ) {
 		vector<int> children_pos = ST_DFSGetChildren( node );
 		if ( !children_pos.empty() ) {
+			std::sort( children_pos.begin(), children_pos.end() );
 			NODE* dot_link = node->dot_link = create_node( node, 0, 0, 0 );
 			NODE* new_node = create_node( dot_link, children_pos.front() + depth + 1, tree->length, children_pos.front() );
 			dot_link->sons = new_node;
@@ -1285,3 +1287,16 @@ void ST_PrintTree(SUFFIX_TREE* tree)
 }
 
 
+namespace {
+unsigned DFS_CountNodes( SUFFIX_TREE* tree, NODE* node, bool follow_dot_links ) {
+	unsigned res = 1;
+	if ( follow_dot_links && node->dot_link ) res += DFS_CountNodes( tree, node->dot_link, follow_dot_links );
+	for ( NODE* cur = node->sons; cur; cur = cur->right_sibling ) res += DFS_CountNodes( tree, cur, follow_dot_links );
+	return res;
+}
+}
+
+unsigned ST_CountNodes( SUFFIX_TREE* tree, bool follow_dot_links ) {
+	return DFS_CountNodes( tree, tree->root, follow_dot_links );
+}
+	
