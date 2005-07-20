@@ -111,6 +111,8 @@ typedef struct SUFFIXTREE
 
 SUFFIX_TREE* ST_CreateTree(const char*   str, DBL_WORD length);
 
+void ST_AddDotLinks( SUFFIX_TREE* tree );
+
 /******************************************************************************/
 /*
    ST_FindSubstring :

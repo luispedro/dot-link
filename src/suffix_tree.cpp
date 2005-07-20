@@ -1129,16 +1129,20 @@ vector<int> ST_DFSGetChildren( NODE* node ) {
 }
 
 void ST_DFSVisitNode( SUFFIX_TREE* tree, NODE* node, string str, int depth ) {
-	vector<int> children_pos = ST_DFSGetChildren( node );
-	NODE* dot_link = node->dot_link = create_node( node, 0, 0, 0 );
-	for ( vector<int>::const_iterator first = children_pos.begin(), past = children_pos.end(); first != past; ++first ) {
-		DBL_WORD nfound;
-		POS pos;
-		PATH path = PATH( *first + depth + 1, tree->length );
-		pos.node = trace_string( tree, dot_link, path, &( pos.edge_pos ), &nfound, no_skip );
-		RULE_2_TYPE s = ( is_last_char_in_edge( tree, &pos ) ? new_son : split );
-		DBL_WORD edge_pos = ( is_last_char_in_edge( tree, &pos ) ? 0 : pos.edge_pos );
-		apply_extension_rule_2( pos.node, *first + depth + nfound, tree->length, *first, edge_pos, s );
+	if ( node != tree->root ) {
+		vector<int> children_pos = ST_DFSGetChildren( node );
+		NODE* dot_link = node->dot_link = create_node( node, 0, 0, 0 );
+		NODE* new_node = create_node( dot_link, children_pos.front() + depth + 1, tree->length, children_pos.front() );
+		dot_link->sons = new_node;
+		for ( vector<int>::const_iterator first = children_pos.begin() + 1, past = children_pos.end(); first != past; ++first ) {
+			DBL_WORD nfound;
+			POS pos;
+			PATH path = PATH( *first + depth + 1, tree->length );
+			pos.node = trace_string( tree, dot_link, path, &( pos.edge_pos ), &nfound, no_skip );
+			RULE_2_TYPE s = ( is_last_char_in_edge( tree, &pos ) ? new_son : split );
+			DBL_WORD edge_pos = ( is_last_char_in_edge( tree, &pos ) ? 0 : pos.edge_pos );
+			apply_extension_rule_2( pos.node, *first + depth + nfound, tree->length, *first, edge_pos, s );
+		}
 	}
 	for ( NODE* cur = node->sons; cur; cur = cur->right_sibling ) {
 		int len = get_node_label_length( tree, cur );
@@ -1148,6 +1152,10 @@ void ST_DFSVisitNode( SUFFIX_TREE* tree, NODE* node, string str, int depth ) {
 				depth + len );
 	}
 
+}
+
+void ST_AddDotLinks( SUFFIX_TREE* tree ) {
+	ST_DFSVisitNode( tree, tree->root, "", 0 );
 }
 
 void ST_DFSPrintNode( SUFFIX_TREE* tree, NODE* node, string str ) {

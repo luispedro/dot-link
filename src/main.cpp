@@ -119,6 +119,7 @@ int main(int argc, char* argv[])
 
 	printf("Constructing tree.....");
 	tree = ST_CreateTree(str,len);
+	ST_AddDotLinks( tree );
 	printf("Done.\n");
 	
 	/*If 'p' was included in the command-line arguments - print the tree.*/

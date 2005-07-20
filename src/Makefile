@@ -1,6 +1,6 @@
 COMPILER = g++
 DFLAGS = -ansi -pedantic -Wall -g
-CXXFLAGS = -c -I/sw/include/
+CXXFLAGS = -c -I/sw/include/ -Wno-long-double
 OFLAGS = -o
 EXECNAME = suffixtree
 
