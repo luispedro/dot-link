@@ -138,7 +138,7 @@ int main(int argc, char* argv[])
 #ifdef STATISTICS
 		counter = 0;
 #endif
-		i = ST_FindSubstring(tree, (unsigned char*)(argv[3]), strlen(argv[3]));
+		i = ST_FindSubstringWithErrors(tree, (unsigned char*)(argv[3]), strlen(argv[3]));
 #ifdef STATISTICS
 		printf("\nSearching:    Atomic operations per text symbol = %.3f\n", ((double)counter/strlen(argv[3])));
 #endif

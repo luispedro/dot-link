@@ -532,7 +532,7 @@ NODE* trace_string(
 */
 
 DBL_WORD ST_FindSubstring(
-                      /* The suffix array */
+                      /* The suffix tree */
                       SUFFIX_TREE*    tree,      
                       /* The substring to find */
                       const char*  W,         
@@ -573,6 +573,98 @@ DBL_WORD ST_FindSubstring(
    }
    return ST_ERROR;
 }
+
+
+
+/*
+   ST_FindSubstringWithErrors :
+   See suffix_tree.h for description.
+*/
+
+DBL_WORD ST_FindSubstringWithErrors(
+                      /* The suffix tree */
+                      SUFFIX_TREE*    tree,      
+                      /* The substring to find */
+                      const char*  W,         
+                      /* The length of W */
+                      DBL_WORD        P)         
+{
+   /* Starts with the root's son that has the first character of W as its
+      incoming edge first character */
+   NODE* node   = find_son(tree, tree->root, W[0]);
+   DBL_WORD k,j = 0, node_label_end;
+   int errors_seen = 0;
+   const int max_errors = 1;
+  
+
+   // Special case:
+   int special = ST_FindSubstring( tree, W + 1, P - 1 );
+   if ( special != ST_ERROR ) return special - 1;
+
+   /* Scan nodes down from the root until a leaf is reached or the substring is
+      found */
+   while(node!=0)
+   {
+      k=node->edge_label_start;
+      node_label_end = get_node_label_end(tree,node);
+      
+scan:
+      /* Scan a single edge - compare each character with the searched string */
+      while(j<P && k<=node_label_end && tree->tree_string[k] == W[j])
+      {
+         j++;
+         k++;
+
+#ifdef STATISTICS
+         counter++;
+#endif
+      }
+      
+      /* Checking which of the stopping conditions are true */
+      if(j == P) { // W was found - it is a substring. Return its path starting index */
+         return node->path_position;
+      } else if(k > node_label_end) { // Current edge is found to match, continue to next edge 
+find_next:
+         NODE* next = find_son(tree, node, W[j]);
+	 if ( next ) node = next;
+	 else {
+		++errors_seen;
+		if ( errors_seen > max_errors ) {
+			std::cout << boost::format( "We cannot seem to follow a link and we're out of luck\n" );
+			return ST_ERROR;
+		} else {
+			std::cout << boost::format( "Following dot link at position %s(%s)\n" )
+			% j
+			% std::string( W, 0, j );
+		}
+		++j;
+		if ( j == P ) return node->path_position;
+		node = node->dot_link;
+		goto find_next;
+	 }
+      } else {
+	++errors_seen;
+	if ( errors_seen > max_errors ) {
+		std::cout << boost::format("Seen too many errors at pos %s (%s) [%s != %s] (k = %s)\n" )
+			% j
+			% std::string( W, 0, j )
+			% W[ j ]
+			% tree->tree_string[ k ]
+			% k;
+		return ST_ERROR;
+	}
+	std::cout << boost::format("Error at pos %s (%s), but we've got a margin\n" )
+		% j
+		% std::string( W, 0, j );
+	++j;
+	++k;
+	goto scan;
+      }
+   }
+   return ST_ERROR;
+}
+
+
 
 /******************************************************************************/
 /*
@@ -1115,11 +1207,11 @@ DBL_WORD ST_SelfTest(SUFFIX_TREE* tree)
    return 1;
 }
 
-vector<int> ST_DFSGetChildren( NODE* node ) {
+vector<int> ST_DFSGetChildrenRecur( NODE* node ) {
 	vector<int> res;
 	if ( node->sons ) {
 		for ( NODE* cur = node->sons; cur; cur = cur->right_sibling ) {
-			vector<int> now = ST_DFSGetChildren( cur );
+			vector<int> now = ST_DFSGetChildrenRecur( cur );
 			res.insert( res.end(), now.begin(), now.end() );
 		}
 	} else {
@@ -1127,21 +1219,28 @@ vector<int> ST_DFSGetChildren( NODE* node ) {
 	}
 	return res;
 }
+vector<int> ST_DFSGetChildren( NODE* node ) {
+	vector<int> res = ST_DFSGetChildrenRecur( node );
+	res.pop_back();
+	return res;
+}
 
 void ST_DFSVisitNode( SUFFIX_TREE* tree, NODE* node, string str, int depth ) {
 	if ( node != tree->root ) {
 		vector<int> children_pos = ST_DFSGetChildren( node );
-		NODE* dot_link = node->dot_link = create_node( node, 0, 0, 0 );
-		NODE* new_node = create_node( dot_link, children_pos.front() + depth + 1, tree->length, children_pos.front() );
-		dot_link->sons = new_node;
-		for ( vector<int>::const_iterator first = children_pos.begin() + 1, past = children_pos.end(); first != past; ++first ) {
-			DBL_WORD nfound;
-			POS pos;
-			PATH path = PATH( *first + depth + 1, tree->length );
-			pos.node = trace_string( tree, dot_link, path, &( pos.edge_pos ), &nfound, no_skip );
-			RULE_2_TYPE s = ( is_last_char_in_edge( tree, &pos ) ? new_son : split );
-			DBL_WORD edge_pos = ( is_last_char_in_edge( tree, &pos ) ? 0 : pos.edge_pos );
-			apply_extension_rule_2( pos.node, *first + depth + nfound, tree->length, *first, edge_pos, s );
+		if ( !children_pos.empty() ) {
+			NODE* dot_link = node->dot_link = create_node( node, 0, 0, 0 );
+			NODE* new_node = create_node( dot_link, children_pos.front() + depth + 1, tree->length, children_pos.front() );
+			dot_link->sons = new_node;
+			for ( vector<int>::const_iterator first = children_pos.begin() + 1, past = children_pos.end(); first != past; ++first ) {
+				DBL_WORD nfound;
+				POS pos;
+				PATH path = PATH( *first + depth + 1, tree->length );
+				pos.node = trace_string( tree, dot_link, path, &( pos.edge_pos ), &nfound, no_skip );
+				RULE_2_TYPE s = ( is_last_char_in_edge( tree, &pos ) ? new_son : split );
+				DBL_WORD edge_pos = ( is_last_char_in_edge( tree, &pos ) ? 0 : pos.edge_pos );
+				apply_extension_rule_2( pos.node, *first + depth + nfound, tree->length, *first, edge_pos, s );
+			}
 		}
 	}
 	for ( NODE* cur = node->sons; cur; cur = cur->right_sibling ) {
@@ -1160,9 +1259,12 @@ void ST_AddDotLinks( SUFFIX_TREE* tree ) {
 
 void ST_DFSPrintNode( SUFFIX_TREE* tree, NODE* node, string str ) {
 	std::cout << boost::format( "node[\"%s\"]\n" ) % str;
-	for ( NODE* cur = node->sons; cur; cur = cur->right_sibling )
+	if ( node->dot_link ) ST_DFSPrintNode( tree, node->dot_link, str + "." );
+	else std::cout << "node has no dot link!\n";
+	for ( NODE* cur = node->sons; cur; cur = cur->right_sibling ) {
 		ST_DFSPrintNode( tree, cur, 
 				str + string( tree->tree_string + cur->edge_label_start, get_node_label_length( tree, cur ) ) );
+	}
 
 }
 
