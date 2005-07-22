@@ -1,11 +1,11 @@
 #include "suffix_tree.h"
+#include "timer.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <iostream>
 #include <boost/format.hpp>
 
-/**************************************************************************************************/
 /**************************************************************************************************/
 
 /*Prints all possible command-line arguments and then exits the program.
@@ -61,17 +61,10 @@ file given as input.
 int main(int argc, char* argv[])
 {
 	SUFFIX_TREE* tree;
-	unsigned char command, *str = NULL, *filename, freestr = 0;
-	FILE* file = 0;
+	unsigned char command, *str = NULL, freestr = 0;
 	DBL_WORD i,len = 0;
-
-#ifdef STATISTICS
-	counter = heap = 0;
-#endif
-
 	/*If less then 3 arguments - print a proper message and exit the program.*/
-	if(argc < 3)
-		PrintUsage();
+	if(argc < 3) PrintUsage();
 		
 	/*'t' means selfTest request.*/
 	if(argv[1][0] == 't')
@@ -91,59 +84,53 @@ int main(int argc, char* argv[])
 		len = strlen((const char*)str);
 		break;
 	/*'s' means a file*/
-	case 'f':
-		filename = (unsigned char*)argv[2];
-		file = fopen((const char*)filename,"r");
-		/*Check for validity of the file.*/
-		if(file == 0)
-		{
-			printf("can't open file.\n");
-			return(0);
-		}
-		/*Calculate the file length in bytes. This will be the length of the source string.*/
-		fseek(file, 0, SEEK_END);
-		len = ftell(file);
-		fseek(file, 0, SEEK_SET);
-		str = (unsigned char*)malloc(len*sizeof(unsigned char));
-		if(str == 0)
-		{
-			printf("\nOut of memory.\n");
-			exit(0);
-		}
-		fread(str, sizeof(unsigned char), len, file);
-		/*When freestr = 1 it means that a temporary string has been allocated and therefor 
-		must be deleted afterwards.*/
-		freestr = 1;
+	case 'f': {
+			  FILE* file = fopen((const char*)argv[ 2 ],"r");
+			  /*Check for validity of the file.*/
+			  if(!file)
+			  {
+				  printf("can't open file '%s'.\n", argv[ 2 ] );
+				  return(1);
+			  }
+			  /*Calculate the file length in bytes. This will be the length of the source string.*/
+			  fseek(file, 0, SEEK_END);
+			  len = ftell(file);
+			  fseek(file, 0, SEEK_SET);
+			  str = (unsigned char*)malloc(len*sizeof(unsigned char));
+			  if(str == 0)
+			  {
+				  printf("\nOut of memory.\n");
+				  exit(0);
+			  }
+			  fread(str, sizeof(unsigned char), len, file);
+			  /*When freestr = 1 it means that a temporary string has been allocated and therefor 
+			    must be deleted afterwards.*/
+			  freestr = 1;
+			  fclose(file );
+		  }
 		break;
 	default:
 		PrintUsage();
 	}
 
-	printf("Constructing tree.....");
+	Timer full( "full-tree-construction" );
+	Timer dots( "add-dot-links" );
+	full.start();
 	tree = ST_CreateTree(str,len);
+	dots.start();
 	ST_AddDotLinks( tree );
-	printf("Done.\n");
+	full.stop();
+	dots.stop();
 	
 	/*If 'p' was included in the command-line arguments - print the tree.*/
 	if((argc == 5 && argv[4][0] == 'p') || (argv[1][0] == 't' && argc == 4 && argv[3][0] == 'p'))
 		ST_PrintTree(tree);
 
-#ifdef STATISTICS
-	printf("\nN = %lu\n",tree->length);
-	printf("Construction: Bytes allocated per text symbol   = %.3f\n", ((double)heap/tree->length));
-	printf("              Atomic operations per text symbol = %.3f\n", ((double)counter/tree->length));
-#endif
 	if(argv[1][0] == 't')
 		ST_SelfTest(tree);
 	else
 	{
-#ifdef STATISTICS
-		counter = 0;
-#endif
 		i = ST_FindSubstringWithErrors(tree, (unsigned char*)(argv[3]), strlen(argv[3]));
-#ifdef STATISTICS
-		printf("\nSearching:    Atomic operations per text symbol = %.3f\n", ((double)counter/strlen(argv[3])));
-#endif
 		if(i == ST_ERROR)
 			printf("\nResults:      String is not a substring.\n\n");
 		else

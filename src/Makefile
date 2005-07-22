@@ -1,18 +1,8 @@
-COMPILER = g++
-DFLAGS = -ansi -pedantic -Wall -g
-CXXFLAGS = -c -I/sw/include/ -Wno-long-double
-OFLAGS = -o
-EXECNAME = suffixtree
+sinclude MakeVars
 
-suffixtree: main.o suffix_tree.o
-	${COMPILER} ${DFLAGS} main.o suffix_tree.o ${OFLAGS} ${EXECNAME}
+CXXFLAGS += -I/sw/include -g -Wall -Wno-long-double
+PROGRAM=suffixtree
+LIBS=
 
-suffix_tree.o:	suffix_tree.cpp suffix_tree.h
-	${COMPILER} ${DFLAGS} ${CXXFLAGS} suffix_tree.cpp
+include Makefile.C++
 
-main.o:	suffix_tree.h 
-	${COMPILER} ${DFLAGS} ${CXXFLAGS} main.cpp
-
-clean: 
-	rm *.o 
-	rm ${EXECNAME}

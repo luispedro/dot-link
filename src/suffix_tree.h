@@ -1,3 +1,6 @@
+#ifndef LPC_SUFFIX_TREE_H1122058543_INCLUDE_GUARD_
+#define LPC_SUFFIX_TREE_H1122058543_INCLUDE_GUARD_
+
 /******************************************************************************
 Suffix Tree Version 2.1
 by:         Dotan Tsadok.
@@ -180,3 +183,6 @@ DBL_WORD ST_SelfTest(SUFFIX_TREE* tree);
 
 
 unsigned ST_CountNodes( SUFFIX_TREE* tree, bool follow_dot_links );
+
+
+#endif /* LPC_SUFFIX_TREE_H1122058543_INCLUDE_GUARD_ */
