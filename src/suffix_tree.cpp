@@ -227,6 +227,7 @@ DBL_WORD get_node_label_end(SUFFIX_TREE* tree, NODE* node)
 
 DBL_WORD get_node_label_length(SUFFIX_TREE* tree, NODE* node)
 {
+   if ( !node->edge_label_start ) return 0;
    /* Calculate and return the lentgh of the node */
    return get_node_label_end(tree, node) - node->edge_label_start + 1;
 }
@@ -631,12 +632,14 @@ find_next:
 	 else {
 		++errors_seen;
 		if ( errors_seen > max_errors ) {
-			std::cout << boost::format( "We cannot seem to follow a link and we're out of luck\n" );
+			std::cout << boost::format( "We have seen too many errors at end of node %s(%s)\n" )
+				% j
+				% std::string( W, 0, j );
 			return ST_ERROR;
 		} else {
 			std::cout << boost::format( "Following dot link after position %s(%s)\n" )
-			% j
-			% std::string( W, 0, j );
+				% j
+				% std::string( W, 0, j );
 		}
 		++j;
 		if ( j == P ) return node->path_position;
@@ -1208,6 +1211,14 @@ DBL_WORD ST_SelfTest(SUFFIX_TREE* tree)
    return 1;
 }
 
+static std::string node2string( SUFFIX_TREE* tree, NODE* node ) {
+	return ( boost::format( "{%s (%s-%s) \"%s\"}" )
+			% node->path_position
+			% node->edge_label_start
+			% get_node_label_end( tree, node )
+			% std::string( tree->tree_string + 1, node->edge_label_start - 1, get_node_label_length( tree, node ) ) ).str();
+}
+
 vector<int> ST_DFSGetChildrenRecur( NODE* node ) {
 	vector<int> res;
 	if ( node->sons ) {
@@ -1233,15 +1244,18 @@ NODE* copy_node( NODE* node ) {
 enum copy_filter_type { first_leaf, not_matching_x };
 NODE* copy_subtree( SUFFIX_TREE* tree, NODE* start, copy_filter_type ftype, char x ) {
 	if ( !start ) return 0; // makes a couple of cases simpler below
-	std::cout << boost::format( "copy_subtree( . , %s (%s-%s), %s, %s )\n" )
+	/*std::cout << boost::format( "copy_subtree( . , %s (%s-%s), %s, %s )\n" )
 			% start->path_position
 			% start->edge_label_start
 			% get_node_label_end( tree, start )
 			% ( ftype == first_leaf ? "first_leaf" : "not_matching_x" )
 			% ( x ? x : '-' );
+			*/
 	NODE* res = 0;
 	if ( !start->sons ) {
-		std::cout << boost::format( "We're at '%s'\n" ) % char( tree->tree_string[ start->path_position ] );
+		std::cout << boost::format( "We're at leaf %s ('%s')\n" )
+			% start->path_position
+			% char( tree->tree_string[ start->path_position ] );
 		// We're at a leaf, check if we are supposed to be included:
 		
 		if ( start->path_position == 1  || ftype == not_matching_x && tree->tree_string[ start->path_position - 1 ] != x ) {
@@ -1250,18 +1264,40 @@ NODE* copy_subtree( SUFFIX_TREE* tree, NODE* start, copy_filter_type ftype, char
 		res = copy_node( start );
 		res->right_sibling = copy_subtree( tree, start->right_sibling, ftype, x );
 		if ( res->right_sibling ) res->right_sibling->left_sibling = res;
+		--res->path_position;
 	} else {
 		NODE* sons = copy_subtree( tree, start->sons, ftype, x );
 		if ( !sons ) return copy_subtree( tree, start->right_sibling, ftype, x );
+
+		if ( !sons->right_sibling && get_node_label_length( tree, start ) ) {
+			std::cout << boost::format( "merging nodes %s %s..." )
+				% node2string( tree, start )
+				% node2string( tree, sons );
+			sons->edge_label_start -= get_node_label_length( tree, start );
+			for ( int i = 0; i != get_node_label_length( tree, start ); ++i ) {
+				if ( tree->tree_string[ start->edge_label_start + i ] != tree->tree_string[ sons->edge_label_start + i ] ) 
+					std::cout << boost::format( "ooops: [%s(%s) != %s(%s)] (out of %s)\n" )
+						% ( start->edge_label_start + i )
+						% tree->tree_string[ start->edge_label_start + i ]
+						% ( sons->edge_label_start + i )
+						% tree->tree_string[ sons->edge_label_start + i ]
+						% get_node_label_length( tree, start );
+			}
+			std::cout << boost::format( "resulted in  %s.\n" ) % node2string( tree, sons );
+			sons->right_sibling = copy_subtree( tree, start->right_sibling, ftype, x );
+			if ( sons->right_sibling ) sons->right_sibling->left_sibling = sons;
+			return sons;
+		}
+		
 		res = copy_node( start );
 		res->sons = sons;
+		res->path_position = sons->path_position;
 		for ( NODE* cur = sons; cur ; cur = cur->right_sibling ) cur->father = res;
 		if ( start->right_sibling ) {
 			res->right_sibling = copy_subtree( tree, start->right_sibling, ftype, x );
 			if ( res->right_sibling ) res->right_sibling->left_sibling = res;
 		}
 	}
-	--res->path_position;
 	return res;
 }
 
@@ -1270,11 +1306,12 @@ NODE* copy_subtree( SUFFIX_TREE* tree, NODE* start, copy_filter_type ftype, char
 static void AddDotLink( SUFFIX_TREE* tree, NODE* node ) {
 	if ( node->dot_link ) return;
 	if ( !node->sons ) return;
-	std::cout<< boost::format( "AddDotLink( . , {%s (%s-%s) \"%s\"}\n" )
+	/*std::cout<< boost::format( "AddDotLink( . , {%s (%s-%s) \"%s\"}\n" )
 			% node->path_position
 			% node->edge_label_start
 			% get_node_label_end( tree, node )
 			% std::string( tree->tree_string + 1, node->edge_label_start - 1, get_node_label_length( tree, node ) );
+			*/
 
 	if ( node->suffix_link ) AddDotLink( tree, node->suffix_link );
 	else {
