@@ -4,6 +4,8 @@
 #include <sys/times.h> //  clock
 #include <sys/resource.h>
 #include <unistd.h>
+#include <string.h>
+#include <errno.h>
 #include <cassert>
 #include <iostream>
 
@@ -23,7 +25,6 @@ Timer::~Timer() {
 }
 
 void Timer::stop() {
-	assert( begin );
 	struct tms tmp;
 	times( &tmp );
 	clock_t now = tmp.tms_utime;
@@ -32,9 +33,13 @@ void Timer::stop() {
 }
 void Timer::start() {
 	struct tms tmp;
-	times( &tmp );
-	begin = tmp.tms_utime;
-	if ( !Clk_Tck ) Clk_Tck = sysconf( _SC_CLK_TCK );
+	if ( times( &tmp ) != clock_t( -1 ) ) {
+		begin = tmp.tms_utime;
+		if ( !Clk_Tck ) Clk_Tck = sysconf( _SC_CLK_TCK );
+	} else {
+		std::cerr << "Error: " << strerror( errno ) << '\n';
+		exit( 1 );
+	}
 }
 
 AvgRealTimer::AvgRealTimer( const char* name )
@@ -91,7 +96,6 @@ CummulativeTimer::~CummulativeTimer() {
 }
 
 void CummulativeTimer::stop() {
-	assert( begin );
 	struct tms tmp;
 	times( &tmp );
 	clock_t now = tmp.tms_utime;
@@ -120,7 +124,6 @@ void RealTimer::start() {
 	time( &begin );
 }
 void RealTimer::stop() {
-	assert( begin );
 	time_t now = time( 0 );
 	stats::printtime( "STOP" );
 	stats::file() << "real-time[" << id << "]: " << ( now - begin ) << '\n';
