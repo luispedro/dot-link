@@ -1253,9 +1253,10 @@ NODE* copy_subtree( SUFFIX_TREE* tree, NODE* start, copy_filter_type ftype, char
 			*/
 	NODE* res = 0;
 	if ( !start->sons ) {
-		std::cout << boost::format( "We're at leaf %s ('%s')\n" )
+		/*std::cout << boost::format( "We're at leaf %s ('%s')\n" )
 			% start->path_position
 			% char( tree->tree_string[ start->path_position ] );
+			*/
 		// We're at a leaf, check if we are supposed to be included:
 		
 		if ( start->path_position == 1  || ftype == not_matching_x && tree->tree_string[ start->path_position - 1 ] != x ) {
@@ -1270,20 +1271,12 @@ NODE* copy_subtree( SUFFIX_TREE* tree, NODE* start, copy_filter_type ftype, char
 		if ( !sons ) return copy_subtree( tree, start->right_sibling, ftype, x );
 
 		if ( !sons->right_sibling && get_node_label_length( tree, start ) ) {
-			std::cout << boost::format( "merging nodes %s %s..." )
+			/*std::cout << boost::format( "merging nodes %s %s..." )
 				% node2string( tree, start )
 				% node2string( tree, sons );
+				*/
 			sons->edge_label_start -= get_node_label_length( tree, start );
-			for ( int i = 0; i != get_node_label_length( tree, start ); ++i ) {
-				if ( tree->tree_string[ start->edge_label_start + i ] != tree->tree_string[ sons->edge_label_start + i ] ) 
-					std::cout << boost::format( "ooops: [%s(%s) != %s(%s)] (out of %s)\n" )
-						% ( start->edge_label_start + i )
-						% tree->tree_string[ start->edge_label_start + i ]
-						% ( sons->edge_label_start + i )
-						% tree->tree_string[ sons->edge_label_start + i ]
-						% get_node_label_length( tree, start );
-			}
-			std::cout << boost::format( "resulted in  %s.\n" ) % node2string( tree, sons );
+			//std::cout << boost::format( "resulted in  %s.\n" ) % node2string( tree, sons );
 			sons->right_sibling = copy_subtree( tree, start->right_sibling, ftype, x );
 			if ( sons->right_sibling ) sons->right_sibling->left_sibling = sons;
 			return sons;
