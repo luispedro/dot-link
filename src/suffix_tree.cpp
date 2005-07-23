@@ -612,8 +612,12 @@ DBL_WORD ST_FindSubstringWithErrors(
 	NODE* previous_exact = 0;
 	int exact_j = j;
 
-	/* Scan nodes down from the root until a leaf is reached or the substring is
-	   found */
+	if ( !node ) {
+		node = find_son( tree, tree->root->dot_link, W[ 1 ] );
+		if ( !node ) return ST_ERROR;
+		++j;
+		++errors_seen;
+	}
 	unsigned k = node->edge_label_start;
 	while ( node )
 	{
