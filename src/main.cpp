@@ -43,47 +43,34 @@ printf("<string | filename> - the string that follows command s or the file name
 	exit(0);
 }
 
+void find_substring( SUFFIX_TREE* tree, const char* string ) {
+	Timer match( "match" );
+	unsigned i = ST_FindSubstringWithErrors(tree, string, strlen(string));
+	match.stop();
 
-/**************************************************************************************************/
-/**************************************************************************************************/
-
-/*The program entry point. Handles all command line arguments. 
-This function calls suffix tree interface functions in order to 
-create, search and delete a suffix tree out of a string or a 
-file given as input. 
-
-  Input : Number of command-line parameters, an array of command-line parameters.
-  
-  Output: Returns 0 to the operating system.*/
+	if(i == ST_ERROR)
+		printf("\nResults: String is not a substring.\n\n");
+	else
+		std::cout << boost::format( "\nResults:   Substring exists in position %s.\n\n" ) % i;
+}
 
 
-/**************************************************************************************************/
 int main(int argc, char* argv[])
 {
 	SUFFIX_TREE* tree;
-	unsigned char command, *str = NULL, freestr = 0;
-	DBL_WORD i,len = 0;
-	/*If less then 3 arguments - print a proper message and exit the program.*/
-	if(argc < 3) PrintUsage();
-		
-	/*'t' means selfTest request.*/
-	if(argv[1][0] == 't')
-		command = argv[1][1];
-	else
-	{
-		if(argc < 4)
-			PrintUsage();
-		command = argv[1][0];
-	}
+	char* str;
+	bool freestr;
+	DBL_WORD len = 0;
+	if(argc < 4) PrintUsage();
 
-	switch(command)
+	switch ( argv[ 1 ][ 0 ] )
 	{
 	/*'s' means an immediate string*/
 	case 's':
-		str = (unsigned char*)argv[2];
-		len = strlen((const char*)str);
+		str = argv[ 2 ];
+		len = strlen(str);
 		break;
-	/*'s' means a file*/
+	/*'f' means a file*/
 	case 'f': {
 			  FILE* file = fopen((const char*)argv[ 2 ],"r");
 			  /*Check for validity of the file.*/
@@ -96,16 +83,14 @@ int main(int argc, char* argv[])
 			  fseek(file, 0, SEEK_END);
 			  len = ftell(file);
 			  fseek(file, 0, SEEK_SET);
-			  str = (unsigned char*)malloc(len*sizeof(unsigned char));
+			  str = (char*)malloc(len*sizeof(char));
 			  if(str == 0)
 			  {
 				  printf("\nOut of memory.\n");
 				  exit(0);
 			  }
 			  fread(str, sizeof(unsigned char), len, file);
-			  /*When freestr = 1 it means that a temporary string has been allocated and therefor 
-			    must be deleted afterwards.*/
-			  freestr = 1;
+			  freestr = true;
 			  fclose(file );
 		  }
 		break;
@@ -113,6 +98,7 @@ int main(int argc, char* argv[])
 		PrintUsage();
 	}
 
+	
 	Timer full( "full-tree-construction" );
 	Timer dots( "add-dot-links" );
 	full.start();
@@ -122,29 +108,18 @@ int main(int argc, char* argv[])
 	full.stop();
 	dots.stop();
 	
-	/*If 'p' was included in the command-line arguments - print the tree.*/
-	if((argc == 5 && argv[4][0] == 'p') || (argv[1][0] == 't' && argc == 4 && argv[3][0] == 'p'))
-		ST_PrintTree(tree);
-
-	if(argv[1][0] == 't')
-		ST_SelfTest(tree);
-	else
-	{
-		i = ST_FindSubstringWithErrors(tree, (unsigned char*)(argv[3]), strlen(argv[3]));
-		if(i == ST_ERROR)
-			printf("\nResults:      String is not a substring.\n\n");
-		else
-			std::cout << boost::format( "\nResults:      Substring exists in position %s.\n\n" ) % i;
-
-		std::cout << boost::format( "String size: %s \n" ) % tree->length;
-		std::cout << boost::format( "Nodes without dot links: %s \n" ) % ST_CountNodes( tree, false );
-		std::cout << boost::format( "Nodes with dot links: %s \n" ) % ST_CountNodes( tree, true );
+	
+	if ( strcmp( argv[ 3 ], "-" ) ) {
+		find_substring( tree, argv[ 3 ] );
+	} else {
+		std::string tmp;
+		while ( std::getline( std::cin, tmp ) ) find_substring( tree, tmp.c_str() );
 	}
+	std::cout << boost::format( "String size: %s \n" ) % ( tree->length - 1 );
+	std::cout << boost::format( "Nodes without dot links: %s \n" ) % ST_CountNodes( tree, false );
+	std::cout << boost::format( "Nodes with dot links: %s \n" ) % ST_CountNodes( tree, true );
 
-	/*Delete the temporary string.*/
-	if(freestr == 1)
-		free(str);
-
+	if(freestr) free(str);
 	ST_DeleteTree(tree);
 	return 0;
 }
