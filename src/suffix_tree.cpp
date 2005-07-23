@@ -68,10 +68,11 @@ of (1) points only to (2).
 
 *******************************************************************************/
 
-#include "stdlib.h"
-#include "stdio.h"
-#include "string.h"
+#include "stats.h"
 #include "suffix_tree.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 #include <iostream>
 #include <algorithm>
 #include <string>
@@ -265,6 +266,17 @@ void connect_siblings(NODE* left_sib, NODE* right_sib)
    /* Connect the left node as the left sibling of the right node */
    if(right_sib != 0)
       right_sib->left_sibling = left_sib;
+}
+
+static std::string node2string( SUFFIX_TREE* tree, NODE* node ) {
+	return ( boost::format( "{%s (%s-%s) \"%s\"}" )
+			% node->path_position
+			% node->edge_label_start
+			% get_node_label_end( tree, node )
+			% ( node->edge_label_start ?
+				std::string( tree->tree_string + 1, node->edge_label_start - 1, get_node_label_length( tree, node ) ) :
+				std::string( "" ) )
+			).str();
 }
 
 /******************************************************************************/
@@ -584,88 +596,92 @@ DBL_WORD ST_FindSubstring(
 */
 
 DBL_WORD ST_FindSubstringWithErrors(
-                      /* The suffix tree */
-                      SUFFIX_TREE*    tree,      
-                      /* The substring to find */
-                      const char*  W,         
-                      /* The length of W */
-                      DBL_WORD        P)         
+		/* The suffix tree */
+		SUFFIX_TREE*    tree,      
+		/* The substring to find */
+		const char*  W,         
+		/* The length of W */
+		DBL_WORD        P)         
 {
-   /* Starts with the root's son that has the first character of W as its
-      incoming edge first character */
-   NODE* node   = find_son(tree, tree->root, W[0]);
-   DBL_WORD k,j = 0, node_label_end;
-   int errors_seen = 0;
-   const int max_errors = 1;
-  
+	/* Starts with the root's son that has the first character of W as its
+	   incoming edge first character */
+	NODE* node   = find_son(tree, tree->root, W[0]);
+	DBL_WORD j = 0;
+	int errors_seen = 0;
+	const int max_errors = 1;
+	NODE* previous_exact = 0;
+	int exact_j = j;
 
-   // Special case:
-   unsigned special = ST_FindSubstring( tree, W + 1, P - 1 );
-   if ( special != ST_ERROR ) return special - 1;
-
-   /* Scan nodes down from the root until a leaf is reached or the substring is
-      found */
-   while(node!=0)
-   {
-      k=node->edge_label_start;
-      node_label_end = get_node_label_end(tree,node);
-      
-scan:
-      /* Scan a single edge - compare each character with the searched string */
-      while(j<P && k<=node_label_end && tree->tree_string[k] == W[j])
-      {
-         j++;
-         k++;
-
-#ifdef STATISTICS
-         counter++;
-#endif
-      }
-      
-      /* Checking which of the stopping conditions are true */
-      if(j == P) { // W was found - it is a substring. Return its path starting index */
-         return node->path_position;
-      } else if(k > node_label_end) { // Current edge is found to match, continue to next edge 
-find_next:
-         NODE* next = find_son(tree, node, W[j]);
-	 if ( next ) node = next;
-	 else {
-		++errors_seen;
-		if ( errors_seen > max_errors ) {
-			std::cout << boost::format( "We have seen too many errors at end of node %s(%s)\n" )
-				% j
-				% std::string( W, 0, j );
-			return ST_ERROR;
-		} else {
-			std::cout << boost::format( "Following dot link after position %s(%s)\n" )
-				% j
-				% std::string( W, 0, j );
+	/* Scan nodes down from the root until a leaf is reached or the substring is
+	   found */
+	unsigned k = node->edge_label_start;
+	while ( node )
+	{
+		unsigned node_label_end = get_node_label_end( tree, node );
+		std::cout << boost::format( "Going down node %s\n" )  % node2string( tree, node );
+		/* Scan a single edge - compare each character with the searched string */
+		while ( j<P &&
+				k <= node_label_end &&
+				tree->tree_string[k] == W[j] )
+		{
+			++k;
+			++j;
+			stats::count_one( "match-char" );
 		}
-		++j;
-		if ( j == P ) return node->path_position;
-		node = node->dot_link;
-		goto find_next;
-	 }
-      } else {
-	++errors_seen;
-	if ( errors_seen > max_errors ) {
-		std::cout << boost::format("Seen too many errors at pos %s (%s) [%s != %s] (k = %s)\n" )
-			% j
-			% std::string( W, 0, j )
-			% W[ j ]
-			% tree->tree_string[ k ]
-			% k;
-		return ST_ERROR;
+		if(j == P) return node->path_position;
+
+		if (k > node_label_end) {
+			if ( !previous_exact && errors_seen < max_errors ) {
+#define PUSH_STATE() \
+				previous_exact = node; \
+				exact_j = j;
+				
+				PUSH_STATE();
+				++j;
+				++errors_seen;
+				node = find_son( tree, node->dot_link, W[ j ] );
+				if ( node ) {
+					k = node->edge_label_start;
+					continue;
+				} // else fallthrough
+			}
+
+#define POP_STATE() \
+			node = find_son( tree, previous_exact, W[ exact_j ] ); \
+			if ( !node ) return ST_ERROR; \
+			j = exact_j; \
+			previous_exact = 0; \
+			errors_seen = 0; \
+			k = node->edge_label_start; \
+			
+			if ( previous_exact ) {
+				POP_STATE();
+			} else return ST_ERROR;
+		} else {
+			++errors_seen;
+			if ( errors_seen > max_errors ) {
+				if ( previous_exact ) {
+					std::cout << "error, popping\n";
+					POP_STATE();
+					continue;
+				}
+				std::cout << boost::format("Seen too many errors at pos %s (%s) [%s != %s] (k = %s)\n" )
+					% j
+					% std::string( W, 0, j )
+					% W[ j ]
+					% tree->tree_string[ k ]
+					% k;
+				return ST_ERROR;
+			}
+			std::cout << boost::format("Error at pos %s (%s), but we've got a margin\n" )
+				% j
+				% std::string( W, 0, j );
+			++j;
+			++k;
+			continue;
+		}
 	}
-	std::cout << boost::format("Error at pos %s (%s), but we've got a margin\n" )
-		% j
-		% std::string( W, 0, j );
-	++j;
-	++k;
-	goto scan;
-      }
-   }
-   return ST_ERROR;
+	return ST_ERROR;
 }
 
 
@@ -1209,14 +1225,6 @@ DBL_WORD ST_SelfTest(SUFFIX_TREE* tree)
    /* If we are here no search has failed and the test passed successfuly */
    printf("\n\nTest Results: Success.\n\n");
    return 1;
-}
-
-static std::string node2string( SUFFIX_TREE* tree, NODE* node ) {
-	return ( boost::format( "{%s (%s-%s) \"%s\"}" )
-			% node->path_position
-			% node->edge_label_start
-			% get_node_label_end( tree, node )
-			% std::string( tree->tree_string + 1, node->edge_label_start - 1, get_node_label_length( tree, node ) ) ).str();
 }
 
 vector<int> ST_DFSGetChildrenRecur( NODE* node ) {
