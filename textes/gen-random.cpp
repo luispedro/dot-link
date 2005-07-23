@@ -3,13 +3,11 @@
 #include <cstdlib>
 
 void usage( char* argv[] ) {
-	std::cerr << "usage: " << argv[ 0 ] << " Nchar [MaxAlph]\n";
+	std::cerr << "usage: " << argv[ 0 ] << " Nchar [index] [MaxAlph]\n";
 }
 
 int main( int argc, char** argv ) {
 	const char* alphabet = "ABCDEFGHIJKLMNOPQRSTUVXZabcdefghijklmnopqrstuvxz1234567890";
-
-	std::srand( 1023 );
 
 	if ( argc < 2 ) {
 		usage( argv );
@@ -17,7 +15,10 @@ int main( int argc, char** argv ) {
 	}
 
 	int n = std::atoi( argv[ 1 ] );
-	int alph = ( argv[ 2 ] ? std::atoi( argv[ 2 ] ) : std::strlen( alphabet ) );
+	int index = ( argv[ 2 ] ? std::atoi( argv[ 2 ] ) : 0 );
+	int alph = ( argc > 3 ? std::atoi( argv[ 3 ] ) : std::strlen( alphabet ) );
+
+	std::srand( 1023 + 5 * index );
 
 	if ( n <= 0 || alph <= 0 ) {
 		usage( argv );
