@@ -24,6 +24,7 @@ DECL( void proportion( std::string, bool ) )
 DECL( void count( std::string name, unsigned current, unsigned limit ) )
 DECL( void setfile( std::ostream& out ) )
 DECL( void printtime( const char* ) )
+DECL( void count_one( const char* ) )
 
 struct accumulator_type {
 		accumulator_type() : value_( 0 ) { }

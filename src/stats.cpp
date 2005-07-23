@@ -47,6 +47,10 @@ void stats::count( std::string name, unsigned current, unsigned limit ) {
 	++c[ std::min<unsigned>( current, limit ) ];
 }
 
+void stats::count_one( const char* name ) {
+	accumulator( name ).add( 1 );
+}
+
 void stats::print() {
 	stats::print( stats::file() );
 }
