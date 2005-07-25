@@ -590,6 +590,41 @@ DBL_WORD ST_FindSubstring(
 
 
 
+namespace {
+DBL_WORD find_string( SUFFIX_TREE* tree, NODE* node, const char* W, DBL_WORD P, int d ) {
+	if ( !node ) return ST_ERROR;
+	if ( !P ) return node->path_position;
+	if ( d ) {
+		DBL_WORD follow_dot_link = find_string( tree, node->dot_link, W + 1, P - 1, d - 1 );
+		if ( follow_dot_link != ST_ERROR ) return follow_dot_link;
+	}
+	node = find_son( tree, node, W[ 0 ] );
+	if ( !node ) return ST_ERROR;
+
+	DBL_WORD j = 0;
+	unsigned k = node->edge_label_start;
+	const unsigned label_end = get_node_label_end( tree, node );
+	while ( d >= 0 ) {
+		while ( j < P &&
+				k <= label_end &&
+				W[ j ] == tree->tree_string[ k ] ) {
+			++j;
+			++k;
+		}
+		// Check what caused the break:
+		if ( j == P ) return node->path_position;
+
+		if ( k > label_end ) {
+			return find_string( tree, node, W + j, P - j, d );
+		}
+		--d;
+		++k;
+		++j;
+	}
+	return ST_ERROR;
+}
+}
+
 /*
    ST_FindSubstringWithErrors :
    See suffix_tree.h for description.
@@ -603,91 +638,8 @@ DBL_WORD ST_FindSubstringWithErrors(
 		/* The length of W */
 		DBL_WORD        P)         
 {
-	/* Starts with the root's son that has the first character of W as its
-	   incoming edge first character */
-	NODE* node   = find_son(tree, tree->root, W[0]);
-	DBL_WORD j = 0;
-	int errors_seen = 0;
-	const int max_errors = 1;
-	NODE* previous_exact = 0;
-	int exact_j = j;
-
-	if ( !node ) {
-		node = find_son( tree, tree->root->dot_link, W[ 1 ] );
-		if ( !node ) return ST_ERROR;
-		++j;
-		++errors_seen;
-	}
-	unsigned k = node->edge_label_start;
-	while ( node )
-	{
-		unsigned node_label_end = get_node_label_end( tree, node );
-		std::cout << boost::format( "Going down node %s\n" )  % node2string( tree, node );
-		/* Scan a single edge - compare each character with the searched string */
-		while ( j<P &&
-				k <= node_label_end &&
-				tree->tree_string[k] == W[j] )
-		{
-			++k;
-			++j;
-			stats::count_one( "match-char" );
-		}
-		if(j == P) return node->path_position;
-
-		if (k > node_label_end) {
-			if ( !previous_exact && errors_seen < max_errors ) {
-#define PUSH_STATE() \
-				previous_exact = node; \
-				exact_j = j;
-				
-				PUSH_STATE();
-				++j;
-				++errors_seen;
-				node = find_son( tree, node->dot_link, W[ j ] );
-				if ( node ) {
-					k = node->edge_label_start;
-					continue;
-				} // else fallthrough
-			}
-
-#define POP_STATE() \
-			node = find_son( tree, previous_exact, W[ exact_j ] ); \
-			if ( !node ) return ST_ERROR; \
-			j = exact_j; \
-			previous_exact = 0; \
-			errors_seen = 0; \
-			k = node->edge_label_start; \
-			
-			if ( previous_exact ) {
-				POP_STATE();
-			} else return ST_ERROR;
-		} else {
-			++errors_seen;
-			if ( errors_seen > max_errors ) {
-				if ( previous_exact ) {
-					std::cout << "error, popping\n";
-					POP_STATE();
-					continue;
-				}
-				std::cout << boost::format("Seen too many errors at pos %s (%s) [%s != %s] (k = %s)\n" )
-					% j
-					% std::string( W, 0, j )
-					% W[ j ]
-					% tree->tree_string[ k ]
-					% k;
-				return ST_ERROR;
-			}
-			std::cout << boost::format("Error at pos %s (%s), but we've got a margin\n" )
-				% j
-				% std::string( W, 0, j );
-			++j;
-			++k;
-			continue;
-		}
-	}
-	return ST_ERROR;
+	return find_string( tree, tree->root, W, P, 1 );
 }
-
 
 
 /******************************************************************************/
