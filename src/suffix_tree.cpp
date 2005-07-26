@@ -638,7 +638,7 @@ DBL_WORD ST_FindSubstringWithErrors(
 		/* The length of W */
 		DBL_WORD        P)         
 {
-	return find_string( tree, tree->root, W, P, 1 );
+	return find_string( tree, tree->root, W, P, 2 );
 }
 
 
@@ -1024,17 +1024,11 @@ SUFFIX_TREE* ST_CreateTree(const char* str, DBL_WORD length)
 
 void ST_DeleteSubTree(NODE* node)
 {
-   /* Recoursion stoping condition */
-   if(node == 0)
-      return;
-   /* Recoursive call for right sibling */
-   if(node->right_sibling!=0)
-      ST_DeleteSubTree(node->right_sibling);
-   /* Recoursive call for first son */
-   if(node->sons!=0)
-      ST_DeleteSubTree(node->sons);
-   /* Delete node itself, after its whole tree was deleted as well */
-   free(node);
+	if ( !node ) return;
+	ST_DeleteSubTree( node->right_sibling );
+	ST_DeleteSubTree( node->dot_link );
+	ST_DeleteSubTree( node->sons );
+	free( node );
 }
 
 /******************************************************************************/
@@ -1254,13 +1248,13 @@ NODE* copy_subtree( SUFFIX_TREE* tree, NODE* start, copy_filter_type ftype, char
 			res->right_sibling = copy_subtree( tree, start->right_sibling, ftype, x );
 			if ( res->right_sibling ) res->right_sibling->left_sibling = res;
 		}
+		res->dot_link = copy_subtree( tree, res->dot_link, ftype, x );
 	}
 	return res;
 }
 
-}
 
-static void AddDotLink( SUFFIX_TREE* tree, NODE* node ) {
+void AddDotLink( SUFFIX_TREE* tree, NODE* node ) {
 	if ( node->dot_link ) return;
 	if ( !node->sons ) return;
 	/*std::cout<< boost::format( "AddDotLink( . , {%s (%s-%s) \"%s\"}\n" )
@@ -1290,16 +1284,29 @@ static void AddDotLink( SUFFIX_TREE* tree, NODE* node ) {
 	node->dot_link->father = node;
 }
 
-static void DFSAddDotLink( SUFFIX_TREE* tree, NODE* node ) {
+void DFSAddDotLink( SUFFIX_TREE* tree, NODE* node ) {
 	AddDotLink( tree, node );
 	for ( NODE* cur = node->sons; cur ; cur = cur->right_sibling )
 		DFSAddDotLink( tree, cur );
 }
 
-void ST_AddDotLinks( SUFFIX_TREE* tree ) {
-	tree->root->dot_link = copy_subtree( tree, tree->root, first_leaf, '\0' );
-	tree->root->dot_link->father = tree->root;
-	DFSAddDotLink( tree, tree->root );
+void removeDotLinks( SUFFIX_TREE* tree, NODE* node ) {
+	if ( node != tree->root ) {
+		ST_DeleteSubTree( node->dot_link );
+		node->dot_link = 0;
+	}
+	for ( NODE* cur = node->sons; cur; cur = cur->right_sibling ) removeDotLinks( tree, cur );
+}
+}
+
+void ST_AddDotLinks( SUFFIX_TREE* tree, const int d ) {
+	for ( int i = 0; i != d; ++i ) {
+		tree->root->dot_link = copy_subtree( tree, tree->root, first_leaf, '\0' );
+		tree->root->dot_link->father = tree->root;
+
+		removeDotLinks( tree, tree->root );
+		DFSAddDotLink( tree, tree->root );
+	}
 }
 
 void ST_DFSPrintNode( SUFFIX_TREE* tree, NODE* node, string str ) {

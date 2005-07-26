@@ -104,7 +104,7 @@ int main(int argc, char* argv[])
 	full.start();
 	tree = ST_CreateTree(str,len);
 	dots.start();
-	ST_AddDotLinks( tree );
+	ST_AddDotLinks( tree, 2 );
 	full.stop();
 	dots.stop();
 	
