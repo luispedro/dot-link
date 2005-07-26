@@ -1,0 +1,40 @@
+\begin{algorithm}
+\caption{findString}
+\label{algo:findString}
+\SetKwInOut{Input}{input}
+\SetKwInOut{Output}{output}
+\SetKwData{J}{j}
+\SetKwData{W}{s}
+\SetKwData{K}{k}
+\SetKwData{Len}{len}
+\SetKwData{Node}{node}
+\SetKwData{String}{treeString}
+
+\KwIn{Current node \Node}
+\KwIn{String \W}
+\KwIn{Maximum errors \K}
+
+\String \Assign \emph{The tree's string}\;
+\If{\W is empty}{
+	\emph{report all \Node's children}\;
+}
+\If{$\K > 0$}{
+	findString(\Node.dotLink, $\W+1$,$\K-1$)\;
+}
+\Node \Assign \Node.getSon($\W_0$)\;
+\J \Assign 0\;
+\Len \Assign min(length(\Node),length(\W))\;
+\While{$\K \ge 0$}{
+	\While{$\W_{\J} = \String_{\K+\J}$ and $\J < \Len$}{
+		\J \Assign $\J + 1$\;
+	}
+	\If{$J = \Len$}{
+		findString(\Node,$\S+\J$,\K)
+	}
+	$\K$ \Assign $\K-1$\;
+	$\J$ \Assign $\J+1$\;
+}
+
+
+
+\end{algorithm}
