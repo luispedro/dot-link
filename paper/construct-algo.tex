@@ -1,0 +1,10 @@
+\begin{algorithm}
+\caption{Algorithm for turning a suffix tree into a dotted tree}\label{algo:construct-1}
+
+\KwIn{A suffix tree $\mathcal{T}$}
+
+Root.dotLink = copySubtree(Root)\;
+\Foreach{$\overline{w} \in \mathcal{T}$}{
+	$\overline{w}$.dotLink = copySubtree($\overline{w}$.suffixLink, \emph{ignore $\overline{w}$.suffixLinkLabel})\;
+}
+\end{algorithm}
