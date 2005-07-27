@@ -1,0 +1,35 @@
+\begin{algorithm}
+\caption{Algorithm for copying a sub tree}\label{algo:copy-subtree}
+\SetKwData{Copy}{copy}
+\SetKwData{SonCopy}{copy of son}
+\SetKwData{String}{string}
+
+\KwIn{A node in a suffix tree $\overline{w}$}
+\KwIn{An optional character $a$}
+\KwData{The string \String}
+
+\If{$\overline{w}$ is a leaf}{
+	$p$ \Assign $\overline{w}$.label\;
+	\eIf{$p = 1$} \Return{null}\;
+	\If{$a$ was not given or $\String_{p-1} = a$}{
+		\Copy \Assign $\overline{w}$\;
+		\Copy.label \Assign \Copy.label - 1\;
+		\Return{\Copy}
+	}
+}
+\Copy \Assign copy($\overline{w}$)\;
+\Copy.dotLink \Assign copySubtree($\overline{w}$.dotLink,$a$)\;
+\ForEach{$n \in \overline{w}.\mathit{sons}$}{
+	\SonCopy \Assign copySubtree($n$,$a$)\;
+	\If{\SonCopy isn't null}{
+		\Copy.sons \Assign \Copy.sons $\cup$ \SonCopy\;
+	}
+}
+\If{\Copy.sons is empty}{
+	\Return{null}
+}
+\If{\Copy.sons has only one element}{
+	\emph{merge \Copy.sons into \Copy and return that}\;
+}
+
+\end{algorithm}

@@ -4,7 +4,7 @@
 \KwIn{A suffix tree $\mathcal{T}$}
 
 Root.dotLink = copySubtree(Root)\;
-\Foreach{$\overline{w} \in \mathcal{T}$}{
-	$\overline{w}$.dotLink = copySubtree($\overline{w}$.suffixLink, \emph{ignore $\overline{w}$.suffixLinkLabel})\;
+\ForEach{$\overline{w} \in \mathcal{T}$}{
+	addDotLink($\overline{w}$)\;
 }
 \end{algorithm}

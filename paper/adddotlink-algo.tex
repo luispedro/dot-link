@@ -1,0 +1,7 @@
+\begin{algorithm}
+\caption{addDotLink: add an error tree to a node}\label{algo:addDotLink}
+\KwIn{A node $n$}
+\If{\emph{already has dot tree}}{\Return{}}
+addDotLink($n$.suffixLink)\;
+$\overline{w}$.dotLink = copySubtree($\overline{w}$.suffixLink, \emph{ignore $\overline{w}$.suffixLinkLabel})\;
+\end{algorithm}

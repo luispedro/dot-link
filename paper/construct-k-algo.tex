@@ -1,0 +1,19 @@
+\begin{algorithm}
+\caption{Algorithm for turning a suffix tree into a dotted tree}\label{algo:construct-1}
+\SetKwData{K}{k}
+\SetKwData{Null}{null}
+
+\KwIn{A suffix tree $\mathcal{T}$}
+\KwIn{An integer \K}
+
+\SetKwBlock{DoKTimes}{Repeat \K Times}{}
+\DoKTimes{
+	Root.dotLink = copySubtree(Root)\;
+	\ForEach{$\overline{w} \in \mathcal{T}$}{
+		$\overline{w}$.dotLink \Assign \Null\;
+	}
+	\ForEach{$\overline{w} \in \mathcal{T}$}{
+		addDotLink($\overline{w}$)\;
+	}
+}
+\end{algorithm}
