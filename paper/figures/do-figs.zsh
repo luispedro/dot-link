@@ -1,3 +1,4 @@
 #!/bin/zsh
-transfig -L eepic aaaa.fig mississipi-0.fig mississipi-1.fig && make
+format=eps
+transfig -L $format aaaa.fig mississipi-0.fig mississipi-1.fig && make
 
