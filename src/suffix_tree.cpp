@@ -602,23 +602,16 @@ DBL_WORD find_string( SUFFIX_TREE* tree, NODE* node, const char* W, DBL_WORD P, 
 	if ( !node ) return ST_ERROR;
 
 	DBL_WORD j = 0;
-	unsigned k = node->edge_label_start;
-	const unsigned label_end = get_node_label_end( tree, node );
+	const unsigned start = node->edge_label_start;
+	const unsigned len = std::min( P, get_node_label_length( tree, node ) );
 	while ( d >= 0 ) {
-		while ( j < P &&
-				k <= label_end &&
-				W[ j ] == tree->tree_string[ k ] ) {
+		while ( j < len && W[ j ] == tree->tree_string[ start + j ] ) {
 			++j;
-			++k;
 		}
-		// Check what caused the break:
-		if ( j == P ) return node->path_position;
-
-		if ( k > label_end ) {
+		if ( j == len ) {
 			return find_string( tree, node, W + j, P - j, d );
 		}
 		--d;
-		++k;
 		++j;
 	}
 	return ST_ERROR;
@@ -1248,7 +1241,7 @@ NODE* copy_subtree( SUFFIX_TREE* tree, NODE* start, copy_filter_type ftype, char
 			res->right_sibling = copy_subtree( tree, start->right_sibling, ftype, x );
 			if ( res->right_sibling ) res->right_sibling->left_sibling = res;
 		}
-		res->dot_link = copy_subtree( tree, res->dot_link, ftype, x );
+		res->dot_link = copy_subtree( tree, start->dot_link, ftype, x );
 	}
 	return res;
 }
