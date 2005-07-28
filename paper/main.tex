@@ -1,10 +1,13 @@
-\documentclass[a4paper,10pt]{article}
+\documentclass[letter,10pt]{article}
 \usepackage[boxruled,vlined,portugues,figure,linesnumbered,longend]{algorithm2e}
+\input{figures/transfig}
+\usepackage[]{graphicx}
 
 
 \newcommand*{\Assign}{\ensuremath\longleftarrow}
 \newcommand{\putstring}[1]{\textsl{#1}}
 \newtheorem{definition}{Definition}
+\newtheorem{lemma}{Lemma}
 
 
 \title{Dotted Suffix Trees\\A Structure for Approximate Text Indexing}
@@ -15,26 +18,29 @@
 \maketitle
 
 \begin{abstract}
-
+\input{abstract}
 \end{abstract}
 
 \section{Introduction}
-
-
-
-\subsection{Related Work}
-\subsection{Structure of the Paper}
-
-In section~\ref{sec:structure} we present the structure and the way to use it for searching. In section~\ref{sec:build-1} we show the way to build a structure to handle one error only and analize this version of the algorithm. Then, we show, in section~\ref{sec:build-k} how to generalize this procedure for any number of errors and how the previous analisys also applies to any number of errors.
+\input{introduction}
 
 \section{The Indexing Structure}
 
 \subsection{Intuition}
-Suffix Trees have become a well known structure since their introduction in 1973~\cite{weiner}. In Figure~\ref{fig:suffix-0} we show the suffix tree for the string \putstring{mississipi}.
 
-We add to each internal node in the structure a new link, which we call the \emph{error link}. 
+\begin{figure}
+\includegraphics{figures/mississipi-0}
+\caption{Suffix Tree for the string \putstring{mississipi}}%
+\label{fig:mississipi-0}
+\end{figure}
+
+Suffix Trees have become a well known structure since their introduction in 1973~\cite{weiner}. In Figure~\ref{fig:mississipi-0} we show the suffix tree for the string \putstring{mississipi}.
+
+Being at a node in the suffix tree corresponds to being in several points in the string at the same time. We now add to each node an extra edge which corresponds to moving one character forward in all these points.
 
 \subsection{Formal definition}
+
+We assume that the reader is familiar with the basic concepts of suffix trees and strings and present the definitions below mainly to introduce the particular notation and terminology used in this paper.
 
 \begin{definition}[Character, string]
 Given a set $\Sigma$, we say that $s$ is a \emph{string over $\Sigma$} if $s$ is a possibly empty sequence of elements of $\Sigma$. The elements of the set $\Sigma$ are also called \emph{character}. The lenght of the string, denoted by $|s|$ is the number of elements it contains. We shall write $s_i$ for the $i$th element of the string. For the empty string, we write $\epsilon$.
@@ -50,19 +56,22 @@ $wx$ will denote the string formed by all the character of $w$ followed by all t
 If $s = wxy$, then $w$ is a \emph{prefix} of $s$, $x$ is a \emph{substring} of $s$ (at position $s$) and $y$ is a \emph{suffix} of $s$ (at position $p$).
 \end{definition}
 
-\begin{definition}[$\Sigma^+$ tree]
-$T$ is a $\Sigma^+$ tree if $T$ is a rooted tree with edge labels from $\Sigma^+$. For each $a \in \Sigma$ and every node $n$ in $T$, there is at most an edge leaving $n$ whose label is $aw$.
-
-$\Sigma^+$ trees are also called a PATRICIA trees~\cite{pat}.
+\begin{definition}[Patricia tree]
+$T$ is a Patricia tree if $T$ is a rooted tree with edge labels from $\Sigma^+$. For each $a \in \Sigma$ and every node $n$ in $T$, there is at most an edge leaving $n$ whose label is $aw$.
 
 Each node in a $\Sigma^+$ tree has a path leading to it which forms a string. If the node $n$ has the leading path $w$, we shall also refer to $n$ as $\overline{w}$.
 \end{definition}
 
+The name Patricia is sometimes spelt PATRICIA, since it was formed from the initial of Practical Algorithm to Retrieve Information Coded in Alphanumeric~\cite{morrison:patricia}.
+
 In what follows we will assume that there are two symbols (\$ and $.$) which are not part of $\Sigma$.
+
+In this paper, we will be interested in substitution of Hamming distance:
 
 \begin{definition}[Aproximate Match]
 We say that the string $s$ matches the string $t$ at position $p$ with $k$ errors if we can make $k$ substitutions in $s$ such that $s$ is a substring of $t$ at position $p$.
 \end{definition}
+
 
 \begin{definition}[Pattern]
 A pattern is a string over the extended alphabet $\Sigma\cup\{.\}$. We say that a pattern $s$ matches a string $t$ at position $p$, if for each dot in the pattern we can replace it by a character in the original alphabet to obtain $s'$ which is a substring of $t$ at position $p$.
@@ -72,7 +81,7 @@ A pattern is a string over the extended alphabet $\Sigma\cup\{.\}$. We say that 
 A \emph{suffix tree} for a string $S$ is a $\Sigma^+$ whose leaf nodes (those without children) have paths corresponding to suffixes of the string $S\$ $.
 \end{definition}
 
-\begin{definition}{Suffix Link}
+\begin{definition}[Suffix Link]
 A suffix link in a suffix tree is a link from the node $\overline{aw}$ to the node $\overline{w}$. This node has the label $a$.
 \end{definition}
 
@@ -82,7 +91,7 @@ In a suffix tree, it is possible to define a suffix link for each internal node.
 Given a node $\overline{w}$ in a suffix tree, we call it's \emph{occurence set} the set of indexes in the original string where the string $w$ occurs.
 \end{definition}
 
-\begin{definition}{Position Set}
+\begin{definition}[Position Set]
 Given a node $\overline{w}$ in a suffix tree, it's \emph{position set} is the set formed by taking it's occurence set and adding the lenght of $w$ to each element.
 \end{definition}
 
@@ -112,7 +121,36 @@ We define a k-error dotted tree as the tree obtained by adding error trees to ea
 
 \subsection{Space Considerations}
 
-How much space does a k-error dotted tree take? Suffix Trees have a number of nodes proportional to the size of the string (which we will refer to as $n$). One-error dotted trees have more nodes. The worst case presented in Figure~\ref{fig:aaaa} is a string of the form \putstring{aa\ldots{}aa} which generates a one-dotted tree taking $O(n^2)$ nodes. For a larger number of errors $k$, it is easy to see that this leads to $O(n^{k+1})$ nodes.
+\begin{figure}
+\includegraphics{figures/aaaa}
+\caption{$a^n$: worst case space consumption}%
+\label{fig:aaaa}
+\end{figure}
+
+
+How much space does a k-error dotted tree take? Suffix Trees have a number of nodes proportional to the size of the string (which we will refer to as $n$). One-error dotted trees have more nodes. The worst case presented in Figure~\ref{fig:aaaa} is a string of the form $a^n = \underbrace{aaa\cdots}_{n \mathit{times }a}$ which generates a one-dotted tree taking $O(n^2)$ nodes. For a larger number of errors $k$, it is easy to see that this leads to $O(n^{k+1})$ nodes.
+
+\begin{definition}[weight under a node, weight of a tree]
+The weight under a node $\mathit{Weight}(n)$ is the number of leafs in the subtree rooted at that node.
+
+The total weight of a tree is the sum of the weights of all the nodes.
+\end{definition}
+
+\begin{definition}[height of a node, average height]
+The height of a node $\mathit{Height}(n)$ is the number of nodes in the path leading to that node from the root. The average height of the tree $\hat{h}$, is the average height of its nodes.
+
+\[ \hat{h} = \frac{1}{n} \sum_{x \mathit{node of \mathcal{T}}} \mathit{Height}(x), n \mathrm{being the number of nodes} \]
+\end{definition}
+
+\begin{lemma}
+Given a tree (any tree, not just suffix or similiar tree), the sum of the weights of all the nodes in the tree is equal to the average height of the node times the number of nodes.
+\end{lemma}
+
+Consider the tree being built node by node, in any order, as long as the property that it remains a tree during the process is maintained. Each node added, adds a certain amount of weight to the tree. In particular it adds one for each node that sits above it in the tree. This is the same as saying that each node adds its height (which does not change). The weight of the final tree is the sum of all these values.
+
+\[ \mathit{Weight}(\mathcal{T}) = \sum_{x \in \mathcal{T}}\mathit{Height}(x) = n\frac{1}{n}\sum_{x \in \mathcal{T}}\mathit{Height}(x) = n\hat{h} \]
+
+FIXME
 
 We will reason by induction, starting with the case of a one-error dotted tree to show that this bound can also be expressed as $O(nh^k)$ where $h$ is the average height of the tree (number of nodes between the root and the leaf).
 
@@ -195,6 +233,13 @@ The code for the copy is shown in Figure~\ref{algo:copy-subtree-with-dot-link} w
 The final algorithm for constructing k-error trees is shown in Figure~\ref{algo:construct-k}.
 
 We note that the method of removing the existing error trees can be improved in practice (the assymptotical bound remains the same) the following way: While making a copy of the tree for construction of the root's error tree, instead of following a dot link to make a copy, move the error tree to its destination and make the necessary adjustments inplace (this move will probably be just an adjustment of pointer depending on the exact implementation). Using this method only leafs labeled one need to be removed (as well as any internal node which becomes unnecessary).
+
+\section{Experimental Results}
+
+\section{Future Work, Open Problems}
+
+In the example for the string \putstring{mississipi}, presented in Figure~\ref{fig:mississipi-1}, one can see that the tree below \putstring{s.i} and \putstring{ssi} are exactly the same. Whether such occurences are the basis for a significant space saving and what algorithms mightexploit them is an open question.
+Along the same lines, the structure's definition might be extended to structures such as the suffix-DAG presented in~\cite[7.7]{gusfield:algorithms}. An algorithm to efficiently construct it over these suffix-DAGs is another open problem.
 
 \bibliographystyle{alpha}
 \bibliography{biblio}
