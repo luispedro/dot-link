@@ -1,0 +1,94 @@
+
+\subsection{Intuition}
+
+\begin{figure}
+\includegraphics{figures/mississipi-0}
+\caption{Suffix Tree for the string \putstring{mississipi}}%
+\label{fig:mississipi-0}
+\end{figure}
+
+Suffix Trees have become a well known structure since their introduction in 1973~\cite{weiner}. In Figure~\ref{fig:mississipi-0} we show the suffix tree for the string \putstring{mississipi}.
+
+Being at a node in the suffix tree corresponds to being in several points in the string at the same time. We now add to each node an extra edge which corresponds to moving one character forward in all these points.
+
+\subsection{Formal definition}
+
+We assume that the reader is familiar with the basic concepts of suffix trees and strings and present the definitions below mainly to introduce the particular notation and terminology used in this paper.
+
+\begin{definition}[Character, string]
+Given a set $\Sigma$, we say that $s$ is a \emph{string over $\Sigma$} if $s$ is a possibly empty sequence of elements of $\Sigma$. The elements of the set $\Sigma$ are also called \emph{character}. The lenght of the string, denoted by $|s|$ is the number of elements it contains. We shall write $s_i$ for the $i$th element of the string. For the empty string, we write $\epsilon$.
+
+The set of all string is denoted by $\Sigma^*$ and $\Sigma^+=\Sigma^*-\{\epsilon\}$.
+\end{definition}
+
+For denoting character we shall use letters from the begginning of the roman alphabet ($a$, $b$, $c$,\ldots) and for strings, we shall use letters from the end of the alphabet ($w$, $z$, \ldots).
+
+\begin{definition}
+$wx$ will denote the string formed by all the character of $w$ followed by all the characters of $x$ (the usual concatenation operation). $aw$ ($wa$) shall the denote the strings by the caracter $a$ before (after) the characters of $w$.
+
+If $s = wxy$, then $w$ is a \emph{prefix} of $s$, $x$ is a \emph{substring} of $s$ (at position $s$) and $y$ is a \emph{suffix} of $s$ (at position $p$).
+\end{definition}
+
+\begin{definition}[Patricia tree]
+$T$ is a Patricia tree if $T$ is a rooted tree with edge labels from $\Sigma^+$. For each $a \in \Sigma$ and every node $n$ in $T$, there is at most an edge leaving $n$ whose label is $aw$.
+
+Each node in a $\Sigma^+$ tree has a path leading to it which forms a string. If the node $n$ has the leading path $w$, we shall also refer to $n$ as $\overline{w}$.
+\end{definition}
+
+The name Patricia is sometimes spelt PATRICIA, since it was formed from the initial of Practical Algorithm to Retrieve Information Coded in Alphanumeric~\cite{morrison:patricia}.
+
+In what follows we will assume that there are two symbols (\$ and $.$) which are not part of $\Sigma$.
+
+In this paper, we will be interested in substitution of Hamming distance:
+
+\begin{definition}[Aproximate Match]
+We say that the string $s$ matches the string $t$ at position $p$ with $k$ errors if we can make $k$ substitutions in $s$ such that $s$ is a substring of $t$ at position $p$.
+\end{definition}
+
+
+\begin{definition}[Pattern]
+A pattern is a string over the extended alphabet $\Sigma\cup\{.\}$. We say that a pattern $s$ matches a string $t$ at position $p$, if for each dot in the pattern we can replace it by a character in the original alphabet to obtain $s'$ which is a substring of $t$ at position $p$.
+\end{definition}
+
+\begin{definition}[Suffix Tree]
+A \emph{suffix tree} for a string $S$ is a $\Sigma^+$ whose leaf nodes (those without children) have paths corresponding to suffixes of the string $S\$ $.
+\end{definition}
+
+\begin{definition}[Suffix Link]
+A suffix link in a suffix tree is a link from the node $\overline{aw}$ to the node $\overline{w}$. This node has the label $a$.
+\end{definition}
+
+In a suffix tree, it is possible to define a suffix link for each internal node. Both Ukkonen's~\cite{ukkonen} and McCreight's~\cite{mccreight} algorithms are linear time algorithms for constructing a suffix tree which includes suffix links.
+
+\begin{definition}[Occurence Set]
+Given a node $\overline{w}$ in a suffix tree, we call it's \emph{occurence set} the set of indexes in the original string where the string $w$ occurs.
+\end{definition}
+
+\begin{definition}[Position Set]
+Given a node $\overline{w}$ in a suffix tree, it's \emph{position set} is the set formed by taking it's occurence set and adding the lenght of $w$ to each element.
+\end{definition}
+
+For example, in the node $\overline{issi}$ in the suffix tree of Figure~\ref{fig:mississipi-0}, the occurence set is $\{5, 2\}$ and its position set is $\{6, 9\}$. In a sense, one can say that being at node $\overline{issi}$ is being at positions 6 and~9 simultaneously. Note that for each node, the tree below it is the $\Sigma^+$ tree of the suffixes starting at the positions in its position set.
+
+In a leaf, the position set is a singleton, and we label the leaf by its element.
+
+\begin{definition}[Error Tree]
+For any node $w$ its error tree is the $\Sigma^+$ tree formed by taking it's position set, adding one to each element and forming the $\Sigma^+$ tree of the suffixes of the suffixes starting at those positions. If the position set includes the end of the string, that element is removed.
+
+The leafs are labeled by the position of the string in which their paths occur minus $|w| + 1$.
+\end{definition}
+
+For example, in the above mentioned node $\overline{issi}$, the error tree is formed by taking the strings starting at positions $\{7, 10\}$ (ie \putstring{sipi\$} and \putstring{i\$}) in a $\Sigma^+$ tree.
+
+\begin{definition}[1-error dotted Tree]
+We define a \emph{1-error dotted tree} as the tree which add to each node in a suffix tree, a new edge labeled by \putstring{.} which points to its error tree. The edge labeled \putstring{.} shall be called a \emph{dot link}.
+\end{definition}
+
+The one-error dotted tree for \putstring{mississipi} is shown in Figure~\ref{fig:mississipi-1}.
+
+The paths in the dotted tree are paths in the extended alphabet $\Sigma\cup\{.,\$\}$. The notions of \emph{occurence set}, \emph{position set} and \emph{error tree} are valid for all nodes in a dotted tree considering that a node path may contain dot elements which match any other character.
+
+\begin{definition}[k-error dotted tree]
+We define a k-error dotted tree as the tree obtained by adding error trees to each node in the (k-1)-error dotted tree.
+\end{definition}
+

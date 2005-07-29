@@ -10,9 +10,9 @@
 
 \If{$\overline{w}$ is a leaf}{
 	$p$ \Assign $\overline{w}$.label\;
-	\eIf{$p = 1$} \Return{null}\;
+	\If{$p = 1$} \Return{null}\;
 	\If{$a$ was not given or $\String_{p-1} = a$}{
-		\Copy \Assign $\overline{w}$\;
+		\Copy \Assign copy($\overline{w}$)\;
 		\Copy.label \Assign \Copy.label - 1\;
 		\Return{\Copy}
 	}
@@ -28,7 +28,7 @@
 	\Return{null}
 }
 \If{\Copy.sons has only one element}{
-	\emph{merge \Copy.sons into \Copy and return that}\;
+	\emph{merge \Copy.sons into \Copy and return that}\;\ref{algoline:copy-subtree:merge}
 }
 
 \end{algorithm}

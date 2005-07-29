@@ -1,0 +1,15 @@
+To search a string with at maximum k errors in a k-error dotted tree, we need to descend the tree. Whenever we find a node we follow both the dot link and the edge which matches the current position of the string we are searching. If we have a mismatch in the middle of an edge, we continue, decreasing the amount of errors permitted.
+
+\begin{figure}
+\includegraphics{figures/mississipi-nodes}
+\caption{Suffix Tree for the string \putstring{mississipi}}%
+\label{fig:mississipi-nodes}
+\end{figure}
+
+To understand the pseudo-code, it is important to understand that suffix trees are normally implemented as shown in Figure~\ref{fig:mississipi-nodes} where each node contains the start and end indices of its incoming edge. When presenting the algorithm, we take the liberty of using $s+j$ where $s$ is a string and $j$ an integer to mean the suffix of $s$ starting at position $j$.
+
+\input{search-algo}
+
+The search algorithm is presented in Figure~\ref{algo:search}. Reporting of the leafs below a certain node can be done by a simple Depth First Search reporting any leafs found. If one is interested in knowing only whether the string occurs, then the lines which report the matches can be substituted by simple early exist returning true.
+
+This algorithm runs in time $O(m^{k+1})$. 
