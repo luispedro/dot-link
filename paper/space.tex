@@ -15,7 +15,7 @@ The total weight of a tree is the sum of the weights of all the nodes.
 \begin{definition}[height of a node, average height]
 The height of a node $\mathit{Height}(n)$ is the number of nodes in the path leading to that node from the root. The average height of the tree $\hat{h}$, is the average height of its nodes.
 
-\[ \hat{h} = \frac{1}{n} \sum_{x \mathit{node of \mathcal{T}}} \mathit{Height}(x), n \mathrm{being the number of nodes} \]
+\[ \hat{h} = \frac{1}{|\mathcal{T}|} \sum_{x \in \mathit{\mathcal{T}}} \mathit{Height}(x) \]
 \end{definition}
 
 \begin{lemma}
@@ -24,15 +24,17 @@ Given a tree (any tree, not just suffix or similiar tree), the sum of the weight
 
 Consider the tree being built node by node, in any order, as long as the property that it remains a tree during the process is maintained. Each node added, adds a certain amount of weight to the tree. In particular it adds one for each node that sits above it in the tree. This is the same as saying that each node adds its height (which does not change). The weight of the final tree is the sum of all these values.
 
-\[ \mathit{Weight}(\mathcal{T}) = \sum_{x \in \mathcal{T}}\mathit{Height}(x) = n\frac{1}{n}\sum_{x \in \mathcal{T}}\mathit{Height}(x) = n\hat{h} \qed \]
+\[ \mathit{Weight}(\mathcal{T}) = \sum_{x \in \mathcal{T}}\mathit{Height}(x) = |\mathcal{T}|\frac{1}{|\mathcal{T}|}\sum_{x \in \mathcal{T}}\mathit{Height}(x) = |\mathcal{T}|\hat{h} \qed \]
 
-We will reason by induction, starting with the case of a one-error dotted tree to show, that the bound on the number of nodes in an k-error dotted tree can also be expressed as $O(n\hat{h}^k)$ where $\hat{h}$ is the average height of the suffix tree.
+We will reason by induction, starting with the case of a zero-error dotted tree to show, that the bound on the number of nodes in an k-error dotted tree can also be expressed as $O(n\hat{h}^k)$ where $\hat{h}$ is the average height of the suffix tree. The base case is a suffix tree and is obvious.
 
 The number of nodes in a Patricia tree with $c$ strings ($c$ leafs) is $O(c)$~\cite{patricia} (as a special case, a suffix tree is the Patricia tree of all the suffixes in a string). The number of nodes in the error tree of a node is therefore assymptotically bound by the number of leafs in the subtree at that node times a constant.
 
-We define $\mathit{Weight}(\overline{w})$ as above. The total number of nodes for all the error trees in the dotted tree is therefore equal to $\sum_{\overline{w} \in \mathcal{T}}\mathit{Weight}(\overline{w})$ where $\mathcal{T}$ is the original suffix tree. Given the lemma above, $\sum_{\overline{w} \in \mathcal{T}}\mathit{Weight}(\overline{w}) = O(n\hat{h})$.
+%Assume the k-error suffix tree has $O(h\hat{h}^k)$ nodes.
 
-The difference between a k-error and a (k+1)-error tree is that all the 
+%We define $\mathit{Weight}(\overline{w})$ as above. For any node, the number of leafs in its error tree will be $O(\mathit{Weight}(\overline{w}))$. The total number of nodes for all the error trees in the dotted tree is therefore equal to $O(\sum_{\overline{w} \in \mathcal{T}}\mathit{Weight}(\overline{w}))$ where $\mathcal{T}$ is the original suffix tree. Given the lemma above, $\sum_{\overline{w} \in \mathcal{T}}\mathit{Weight}(\overline{w}) = O(n\hat{h})$.
+
+%The difference between a k-error and a (k+1)-error tree is that all the 
 
 Sofar, we have not really obtained much since, in the worst case, $h=O(n)$. However, the average expected case, is $h=O(\log n)$~\cite{devroye:note,szpankowski:unexpected}.
 

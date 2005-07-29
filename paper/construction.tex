@@ -20,7 +20,7 @@ For any other node $\overline{aw}$, the error tree is a filtered copy of the err
 \item All leafs in the copy have a label which is the original label's value minus one
 \end{enumerate}
 
-Note that these conditions are very similiar to the conditions for the root and both can be implemented as shown in Figure~\ref{algo:copy-subtree}.
+Note that these conditions are very similiar to the conditions for the root and both can be implemented as shown in Figure~\ref{algo:copy-subtree}. This is an expression of Lemma~\ref{lemma:suffix-error}.
 
 \input{copy-subtree-algo}
 
@@ -46,7 +46,7 @@ The root's error tree is created in time proportional to the number of nodes it 
 
 The above algorithm can be used to construct trees with any number of errors by iterating it in the following way:
 
-To construct the (k+1)-error tree from the k-error tree, make a copy of the tree as above (adjusting leafs, filtering the leafs labeled one) and make this the root's error tree. Then, for every other node, remove the current error tree (it has a level too few). Finally, for every node except the root, construct its error tree as above (adjusting leafs, filtering the leafs labeled one or which do not correspond to positions in the suffix link's label).
+To construct the (k+1)-error tree from the k-error tree, make a copy of the tree as above (adjusting leafs and filtering the leafs labeled one) and make this the new root error tree. Then, for every other node, remove the current error tree (it has a level too few). Finally, for every node except the root, construct its error tree as above (adjusting leafs, filtering the leafs labeled one or which do not correspond to positions in the suffix link's label). These error trees will now have the correct number of nodes.
 
 \input{copy-subtree-with-dot-link-algo}
 
