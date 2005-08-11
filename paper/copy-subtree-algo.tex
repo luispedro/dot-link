@@ -5,19 +5,18 @@
 \SetKwData{String}{string}
 
 \KwIn{A node in a suffix tree $\overline{w}$}
-\KwIn{An optional character $a$}
+\KwIn{An optional character $a$ (not given when copying the root)}
 \SetKwData{String}{string}
 
+\Copy \Assign copy($\overline{w}$)\;
 \If{$\overline{w}$ is a leaf}{
 	$p$ \Assign $\overline{w}$.label\;
-	\If{$p = 1$} \Return{null}\;
+	\lIf{$p = 1$}{\Return null}\;
 	\If{$a$ was not given or $\String_{p-1} = a$}{
-		\Copy \Assign copy($\overline{w}$)\;
 		\Copy.label \Assign \Copy.label - 1\;
-		\Return{\Copy}
+		\Return \Copy
 	}
 }
-\Copy \Assign copy($\overline{w}$)\;
 \ForEach{$n \in \overline{w}.\mathit{sons}$}{
 	\SonCopy \Assign copySubtree($n$,$a$)\;
 	\If{\SonCopy isn't null}{
@@ -25,10 +24,10 @@
 	}
 }
 \If{\Copy.sons is empty}{
-	\Return{null}
+	\Return null
 }
 \If{\Copy.sons has only one element}{
-	\emph{merge \Copy.sons into \Copy and return that}\;\ref{algoline:copy-subtree:merge}
+	\nllabel{algoline:copy-subtree:merge}\emph{merge \Copy.sons into \Copy and return that}\;
 }
 
 \end{algorithm}

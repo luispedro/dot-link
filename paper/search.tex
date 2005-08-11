@@ -1,7 +1,7 @@
 To search a string with at maximum k errors in a k-error dotted tree, we need to descend the tree. Whenever we find a node we follow both the dot link and the edge which matches the current position of the string we are searching. If we have a mismatch in the middle of an edge, we continue, decreasing the amount of errors permitted.
 
 \begin{figure}
-\includegraphics{figures/mississipi-nodes}
+\includegraphics[width=\textwidth]{figures/mississipi-nodes}
 \caption{Suffix Tree for the string \putstring{mississipi}}%
 \label{fig:mississipi-nodes}
 \end{figure}
@@ -12,4 +12,6 @@ To understand the pseudo-code, it is important to understand that suffix trees a
 
 The search algorithm is presented in Figure~\ref{algo:search}. Reporting of the leafs below a certain node can be done by a simple Depth First Search reporting any leafs found. If one is interested in knowing only whether the string occurs, then the lines which report the matches can be substituted by simple early exist returning true.
 
-This algorithm runs in time $O(m^{k+1})$. 
+This algorithm runs in time $O(m^{k+1})$:
+
+The recursive call at line~\ref{algoline:search:followDot} means that a dot link was followed. There are at most $O(m^k)$ places where a dot link can be followed while descending a string~\footnote{For $k=1$ each point in the string. For $k>1$, each path for $k-1$, can now have at most $m$ extra branches.}. Following one path in the tree takes $O(m)$ time. Therefore, the total time is $O(m^{k+1})$.

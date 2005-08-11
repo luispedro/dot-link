@@ -20,7 +20,8 @@ For any other node $\overline{aw}$, the error tree is a filtered copy of the err
 \item All leafs in the copy have a label which is the original label's value minus one
 \end{enumerate}
 
-Note that these conditions are very similiar to the conditions for the root and both can be implemented as shown in Figure~\ref{algo:copy-subtree}. This is an expression of Lemma~\ref{lemma:suffix-error}.
+These conditions are an expression of Lemma~\ref{lemma:suffix-error}.
+Note that these conditions are very similiar to the conditions for the root and both can be implemented as shown in Figure~\ref{algo:copy-subtree}.
 
 \input{copy-subtree-algo}
 
@@ -34,7 +35,7 @@ One can construct the error tree for any node if the tree for the node pointed t
 
 \input{construct-algo}
 
-To add dot links at every node, we need to add the dot link at the root and then for every node call the procedure addDotLink. This is shown in Figure~\ref{algo:construct}. The \textit{foreach} loop can be implemented using Depth First Search on the tree. In fact, the procedure addDotLink only needs to be called for certain nodes (those who do not posess an incoming suffix link). However, there is no readily available way to access only these nodes and the procedure above does little extra work.
+To add dot links at every node, we need to add the dot link at the root and then for every node call the procedure addDotLink. This is shown in Figure~\ref{algo:construct-1}. The \textit{foreach} loop at line~\ref{algoline:construct-1:foreach} can be implemented using Depth First Search on the tree. In fact, the procedure addDotLink only needs to be called for certain nodes (those who do not posess an incoming suffix link). However, there is no readily available way to access only these nodes and the procedure above does little extra work.
 
 \subsubsection{Time cost}
 

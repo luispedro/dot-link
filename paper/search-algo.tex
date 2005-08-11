@@ -1,6 +1,6 @@
 \begin{algorithm}
 \caption{findString}
-\label{algo:findString}
+\label{algo:search}
 \SetKwData{J}{j}
 \SetKwData{W}{s}
 \SetKwData{K}{k}
@@ -27,12 +27,10 @@
 		\J \Assign $\J + 1$\;
 	}
 	\If{$J = \Len$}{
-		findString(\Node,$\S+\J$,\K)
+		findString(\Node,$\W+\J$,\K)
 	}
 	$\K$ \Assign $\K-1$\;
 	$\J$ \Assign $\J+1$\;
 }
-
-
 
 \end{algorithm}
