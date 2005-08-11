@@ -10,7 +10,7 @@ First, we construct the error tree for the root. This tree is almost a copy of t
 \item All other leafs are labeled with value which is the original leaf's value minus one.
 \end{enumerate}
 
-It is easy to see why this is so. The leaf labeled 1 would have resulted in the string \putstring{.s\$} which does not occur in original string (it is one character too large). For any other leaf $\overline{w\$}$ which occured at position $p$ in the string, we have a new leaf $\overline{.w\$}$ which occurs at position $p-1$ in the string.
+It is easy to see why this is so. The leaf labeled 1 would have resulted in the string \putstring{.s\$} which does not occur in original string (it is one character too large). For any other leaf $\overline{w\$}$ which occurred at position $p$ in the string, we have a new leaf $\overline{.w\$}$ which occurs at position $p-1$ in the string.
 
 For any other node $\overline{aw}$, the error tree is a filtered copy of the error tree at node $\overline{w}$ (the node pointed to by node $\overline{aw}$'s suffix link.
 
@@ -21,13 +21,13 @@ For any other node $\overline{aw}$, the error tree is a filtered copy of the err
 \end{enumerate}
 
 These conditions are an expression of Lemma~\ref{lemma:suffix-error}.
-Note that these conditions are very similiar to the conditions for the root and both can be implemented as shown in Figure~\ref{algo:copy-subtree}.
+Note that these conditions are very similar to the conditions for the root and both can be implemented as shown in Figure~\ref{algo:copy-subtree}.
 
 \input{copy-subtree-algo}
 
 The only point to note is line~\ref{algoline:copy-subtree:merge}. This is motivated by noting that since we filter some leafs, without a merging procedure, it would be possible to have nodes which possess only one child. These need to be removed.
 
-It is very simple to remove these nodes. As discussed above, suffix trees are normally implemented such that each node is actually just a pair of indices into the original string as shown in Figure~\ref{fig:mississipi-nodes}. To merge a child with its parent, we just need to replace both by a node whose starting index is the starting index of the original child minus the lenght of the parent edge. This process is illustrated in Figure~\ref{fig:merge} 
+It is very simple to remove these nodes. As discussed above, suffix trees are normally implemented such that each node is actually just a pair of indices into the original string as shown in Figure~\ref{fig:mississipi-nodes}. To merge a child with its parent, we just need to replace both by a node whose starting index is the starting index of the original child minus the length of the parent edge. This process is illustrated in Figure~\ref{fig:merge} 
 
 \input{adddotlink-algo}
 
@@ -35,7 +35,7 @@ One can construct the error tree for any node if the tree for the node pointed t
 
 \input{construct-algo}
 
-To add dot links at every node, we need to add the dot link at the root and then for every node call the procedure addDotLink. This is shown in Figure~\ref{algo:construct-1}. The \textit{foreach} loop at line~\ref{algoline:construct-1:foreach} can be implemented using Depth First Search on the tree. In fact, the procedure addDotLink only needs to be called for certain nodes (those who do not posess an incoming suffix link). However, there is no readily available way to access only these nodes and the procedure above does little extra work.
+To add dot links at every node, we need to add the dot link at the root and then for every node call the procedure addDotLink. This is shown in Figure~\ref{algo:construct-1}. The \textit{foreach} loop at line~\ref{algoline:construct-1:foreach} can be implemented using Depth First Search on the tree. In fact, the procedure addDotLink only needs to be called for certain nodes (those who do not posses an incoming suffix link). However, there is no readily available way to access only these nodes and the procedure above does little extra work.
 
 \subsubsection{Time cost}
 
@@ -57,5 +57,5 @@ The code for the copy is shown in Figure~\ref{algo:copy-subtree-with-dot-link} w
 
 The final algorithm for constructing k-error trees is shown in Figure~\ref{algo:construct-k}.
 
-We note that the method of removing the existing error trees can be improved in practice (the assymptotical bound remains the same) the following way: While making a copy of the tree for construction of the root's error tree, instead of following a dot link to make a copy, move the error tree to its destination and make the necessary adjustments inplace (this move will probably be just an adjustment of pointer depending on the exact implementation). Using this method only leafs labeled one need to be removed (as well as any internal node which becomes unnecessary).
+We note that the method of removing the existing error trees can be improved in practice (the asymptotic bound remains the same) the following way: While making a copy of the tree for construction of the root's error tree, instead of following a dot link to make a copy, move the error tree to its destination and make the necessary adjustments inplace (this move will probably be just an adjustment of pointer depending on the exact implementation). Using this method only leafs labeled one need to be removed (as well as any internal node which becomes unnecessary).
 

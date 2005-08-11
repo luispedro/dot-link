@@ -15,15 +15,15 @@ To extend the suffix tree, we consider that a node in the suffix tree correspond
 We assume that the reader is familiar with the basic concepts of suffix trees and strings and present the definitions below mainly to introduce the particular notation and terminology used in this paper.
 
 \begin{definition}[Character, string]
-Given a set $\Sigma$, we say that $s$ is a \emph{string over $\Sigma$} if $s$ is a possibly empty sequence of elements of $\Sigma$. The elements of the set $\Sigma$ are also called \emph{character}. The lenght of the string, denoted by $|s|$ is the number of elements it contains. We shall write $s_i$ for the $i$th element of the string. For the empty string, we write $\epsilon$.
+Given a set $\Sigma$, we say that $s$ is a \emph{string over $\Sigma$} if $s$ is a possibly empty sequence of elements of $\Sigma$. The elements of the set $\Sigma$ are also called \emph{character}. The length of the string, denoted by $|s|$ is the number of elements it contains. We shall write $s_i$ for the $i$th element of the string. For the empty string, we write $\epsilon$.
 
 The set of all string is denoted by $\Sigma^*$ and $\Sigma^+=\Sigma^*-\{\epsilon\}$.
 \end{definition}
 
-For denoting character we shall use letters from the begginning of the roman alphabet ($a$, $b$, $c$,\ldots) and for strings, we shall use letters from the end of the alphabet ($w$, $z$, \ldots).
+For denoting character we shall use letters from the beginning of the roman alphabet ($a$, $b$, $c$,\ldots) and for strings, we shall use letters from the end of the alphabet ($w$, $z$, \ldots).
 
 \begin{definition}
-$wx$ will denote the string formed by all the character of $w$ followed by all the characters of $x$ (the usual concatenation operation). $aw$ ($wa$) shall the denote the strings by the caracter $a$ before (after) the characters of $w$.
+$wx$ will denote the string formed by all the character of $w$ followed by all the characters of $x$ (the usual concatenation operation). $aw$ ($wa$) shall the denote the strings by the character $a$ before (after) the characters of $w$.
 
 If $s = wxy$, then $w$ is a \emph{prefix} of $s$, $x$ is a \emph{substring} of $s$ (at position $s$) and $y$ is a \emph{suffix} of $s$ (at position $p$).
 \end{definition}
@@ -34,7 +34,7 @@ $T$ is a Patricia tree if $T$ is a rooted tree with edge labels from $\Sigma^+$.
 Each node in a Patricia tree has a path leading to it which forms a string. If the node $n$ has the leading path $w$, we shall also refer to $n$ as $\overline{w}$.
 \end{definition}
 
-The name Patricia is sometimes spelt PATRICIA, since it was formed from the initial of Practical Algorithm to Retrieve Information Coded in Alphanumeric~\cite{morrison:patricia}.
+The name Patricia is sometimes spelled PATRICIA, since it was formed from the initial of Practical Algorithm to Retrieve Information Coded in Alphanumeric~\cite{morrison:patricia}.
 
 In what follows we will assume that there are two symbols (\$ and $.$) which are not part of $\Sigma$.
 
@@ -60,19 +60,19 @@ A suffix link in a suffix tree is a link from the node $\overline{aw}$ to the no
 In a suffix tree, it is possible to define a suffix link for each internal node. Both Ukkonen's~\cite{ukkonen} and McCreight's~\cite{mccreight} algorithms are linear time algorithms for constructing a suffix tree which includes suffix links. The suffix links are shown in Figure~\ref{fig:mississipi-0} as dotted links.
 
 \begin{definition}[Occurence Set]
-Given a node $\overline{w}$ in a suffix tree, we call it's \emph{occurence set} the set of indexes in the original string where the string $w$ occurs.
+Given a node $\overline{w}$ in a suffix tree, we call it's \emph{occurrence set} the set of indexes in the original string where the string $w$ occurs.
 \end{definition}
 
 \begin{definition}[Position Set]
-Given a node $\overline{w}$ in a suffix tree, it's \emph{position set} is the set formed by taking it's occurence set and adding the lenght of $w$ to each element.
+Given a node $\overline{w}$ in a suffix tree, it's \emph{position set} is the set formed by taking it's occurrence set and adding the length of $w$ to each element.
 \end{definition}
 
-For example, in the node $\overline{issi}$ in the suffix tree of Figure~\ref{fig:mississipi-0}, the occurence set is $\{5, 2\}$ and its position set is $\{6, 9\}$. In a sense, one can say that being at node $\overline{issi}$ is being at positions 6 and~9 simultaneously. Note that for each node, the tree below it is the Patricia tree of the suffixes starting at the positions in its position set.
+For example, in the node $\overline{issi}$ in the suffix tree of Figure~\ref{fig:mississipi-0}, the occurrence set is $\{5, 2\}$ and its position set is $\{6, 9\}$. In a sense, one can say that being at node $\overline{issi}$ is being at positions 6 and~9 simultaneously. Note that for each node, the tree below it is the Patricia tree of the suffixes starting at the positions in its position set.
 
-In a leaf, the occurence set is a singleton, and we label the leaf by its element.
+In a leaf, the occurrence set is a singleton, and we label the leaf by its element.
 
 \begin{lemma}[Position set at the suffix node]\label{lemma:suffix-error}
-Given two nodes $\overline{aw}$ and $\overline{w}$ (connected by a suffix link, labeled $a$), if one takes position set of $\overline{w}$, substracts one to each element, one obtains a superset of the position set of $\overline{w}$. The items shared by both sets are those positions of the string which contain an $a$.
+Given two nodes $\overline{aw}$ and $\overline{w}$ (connected by a suffix link, labeled $a$), if one takes position set of $\overline{w}$, subtracts one to each element, one obtains a superset of the position set of $\overline{w}$. The items shared by both sets are those positions of the string which contain an $a$.
 \end{lemma}
 
 The lemma is fairly obvious given that the position set of $\overline{aw}$ contains all the positions where $aw$ occurs which will be exactly one minus those positions where $w$ occurs following $a$.
@@ -99,7 +99,7 @@ We define a \emph{1-error dotted tree} as the tree which is formed by adding to 
 
 The one-error dotted tree for \putstring{mississipi} is shown in Figure~\ref{fig:mississipi-1}. The nodes are connected to their error trees by diagonal links.
 
-The paths in the dotted tree are paths in the extended alphabet $\Sigma\cup\{.,\$\}$. The notions of \emph{occurence set}, \emph{position set} and \emph{error tree} are valid for all nodes in a dotted tree considering that a node path may contain dot elements which match any other character.
+The paths in the dotted tree are paths in the extended alphabet $\Sigma\cup\{.,\$\}$. The notions of \emph{occurrence set}, \emph{position set} and \emph{error tree} are valid for all nodes in a dotted tree considering that a node path may contain dot elements which match any other character.
 
 \begin{definition}[k-error dotted tree]
 We define a k-error dotted tree as the tree obtained by adding error trees to each node in the (k-1)-error dotted tree which does not already contain one.

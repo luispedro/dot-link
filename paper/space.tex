@@ -6,7 +6,7 @@
 
 How much space does a k-error dotted tree take? Suffix Trees have a number of nodes proportional to the size of the string (which we will refer to as $n$). One-error dotted trees have more nodes. The worst case presented in Figure~\ref{fig:aaaa} is a string of the form $a^n = aaa\cdots$ which generates a one-dotted tree taking $O(n^2)$ nodes. For a larger number of errors $k$, it is easy to see that this leads to $O(n^{k+1})$ nodes.
 
-We can do better, however, by considering the expected case. First we need a pair of auxiliar definitions:
+We can do better, however, by considering the expected case. First we need a pair of definitions:
 
 \begin{definition}[weight under a node, weight of a tree]
 The weight under a node $\mathit{Weight}(n)$ is the number of leafs in the subtree rooted at that node.
@@ -23,7 +23,7 @@ The height of a node $\mathit{Height}(n)$ is the number of nodes in the path lea
 \end{definition}
 
 \begin{lemma}
-Given a tree (any tree, not just suffix or similiar tree), the sum of the weights of all the nodes in the tree is equal to the average height of the node times the number of nodes.
+Given a tree (any tree, not just suffix or similar tree), the sum of the weights of all the nodes in the tree is equal to the average height of the node times the number of nodes.
 \end{lemma}
 
 Consider the tree being built node by node, in any order, as long as the property that it remains a tree during the process is maintained. Each node added, adds a certain amount of weight to the tree. In particular it adds one for each node that sits above it in the tree. This is the same as saying that each node adds its height (which does not change). The weight of the final tree is the sum of all these values.
@@ -32,7 +32,7 @@ Consider the tree being built node by node, in any order, as long as the propert
 
 We will reason by induction, starting with the case of a zero-error dotted tree to show, that the bound on the number of nodes in an k-error dotted tree can also be expressed as $O(n\hat{h}^k)$ where $\hat{h}$ is the average height of the suffix tree. The base case is a suffix tree and is obvious.
 
-The number of nodes in a Patricia tree with $c$ strings ($c$ leafs) is $O(c)$~\cite{patricia} (as a special case, a suffix tree is the Patricia tree of all the suffixes in a string). The number of nodes in the error tree of a node is therefore assymptotically bound by the number of leafs in the subtree at that node times a constant.
+The number of nodes in a Patricia tree with $c$ strings ($c$ leafs) is $O(c)$~\cite{patricia} (as a special case, a suffix tree is the Patricia tree of all the suffixes in a string). The number of nodes in the error tree of a node is therefore asymptomatically bound by the number of leafs in the subtree at that node times a constant.
 
 %Assume the k-error suffix tree has $O(h\hat{h}^k)$ nodes.
 
@@ -40,5 +40,5 @@ The number of nodes in a Patricia tree with $c$ strings ($c$ leafs) is $O(c)$~\c
 
 %The difference between a k-error and a (k+1)-error tree is that all the 
 
-Sofar, we have not really obtained much since, in the worst case, $h=O(n)$. However, the average expected case, is $h=O(\log n)$~\cite{devroye:note,szpankowski:unexpected}. This allows us to conclude that, in the average case, we will have $O(n\log^k n)$ nodes in our tree.
+So far, we have not really obtained much since, in the worst case, $h=O(n)$. However, the average expected case, is $h=O(\log n)$~\cite{devroye:note,szpankowski:unexpected}. This allows us to conclude that, in the average case, we will have $O(n\log^k n)$ nodes in our tree.
 
