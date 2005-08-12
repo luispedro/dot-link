@@ -17,7 +17,7 @@
 	\emph{report all \Node's children}\;
 }
 \If{$\K > 0$}{
-	findString(\Node.dotLink, $\W+1$,$\K-1$)\;
+	findString(\Node.dotLink, $\W+1$,$\K-1$)\nllabel{algoline:search:followDot}\;
 }
 \Node \Assign \Node.getSon($\W_0$)\;
 \J \Assign 0\;

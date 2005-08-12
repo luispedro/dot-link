@@ -26,6 +26,7 @@ The height of a node $\mathit{Height}(n)$ is the number of nodes in the path lea
 Given a tree (any tree, not just suffix or similar tree), the sum of the weights of all the nodes in the tree is equal to the average height of the node times the number of nodes.
 \end{lemma}
 
+\Proof
 Consider the tree being built node by node, in any order, as long as the property that it remains a tree during the process is maintained. Each node added, adds a certain amount of weight to the tree. In particular it adds one for each node that sits above it in the tree. This is the same as saying that each node adds its height (which does not change). The weight of the final tree is the sum of all these values.
 
 \[ \mathit{Weight}(\mathcal{T}) = \sum_{x \in \mathcal{T}}\mathit{Height}(x) = |\mathcal{T}|\frac{1}{|\mathcal{T}|}\sum_{x \in \mathcal{T}}\mathit{Height}(x) = |\mathcal{T}|\hat{h} \qed \]

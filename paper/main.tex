@@ -2,15 +2,15 @@
 \usepackage[boxruled,vlined,portugues,figure,linesnumbered,longend]{algorithm2e}
 \input{figures/transfig}
 \usepackage[]{graphicx}
-\usepackage{QED}
 \usepackage{amssymb}
+\usepackage{QED}
 
 
 \newcommand*{\Assign}{\ensuremath\longleftarrow}
 \newcommand{\putstring}[1]{\textsl{#1}}
 \newtheorem{definition}{Definition}
 \newtheorem{lemma}{Lemma}
-
+\graphicspath{{figures/}}
 
 \title{Dotted Suffix Trees\\A Structure for Approximate Text Indexing}
 \author{L. P. Coelho \and A. Oliveira}
@@ -23,20 +23,25 @@
 \input{abstract}
 \end{abstract}
 
-\section{Introduction}
+\section{Introduction}\label{sec:introduction}
 \input{introduction}
 
-\section{The Indexing Structure}
+\section{The Indexing Structure}\label{sec:structure}
 \input{structure}
-\section{Space Considerations}
+
+\section{Space Considerations}\label{sec:space}
 \input{space}
-\section{Searching}
+
+\section{Searching}\label{sec:search}
 \input{search}
-\section{Constructing the Dotted Tree}
+
+\section{Constructing the Dotted Tree}\label{sec:construction}
 \input{construction}
-\section{Experimental Results}
+
+\section{Experimental Results}\label{sec:experimental}
 \input{experimental}
-\section{Future Work, Open Problems}
+
+\section{Future Work, Open Problems}\label{sec:future}
 
 In the example for the string \putstring{mississipi}, presented in Figure~\ref{fig:mississipi-1}, one can see that the tree below \putstring{s.i} and \putstring{ssi} are exactly the same. Whether such occurrences are the basis for a significant space saving and what algorithms might exploit them is an open question.
 Along the same lines, the structure's definition might be extended to structures such as the suffix-DAG presented in~\cite[7.7]{gusfield:algorithms}. An algorithm to efficiently construct it over these suffix-DAGs is another open problem.
