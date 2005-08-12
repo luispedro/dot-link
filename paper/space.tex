@@ -20,6 +20,9 @@ Note that the weight of a tree \emph{is not the same} as the weight at the root.
 The height of a node $\mathit{Height}(n)$ is the number of nodes in the path leading to that node from the root. The average height of the tree $\hat{h}$, is the average height of its nodes.
 
 \[ \hat{h} = \frac{1}{|\mathcal{T}|} \sum_{x \in \mathit{\mathcal{T}}} \mathit{Height}(x) \]
+
+\[ h_{max} = \mathit{max}_{x \in \mathcal{T}} \mathit{Height}(x) \]
+
 \end{definition}
 
 \begin{lemma}
@@ -30,6 +33,14 @@ Given a tree (any tree, not just suffix or similar tree), the sum of the weights
 Consider the tree being built node by node, in any order, as long as the property that it remains a tree during the process is maintained. Each node added, adds a certain amount of weight to the tree. In particular it adds one for each node that sits above it in the tree. This is the same as saying that each node adds its height (which does not change). The weight of the final tree is the sum of all these values.
 
 \[ \mathit{Weight}(\mathcal{T}) = \sum_{x \in \mathcal{T}}\mathit{Height}(x) = |\mathcal{T}|\frac{1}{|\mathcal{T}|}\sum_{x \in \mathcal{T}}\mathit{Height}(x) = |\mathcal{T}|\hat{h} \qed \]
+
+\begin{lemma}
+Given a tree (any tree), we have
+
+\[ h_{max} \leq 2\hat{h} \]
+\end{lemma}
+
+\Proof Assume $h_{max} > 2\hat{h}$. Then there is a path, ending in a leaf which lies at depth $h_{max}$. Over this path, there are $h_{max}$ nodes at heights 1, 2, \dots $h_{max}$. The average height over this path is $\frac{1}{h_{max}}\sum_{i=1}^{h_{max}}i=\frac{h_{max}-1}{2}$.
 
 We will reason by induction, starting with the case of a zero-error dotted tree to show, that the bound on the number of nodes in an k-error dotted tree can also be expressed as $O(n\hat{h}^k)$ where $\hat{h}$ is the average height of the suffix tree. The base case is a suffix tree and is obvious.
 
