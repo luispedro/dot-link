@@ -86,6 +86,8 @@ typedef struct SUFFIXTREE
    /* The node that is the head of all others. It has no siblings nor a
       father */
    NODE*                    root;
+   /* The error level for the tree (how deep the error trees go) */
+   DBL_WORD k;
 } SUFFIX_TREE;
 
 
@@ -112,7 +114,7 @@ typedef struct SUFFIXTREE
            lost, as the tree is allocated dynamically on the heap.
 */
 
-SUFFIX_TREE* ST_CreateTree(const char*   str, DBL_WORD length);
+SUFFIX_TREE* ST_CreateTree(const char*   str);
 
 void ST_AddDotLinks( SUFFIX_TREE* tree, int d );
 

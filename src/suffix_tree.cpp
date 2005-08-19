@@ -631,7 +631,7 @@ DBL_WORD ST_FindSubstringWithErrors(
 		/* The length of W */
 		DBL_WORD        P)         
 {
-	return find_string( tree, tree->root, W, P, 2 );
+	return find_string( tree, tree->root, W, P, tree->k );
 }
 
 
@@ -953,15 +953,17 @@ void SPA(
 	   lost, as the tree is allocated dynamically on the heap.
 */
 
-SUFFIX_TREE* ST_CreateTree(const char* str, DBL_WORD length)
+SUFFIX_TREE* ST_CreateTree(const char* str)
 {
+
+   if ( !str ) return 0;
    SUFFIX_TREE*  tree;
    DBL_WORD      extension;
    char          repeated_extension = 0;
    POS           pos;
 
-   if(str == 0)
-      return 0;
+
+   DBL_WORD length = strlen( str );
 
    /* Allocating the tree */
    tree = new SUFFIX_TREE;
@@ -1292,8 +1294,9 @@ void removeDotLinks( SUFFIX_TREE* tree, NODE* node ) {
 }
 }
 
-void ST_AddDotLinks( SUFFIX_TREE* tree, const int d ) {
-	for ( int i = 0; i != d; ++i ) {
+void ST_AddDotLinks( SUFFIX_TREE* tree, const int k ) {
+	tree->k = k;
+	for ( int i = 0; i != k; ++i ) {
 		tree->root->dot_link = copy_subtree( tree, tree->root, first_leaf, '\0' );
 		tree->root->dot_link->father = tree->root;
 
