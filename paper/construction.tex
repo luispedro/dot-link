@@ -33,7 +33,7 @@ The only point to note is line~\ref{algoline:copy-subtree:merge}. This is motiva
 \label{fig:merge}
 \end{figure}
 
-It is very simple to remove these nodes. As discussed above, suffix trees are normally implemented such that each node is actually just a pair of indices into the original string as shown in Figure~\ref{fig:mississipi-nodes}. To merge a child with its parent, we just need to replace both by a node whose starting index is the starting index of the original child minus the length of the parent edge. This process is illustrated in Figure~\ref{fig:merge}.
+It is very simple to remove these nodes. As discussed above, suffix trees are normally implemented such that each node is actually just a pair of indices into the original string as shown in Figure~\ref{fig:mississippi-nodes}. To merge a child with its parent, we just need to replace both by a node whose starting index is the starting index of the original child minus the length of the parent edge. This process is illustrated in Figure~\ref{fig:merge}.
 
 The construction of the tree using either Ukonnen or McCreight's algorithm assures one that this operation is always correct due to the way that the indices are created.
 
