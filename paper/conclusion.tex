@@ -1,0 +1,13 @@
+We have presented an indexing structure for approximate text matching which takes $O(n\log^k n)$ space in the average case (this can be seen either in a theoretical or experimentally). This structure allows matches in $O(m^{k+1})$ time and can be constructed in $O(N|\Sigma|)$ time ($N$ being the actual number of nodes). The structure and the algorithms to construct it are very simple and should be easily implemented.
+
+The biggest drawback of this structure is the amount of space it takes which might limit its applicability. Future research along these lines might address this issue (see below). 
+
+\subsection{Future Work, Open Problems}\label{sec:future}
+
+In the example for the string \putstring{mississippi}, presented in Figure~\ref{fig:mississippi-1}, one can see that the tree below \putstring{s.i} and \putstring{ssi} are exactly the same. Whether such occurrences are the basis for a significant space saving and what algorithms might exploit them is an open question.
+
+Along the same lines, the structure's definition might be extended to structures such as the suffix-DAG presented in~\cite[7.7]{gusfield:algorithms}. An algorithm to efficiently construct it over these suffix-DAGs is another open problem.
+
+\subsection{Acknowledgements}
+
+We thank Y for making their suffix tree implementation available~\cite{} over which we implemented our algorithms.
