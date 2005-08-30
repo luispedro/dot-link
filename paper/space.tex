@@ -9,7 +9,7 @@ How much space does a k-error dotted tree take? Suffix Trees have a number of no
 We can do better, however, by considering the expected case. First we need a pair of definitions:
 
 \begin{definition}[weight under a node, weight of a tree]
-The weight under a node $\mathit{Weight}(n)$ is the number of leafs in the subtree rooted at that node.
+The weight under a node $\mathit{Weight}(n)$ is the number of nodes in the subtree rooted at that node.
 
 The total weight of a tree is the sum of the weights of all the nodes.
 \end{definition}
@@ -34,23 +34,16 @@ Consider the tree being built node by node, in any order, as long as the propert
 
 \[ \mathit{Weight}(\mathcal{T}) = \sum_{x \in \mathcal{T}}\mathit{Height}(x) = |\mathcal{T}|\frac{1}{|\mathcal{T}|}\sum_{x \in \mathcal{T}}\mathit{Height}(x) = |\mathcal{T}|\hat{h} \qed \]
 
-\begin{lemma}
-Given a tree (any tree), we have
+\begin{definition}[Height of error tree]
+Given an integer k, we define the height $h_k$ as the average height of all the error trees which exist in the k-error dotted tree and not in the (k-1)-error tree. $h_0$ is the average height of the original suffix tree.
+\end{definition}
 
-\[ h_{max} \leq 2\hat{h} \]
+\begin{lemma}
+The number of nodes of an k-error dotted tree is bounded by $O(nh_0h_1\dots{}h_{k-1})$.
 \end{lemma}
 
-\Proof Assume $h_{max} > 2\hat{h}$. Then there is a path, ending in a leaf which lies at depth $h_{max}$. Over this path, there are $h_{max}$ nodes at heights 1, 2, \dots $h_{max}$. The average height over this path is $\frac{1}{h_{max}}\sum_{i=1}^{h_{max}}i=\frac{h_{max}-1}{2}$.
+\Proof
+By induction. For zero errors, the number of nodes of a suffix tree is known to be $O(n)$~\cite{}. Taking a (k-1)-error dotted tree (which we assume, by induction, to have $O(nh_0\dots{}h_{k-2})$ nodes), we can add error trees to this to obtain a k-error dotted tree. These error trees will be added to the (k-1)-error trees, whose average height is $h_{k-1}$. The maximum total weight of these trees is the number of nodes times the average height, therefore $O(nh_0\dots{}h_{k-1})$. At each node, to which we add an error tree, that error tree has a number of nodes bounded by a multiple of the number of leafs of the node, which is in turn bounded by the weight at the node. The total number of added nodes is therefore bounded by the total weight $O(nh_0\dots{}h_{k-1})$ \qed.
 
-We will reason by induction, starting with the case of a zero-error dotted tree to show, that the bound on the number of nodes in an k-error dotted tree can also be expressed as $O(n\hat{h}^k)$ where $\hat{h}$ is the average height of the suffix tree. The base case is a suffix tree and is obvious.
-
-The number of nodes in a Patricia tree with $c$ strings ($c$ leafs) is $O(c)$~\cite{patricia} (as a special case, a suffix tree is the Patricia tree of all the suffixes in a string). The number of nodes in the error tree of a node is therefore asymptomatically bound by the number of leafs in the subtree at that node times a constant.
-
-%Assume the k-error suffix tree has $O(h\hat{h}^k)$ nodes.
-
-%We define $\mathit{Weight}(\overline{w})$ as above. For any node, the number of leafs in its error tree will be $O(\mathit{Weight}(\overline{w}))$. The total number of nodes for all the error trees in the dotted tree is therefore equal to $O(\sum_{\overline{w} \in \mathcal{T}}\mathit{Weight}(\overline{w}))$ where $\mathcal{T}$ is the original suffix tree. Given the lemma above, $\sum_{\overline{w} \in \mathcal{T}}\mathit{Weight}(\overline{w}) = O(n\hat{h})$.
-
-%The difference between a k-error and a (k+1)-error tree is that all the 
-
-So far, we have not really obtained much since, in the worst case, $h=O(n)$. However, the average expected case, is $h=O(\log n)$~\cite{devroye:note,szpankowski:unexpected}. This allows us to conclude that, in the average case, we will have $O(n\log^k n)$ nodes in our tree.
+So far, we have not really obtained much since, in the worst case, $h_i=O(n)$. However, these are all Patricia trees of suffixes of the original text, and the average expected case, is $h_i=O(\log n)$~\cite{}. This allows us to conclude that, in the average case, we will have $O(n\log^k n)$ nodes in our tree.
 
