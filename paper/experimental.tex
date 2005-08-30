@@ -5,9 +5,27 @@ The code was implemented in the C~Language, starting from the suffix tree implem
 Three data sets were used:
 
 \begin{enumerate}
-\item ``Democracy in America'' by Alexis de Tocqueville as natural language data ser
-\item The DNA of S. Cervesiae
+\item ``Democracy in America'' by Alexis de Tocqueville as natural language example
+\item The DNA of S. Cervesiae (first chromossome)
 \item Randomly generated text
 \end{enumerate}
 
+The machine used for testing was an Intel Pentium~IV at 2.40GHz with 4Gb of main memory.
+
+\subsection{Indexing Time and Size}
+
+We report the indexing time and size (as a count of the nodes in the structure) as a function of the number of character (by using larger and larger suffixes of the datasets).
+
+\begin{figure}%
+\includegraphics{ratio-1}%
+\includegraphics{ratio-2}%
+\includegraphics{ratio-3}%
+\caption{Ratios of k-error and (k+1)-error dotted trees}\label{fig:ratios}%
+\end{figure}
+
+To experimentally verify the average case, we show in Figure~\ref{fig:ratios} the ratios between the k-error and the (k+1)-error dotted trees. We can easily see that for all three data sets, the experimental values do resemble a logarithm.
+
+\subsection{Search Time}
+
+For searching, the full textes were first indexed and then online searches were performed on top of the structure. To generate input patterns, randomly chosen bits of the text were taken. These patterns were then altered by substituting a character at random. To generate mismatches, one character too many was altered~\footnote{Since the characters used were not present in the original text, there is no risk of generating a string which \emph{does appear} in the text.}. The search algorithm performed an early exit, without reporting of occurences (ie, it only reported whether the string exists in the text). Therefore, the number of occurences had no influence on the search time.
 
