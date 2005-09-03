@@ -4,46 +4,29 @@
 \label{fig:aaaa}
 \end{figure}
 
-How much space does a k-error dotted tree take? Suffix Trees have a number of nodes proportional to the size of the string (which we will refer to as $n$). One-error dotted trees have more nodes. The worst case presented in Figure~\ref{fig:aaaa} is a string of the form $a^n = aaa\cdots$ which generates a one-dotted tree taking $O(n^2)$ nodes. For a larger number of errors $k$, it is easy to see that this leads to $O(n^{k+1})$ nodes.
+How much space does a k-error dotted tree take? Suffix Trees have a number of nodes proportional to the size of the string (which we will refer to as $n$). One-error dotted trees have more nodes. The worst case presented in Figure~\ref{fig:aaaa} is a string of the form $a^n = aaa\cdots$ which generates a one-dotted tree taking $\mathcal{O}(n^2)$ nodes. For a larger number of errors $k$, it is easy to see that this leads to $\mathcal{O}(n^{k+1})$ nodes.
 
-We can do better, however, by considering the expected case. First we need a pair of definitions:
+We can do better, however, by considering the expected case.
 
-\begin{definition}[weight under a node, weight of a tree]
-The weight under a node $\mathit{Weight}(n)$ is the number of nodes in the subtree rooted at that node.
+\begin{definition}
+We define $N_k$ to be the number of nodes of the k-error dotted tree.
 
-The total weight of a tree is the sum of the weights of all the nodes.
+$N_0$ is the number of nodes of the suffix tree.
 \end{definition}
 
-Note that the weight of a tree \emph{is not the same} as the weight at the root.
+\begin{definition}[Maximum Path Lenght]
+$l$ is the lenght of the deepest node in the tree (which isn't a leaf)
 
-\begin{definition}[height of a node, average height]
-The height of a node $\mathit{Height}(n)$ is the number of nodes in the path leading to that node from the root. The average height of the tree $\hat{h}$, is the average height of its nodes.
-
-\[ \hat{h} = \frac{1}{|\mathcal{T}|} \sum_{x \in \mathit{\mathcal{T}}} \mathit{Height}(x) \]
-
-\[ h_{max} = \mathit{max}_{x \in \mathcal{T}} \mathit{Height}(x) \]
-
+\[ l = \max_{\overline{w} \in \mathcal{T}} |w| \mathrm{and \overline{w} isn't a leaf} \]
 \end{definition}
 
-\begin{lemma}
-Given a tree (any tree, not just suffix or similar tree), the sum of the weights of all the nodes in the tree is equal to the average height of the node times the number of nodes.
-\end{lemma}
-
-\Proof
-Consider the tree being built node by node, in any order, as long as the property that it remains a tree during the process is maintained. Each node added, adds a certain amount of weight to the tree. In particular it adds one for each node that sits above it in the tree. This is the same as saying that each node adds its height (which does not change). The weight of the final tree is the sum of all these values.
-
-\[ \mathit{Weight}(\mathcal{T}) = \sum_{x \in \mathcal{T}}\mathit{Height}(x) = |\mathcal{T}|\frac{1}{|\mathcal{T}|}\sum_{x \in \mathcal{T}}\mathit{Height}(x) = |\mathcal{T}|\hat{h} \qed \]
-
-\begin{definition}[Height of error tree]
-Given an integer k, we define the height $h_k$ as the average height of all the error trees which exist in the k-error dotted tree and not in the (k-1)-error tree. $h_0$ is the average height of the original suffix tree.
+\begin{definition}[Suffix-Depth]
+For any node $\overline{w}$ its suffix-depth is the number of nodes which must be followed to reach the root.
 \end{definition}
 
-\begin{lemma}
-The number of nodes of an k-error dotted tree is bounded by $O(nh_0h_1\dots{}h_{k-1})$.
-\end{lemma}
+For a node $\overline{w}$, its suffix-depth is $|w|$. It is obvious that the $l$ is a maximum on the suffix-depth of nodes.
 
-\Proof
-By induction. For zero errors, the number of nodes of a suffix tree is known to be $O(n)$~\cite{}. Taking a (k-1)-error dotted tree (which we assume, by induction, to have $O(nh_0\dots{}h_{k-2})$ nodes), we can add error trees to this to obtain a k-error dotted tree. These error trees will be added to the (k-1)-error trees, whose average height is $h_{k-1}$. The maximum total weight of these trees is the number of nodes times the average height, therefore $O(nh_0\dots{}h_{k-1})$. At each node, to which we add an error tree, that error tree has a number of nodes bounded by a multiple of the number of leafs of the node, which is in turn bounded by the weight at the node. The total number of added nodes is therefore bounded by the total weight $O(nh_0\dots{}h_{k-1})$ \qed.
+We can now show that $N_k = \mathcal{O}(nl^k)$ by induction. It is a known fact that $N_0 = \mathcal{O}(n)$. The algorithm for turning a k-error into a (k+1)-error dotted tree, can be looked at the following way~\footnote{We are here considering that the \textit{foreach} loop of Figure~\ref{algo:construct-k} runs in a specific order which is in fact difficult to code for. However, as an analysis tool, it is a valid assumption.}: First it makes an almost exact copy of the k-error dotted tree and sets it as the root's error tree and it clears all the other error trees. Then it makes a (possibly incomplete copy) broken amongst all the nodes whose suffix links point at the root (nodes at suffix-depth 1). It proceeds to the nodes at suffix-depth 2 and on to increasing suffix-depths up to $l$. At each such step, the number of nodes is increased by a maximum of $N_k$. Therefore, we start with $N_k$ nodes, make an almost full copy, and copy that at most $l$ times. We have $N_{k+1}=\mathcal{O}(N_kl)$. Assuming $N_k=\mathcal{O}(nl^k)$ by induction we conclude $N_{k+1}=\mathcal{O}(nl^{k+1})$.
 
-So far, we have not really obtained much since, in the worst case, $h_i=O(n)$. However, these are all Patricia trees of suffixes of the original text, and the average expected case, is $h_i=O(\log n)$~\cite{}. This allows us to conclude that, in the average case, we will have $O(n\log^k n)$ nodes in our tree.
+So far, we have achieved little since in the worst case $l=n-1$ as shown above. However, the expected case is $l=\mathcal{O}(\log n)$~\cite{apostolico92selfalignments} and we have $N_k=\mathcal{O}(n\log^k n)$.
 
