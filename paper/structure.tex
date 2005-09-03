@@ -6,7 +6,7 @@
 \label{fig:mississippi-0}
 \end{figure}
 
-Suffix Trees have become a well known structure since their introduction in 1973~\cite{weiner}. In Figure~\ref{fig:mississippi-0} we show the suffix tree for the string \putstring{mississippi}.
+Suffix Trees have become a well known structure since their introduction in 1973~\cite{DBLP:conf/focs/Weiner73}. In Figure~\ref{fig:mississippi-0} we show the suffix tree for the string \putstring{mississippi}.
 
 To extend the suffix tree, we consider that a node in the suffix tree corresponds to several points in the string at the same time (those points where the string on the path to the node occurs). We now add to each node an extra edge which corresponds to moving one character forward in all these points.
 
@@ -34,7 +34,7 @@ $T$ is a Patricia tree if $T$ is a rooted tree with edge labels from $\Sigma^+$.
 Each node in a Patricia tree has a path leading to it which forms a string. If the node $n$ has the leading path $w$, we shall also refer to $n$ as $\overline{w}$.
 \end{definition}
 
-The name Patricia is sometimes spelled PATRICIA, since it was formed from the initial of Practical Algorithm to Retrieve Information Coded in Alphanumeric~\cite{morrison:patricia}.
+The name Patricia is sometimes spelled PATRICIA, since it was formed from the initial of Practical Algorithm to Retrieve Information Coded in Alphanumeric~\cite{DBLP:journals/jacm/Morrison68}.
 
 In what follows we will assume that there are two symbols (\$ and $.$) which are not part of $\Sigma$.
 
@@ -57,7 +57,7 @@ A \emph{suffix tree} for a string $S$ is a $\Sigma^+$ whose leaf nodes (those wi
 A suffix link in a suffix tree is a link from the node $\overline{aw}$ to the node $\overline{w}$. This node has the label $a$.
 \end{definition}
 
-In a suffix tree, it is possible to define a suffix link for each internal node. Both Ukkonen's~\cite{ukkonen} and McCreight's~\cite{mccreight} algorithms are linear time algorithms for constructing a suffix tree which includes suffix links. The suffix links are shown in Figure~\ref{fig:mississippi-0} as dotted links.
+In a suffix tree, it is possible to define a suffix link for each internal node. Both Ukkonen's~\cite{ukkonen92constructing} and McCreight's~\cite{mccreight} algorithms are linear time algorithms for constructing a suffix tree which includes suffix links. The suffix links are shown in Figure~\ref{fig:mississippi-0} as dotted links.
 
 \begin{definition}[Occurence Set]
 Given a node $\overline{w}$ in a suffix tree, we call it's \emph{occurrence set} the set of indexes in the original string where the string $w$ occurs.
