@@ -47,7 +47,7 @@ To add dot links at every node, we need to add the dot link at the root and then
 
 \subsubsection{Time cost}
 
-If the number of nodes in the final tree is $N$ and the alphabet $\Sigma$, then the above algorithm runs in time $O(N|\Sigma|)$.
+If the number of nodes in the final tree is $N$ and the alphabet $\Sigma$, then the above algorithm runs in time $\mathcal{O}(N|\Sigma|)$.
 
 The root's error tree is created in time proportional to the number of nodes it contains. Every other error tree is constructed by looking at an existing one and copying it. Each of these copies need time proportional to the original error tree. Since there are at maximum $|\Sigma|$ incoming suffix links to a node~\cite{}, each error tree is \emph{looked at} a maximum of $|\Sigma|$ times. The sum of all these operations is therefore bounded by $|\Sigma|N$.
 
