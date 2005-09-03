@@ -1,20 +1,43 @@
 #!/bin/zsh
 
+ext=eps
+gnuplotterminal='postscript eps enhanced color'
+
 function plot() {
-	output="$1.plot.png"
+	output="$1.plot.$ext"
 	input="$1"
 	gnuplot <<-END
-		set terminal png color
+		set terminal $gnuplotterminal
 		set title 'Number of nodes vs Text Size'
 		set xlabel 'Number of Characters'
-		set ylabel 'Number of nodes'
+		set ylabel 'Number of Nodes'
 
 
 		set output "$output"
-		plot '$input' using 1:2 with lines, '$input' using 1:3 with lines
-		set output "ratio-$output"
-		plot  '$input' using 1:(\$3/\$2) with lines
+		plot '$input' using 1:2 with lines title 'Suffix Tree', '$input' using 1:3 with lines title 'Dotted Tree'
 	END
+}
+
+function ratios() {
+	dataset=$1
+	input="pasted-in=$dataset.tmp"
+	paste *.in=$dataset.*.results >$input
+	gnuplot <<-END
+		set terminal $gnuplotterminal
+		set title 'Ratio'
+		set xlabel 'Number of Characters'
+		set ylabel 'Ratio'
+
+		set output "ratio-in=$dataset-0-1.$ext"
+		plot '$input' using 1:(\$3/\$2) with lines title 'No errors to 1 error'
+
+		set output "ratio-in=$dataset-1-2.$ext"
+		plot '$input' using 1:(\$8/\$3) with lines title '1 Errors to 2 Errors'
+
+		set output "ratio-in=$dataset-2-3.$ext"
+		plot '$input' using 1:(\$13/\$8) with lines title '2 Errors to 3 Errors'
+	END
+	rm $input
 }
 
 if test -d ../output; then
@@ -31,3 +54,9 @@ cd $d
 for f in *.results; do
 	plot $f
 done
+
+for f in english dna random; do
+	ratios $f
+done
+
+
