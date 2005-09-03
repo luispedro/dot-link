@@ -12,11 +12,11 @@ First, we construct the error tree for the root. This tree is almost a copy of t
 
 It is easy to see why this is so. The leaf labeled 1 would have resulted in the string \putstring{.s\$} which does not occur in original string (it is one character too large). For any other leaf $\overline{w\$}$ which occurred at position $p$ in the string, we have a new leaf $\overline{.w\$}$ which occurs at position $p-1$ in the string.
 
-For any other node $\overline{aw}$, the error tree is a filtered copy of the error tree at node $\overline{w}$ (the node pointed to by node $\overline{aw}$'s suffix link.
+For any other node $\overline{aw}$, the error tree is a filtered copy of the error tree at node $\overline{w}$ (the node pointed to by node $\overline{aw}$'s suffix link).
 
 \begin{enumerate}
 \item The leaf labeled 1 in the original error tree is not included
-\item A leaf labeled $p$ is only included if $s_{p-1}$ is $a$ (the label of the suffix link)
+\item A leaf labeled $p$ is included only if $s_{p-1}$ equals $a$ (the label of the suffix link)
 \item All leafs in the copy have a label which is the original label's value minus one
 \end{enumerate}
 
@@ -28,7 +28,8 @@ Note that these conditions are very similar to the conditions for the root and b
 The only point to note is line~\ref{algoline:copy-subtree:merge}. This is motivated by noting that since we filter some leafs, without a merging procedure, it would be possible to have nodes which possess only one child. These need to be removed.
 
 \begin{figure}
-\includegraphics{merge}
+\centering
+\includegraphics[width=.5\textwidth]{merge}
 \caption{Node Merging demonstration}%
 \label{fig:merge}
 \end{figure}
@@ -55,7 +56,7 @@ The root's error tree is created in time proportional to the number of nodes it 
 
 The above algorithm can be used to construct trees with any number of errors by iterating it in the following way:
 
-To construct the (k+1)-error tree from the k-error tree, make a copy of the tree as above (adjusting leafs and filtering the leafs labeled one) and make this the new root error tree. Then, for every other node, remove the current error tree (it has a level too few). Finally, for every node except the root, construct its error tree as above (adjusting leafs, filtering the leafs labeled one or which do not correspond to positions in the suffix link's label). These error trees will now have the correct number of nodes.
+To construct the (k+1)-error tree from the k-error tree, make an adjusted copy of the tree as above (adjusting leafs and filtering the leafs labeled one) and make this the new root error tree. Then, for every other node, remove the current error tree (it has a level too few). Finally, for every node except the root, construct its error tree as above (adjusting leafs, filtering the leafs labeled one or which do not correspond to positions in the suffix link's label). These error trees will now have the correct number of nodes.
 
 \input{copy-subtree-with-dot-link-algo}
 
@@ -66,4 +67,6 @@ The code for the copy is shown in Figure~\ref{algo:copy-subtree-with-dot-link} w
 The final algorithm for constructing k-error trees is shown in Figure~\ref{algo:construct-k}.
 
 We note that the method of removing the existing error trees can be improved in practice (the asymptotic bound remains the same) the following way: While making a copy of the tree for construction of the root's error tree, instead of following a dot link to make a copy, move the error tree to its destination and make the necessary adjustments inplace (this move will probably be just an adjustment of pointer depending on the exact implementation). Using this method only leafs labeled one need to be removed (as well as any internal node which becomes unnecessary).
+
+The analysis for the time cost above remains valid. Taking $N_i$ to mean the number of nodes of the i-error tree, we now have that the time cost is $\mathcal{O}(N_1|\Sigma|+N_2|\Sigma|+\dots+N_k|\Sigma)=\mathcal{O}((N_1+N_2+\dots+N_k)|\Sigma|)=\mathcal{O}(N_k|\Sigma|)=\mathcal{O}(N|\Sigma|)$ since $N_k \le N_i$ ($N_k = N$).
 
