@@ -35,7 +35,7 @@ void Timer::start() {
 	struct tms tmp;
 	if ( times( &tmp ) != clock_t( -1 ) ) {
 		begin = tmp.tms_utime;
-		if ( !Clk_Tck ) Clk_Tck = sysconf( _SC_CLK_TCK );
+		if ( !Clk_Tck ) Clk_Tck = sysconf( _SC_CLK_TCK )/100;
 	} else {
 		std::cerr << "Error: " << strerror( errno ) << '\n';
 		exit( 1 );
@@ -106,7 +106,7 @@ void CummulativeTimer::start() {
 	struct tms tmp;
 	times( &tmp );
 	begin = tmp.tms_utime;
-	if ( !Clk_Tck ) Clk_Tck = sysconf( _SC_CLK_TCK );
+	if ( !Clk_Tck ) Clk_Tck = sysconf( _SC_CLK_TCK )/100;
 }
 
 
