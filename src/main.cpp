@@ -1,5 +1,6 @@
 #include "suffix_tree.h"
 #include "timer.h"
+#include "stats.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -22,10 +23,12 @@ void PrintUsage()
 	exit(0);
 }
 
-void find_substring( SUFFIX_TREE* tree, const char* string ) {
+void find_substring( SUFFIX_TREE* tree, const char* string, CummulativeTimer* m = 0 ) {
 	Timer match( "match" );
+	if ( m ) m->start();
 	unsigned i = ST_FindSubstringWithErrors(tree, string, strlen(string));
 	match.stop();
+	if ( m ) m->stop();
 
 	if(i == ST_ERROR)
 		printf("\nResults: String is not a substring.\n\n");
@@ -79,11 +82,19 @@ int main(int argc, char* argv[])
 		find_substring( tree, argv[ 3 ] );
 	} else {
 		std::string tmp;
-		while ( std::getline( std::cin, tmp ) ) find_substring( tree, tmp.c_str() );
+		CummulativeTimer* cummul = 0;
+		while ( std::getline( std::cin, tmp ) ) {
+			if ( tmp.substr( 0, 5 ) == "timer" ) {
+				delete cummul;
+				cummul = new CummulativeTimer( tmp.substr( 6,std::string::npos ).c_str() );
+			} else find_substring( tree, tmp.c_str(), cummul );
+		}
 	}
 	std::cout << boost::format( "String size: %s \n" ) % ( tree->length - 1 );
 	std::cout << boost::format( "Nodes without dot links: %s \n" ) % ST_CountNodes( tree, false );
 	std::cout << boost::format( "Nodes with dot links: %s \n" ) % ST_CountNodes( tree, true );
+
+	stats::print();
 
 	free(str);
 	ST_DeleteTree(tree);
