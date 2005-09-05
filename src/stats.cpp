@@ -56,10 +56,12 @@ void stats::print() {
 }
 
 void stats::print( std::ostream& out ) {
-	out << "Total matches: "<< matches.total
-		<< ", of which " << matches.positive
-		<< " ( " << double( matches.positive ) / matches.total
-		<< " ) were positive\n";
+	if ( matches.total ) {
+		out << "Total matches: "<< matches.total
+			<< ", of which " << matches.positive
+			<< " ( " << double( matches.positive ) / matches.total
+			<< " ) were positive\n";
+	}
 	for ( std::map< std::string, proportioninfo>::const_iterator f = proportions.begin(), e = proportions.end();
 			f != e;
 			++f ) {
