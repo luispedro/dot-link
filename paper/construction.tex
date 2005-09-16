@@ -36,7 +36,7 @@ The only point to note is line~\ref{algoline:copy-subtree:merge}. This is motiva
 
 It is very simple to remove these nodes. As discussed above, suffix trees are normally implemented such that each node is actually just a pair of indices into the original string as shown in Figure~\ref{fig:mississippi-nodes}. To merge a child with its parent, we just need to replace both by a node whose starting index is the starting index of the original child minus the length of the parent edge. This process is illustrated in Figure~\ref{fig:merge}.
 
-The construction of the tree using either Ukonnen or McCreight's algorithm assures one that this operation is always correct due to the way that the indices are created.
+The construction of the tree using either Ukonnen's or McCreight's algorithm assures one that this operation is always correct due to the way that the indices are created.
 
 \input{adddotlink-algo}
 
@@ -52,7 +52,7 @@ If the number of nodes in the final tree is $N$ and the alphabet $\Sigma$, then 
 
 The root's error tree is created in time proportional to the number of nodes it contains. Every other error tree is constructed by looking at an existing one and copying it. Each of these copies need time proportional to the original error tree. Since there are at maximum $|\Sigma|$ incoming suffix links to a node~\cite{}, each error tree is \emph{looked at} a maximum of $|\Sigma|$ times. The sum of all these operations is therefore bounded by $|\Sigma|N$.
 
-\subsection{Extension to any number of errors}
+\subsection{Extension to any number of errors}\label{subsec:construct-k-larger-1}
 
 The above algorithm can be used to construct trees with any number of errors by iterating it in the following way:
 
@@ -66,7 +66,17 @@ The code for the copy is shown in Figure~\ref{algo:copy-subtree-with-dot-link} w
 
 The final algorithm for constructing k-error trees is shown in Figure~\ref{algo:construct-k}.
 
-We note that the method of removing the existing error trees can be improved in practice (the asymptotic bound remains the same) the following way: While making a copy of the tree for construction of the root's error tree, instead of following a dot link to make a copy, move the error tree to its destination and make the necessary adjustments inplace (this move will probably be just an adjustment of pointer depending on the exact implementation). Using this method only leafs labeled one need to be removed (as well as any internal node which becomes unnecessary).
+We note that the method of removing the existing error trees can be improved in practice (the asymptotic bound remains the same) the following way: While making a copy of the tree for construction of the root's error tree, instead of following a dot link to make a copy, move the error tree to its destination and make the necessary adjustments in place (this move will probably be just an adjustment of pointer depending on the exact implementation). Using this method only leafs labeled one need to be removed (as well as any internal node which becomes unnecessary).
 
-The analysis for the time cost above remains valid. Taking $N_i$ to mean the number of nodes of the i-error tree, we now have that the time cost is $\mathcal{O}(N_1|\Sigma|+N_2|\Sigma|+\dots+N_k|\Sigma)=\mathcal{O}((N_1+N_2+\dots+N_k)|\Sigma|)=\mathcal{O}(N_k|\Sigma|)=\mathcal{O}(N|\Sigma|)$ since $N_k \le N_i$ ($N_k = N$).
+
+\begin{definition}
+We define $N_k$ to be the number of nodes of the k-error dotted tree.
+
+$N_0$ is the number of nodes of the suffix tree.
+
+For a known $k$, we set $N=N_k$.
+\end{definition}
+
+
+The analysis for the time cost above remains valid. We now have that the time cost is $\mathcal{O}(N_1|\Sigma|+N_2|\Sigma|+\dots+N_k|\Sigma)=\mathcal{O}((N_1+N_2+\dots+N_k)|\Sigma|)=\mathcal{O}(kN|\Sigma|)$.
 

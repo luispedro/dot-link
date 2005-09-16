@@ -5,20 +5,14 @@
 \label{fig:aaaa}
 \end{figure}
 
-How much space does a k-error dotted tree take? Suffix Trees have a number of nodes proportional to the size of the string (which we will refer to as $n$). One-error dotted trees have more nodes. The worst case presented in Figure~\ref{fig:aaaa} is a string of the form $a^n = aaa\cdots$ which generates a one-dotted tree taking $\mathcal{O}(n^2)$ nodes. For a larger number of errors $k$, it is easy to see that this leads to $\mathcal{O}(n^{k+1})$ nodes.
+How much space does a k-error dotted tree take? Suffix Trees have a number of nodes proportional to the size of the string (which we will refer to as $n$). One-error dotted trees have more nodes. The worst case presented in Figure~\ref{fig:aaaa} is a string of the form $a^n = aaa\dots$ which generates a one-dotted tree taking $\mathcal{O}(n^2)$ nodes. For a larger number of errors $k$, it is easy to see that this leads to $\mathcal{O}(n^{k+1})$ nodes.
 
 We can do better, however, by considering the expected case.
-
-\begin{definition}
-We define $N_k$ to be the number of nodes of the k-error dotted tree.
-
-$N_0$ is the number of nodes of the suffix tree.
-\end{definition}
 
 \begin{definition}[Maximum Path Lenght]
 $l$ is the length of the deepest node in the tree (which isn't a leaf)
 
-\[ l = \max_{\overline{w} \in \mathcal{T}} |w| \mathrm{and \overline{w} isn't a leaf} \]
+\[ l = \max_{\overline{w} \in \mathcal{T}} |w| \mbox{ and $\overline{w}$ isn't a leaf} \]
 \end{definition}
 
 \begin{definition}[Suffix-Depth]
@@ -29,5 +23,4 @@ For a node $\overline{w}$, its suffix-depth is $|w|$. It is obvious that the $l$
 
 We can now show that $N_k = \mathcal{O}(nl^k)$ by induction. It is a known fact that $N_0 = \mathcal{O}(n)$. The algorithm for turning a k-error into a (k+1)-error dotted tree, can be looked at the following way~\footnote{We are here considering that the \textit{foreach} loop of Figure~\ref{algo:construct-k} runs in a specific order which is in fact difficult to code for. However, as an analysis tool, it is a valid assumption.}: First it makes an almost exact copy of the k-error dotted tree and sets it as the root's error tree and it clears all the other error trees. Then it proceeds in stages, making a (possibly incomplete) copy of this tree spread amongst the nodes at suffix-depth 1. It proceeds to the nodes at suffix-depth 2 and on to increasing suffix-depths up to $l$. At each such step, the number of nodes is increased by a maximum of $N_k$. Therefore, we start with $N_k$ nodes, make an almost full copy, and copy that at most $l$ times. We have $N_{k+1}=\mathcal{O}(N_k(l+1))$. Assuming $N_k=\mathcal{O}(nl^k)$ by induction we conclude $N_{k+1}=\mathcal{O}(nl^{k+1})$.
 
-So far, we have achieved little since in the worst case $l=n-1$ as shown above. However, the expected case is $l=\mathcal{O}(\log n)$~\cite{apostolico92selfalignments} and we have $N_k=\mathcal{O}(n\log^k n)$.
-
+So far, we have achieved little since in the worst case $l=n-1$ as shown above. However, the expected case is $l=\mathcal{O}(\log n)$~\cite{apostolico92selfalignments,szpankowski:unexpected} and we have $N_k=\mathcal{O}(n\log^k n)$.

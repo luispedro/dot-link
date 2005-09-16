@@ -6,12 +6,14 @@ To search a string with at maximum k errors in a k-error dotted tree, we need to
 \label{fig:mississippi-nodes}
 \end{figure}
 
-To understand the pseudo-code, it is important to understand that suffix trees are normally implemented as shown in Figure~\ref{fig:mississippi-nodes} where each node contains the start and end indices of its incoming edge. When presenting the algorithm, we take the liberty of using $s+j$ where $s$ is a string and $j$ an integer to mean the suffix of $s$ starting at position $j$.
+To understand the pseudo-code, it is important to understand that suffix trees are normally implemented so that each node tracks the string on the edge leading to it by keeping the start and end indices on the original string (all strings on the trees presented here are substrings of the original one). On Figure~\ref{fig:mississippi-nodes} we show an example of this structure (for the now familiar \putstring{mississippi}) where the string each node references is shown explicitly.
+
+When presenting the algorithm, we take the liberty of using $s+j$ where $s$ is a string and $j$ an integer to mean the suffix of $s$ starting at position $j$ as happens in the C~Programming Language.
 
 \input{search-algo}
 
 The search algorithm is presented in Figure~\ref{algo:search}. Reporting of the leafs below a certain node can be done by a simple Depth First Search reporting any leafs found. If one is interested in knowing only whether the string occurs, then the lines which report the matches can be substituted by simple early exist returning true.
 
-This algorithm runs in time $O(m^{k+1})$:
+This algorithm runs in time $\mathcal{O}(m^{k+1})$:
 
-The recursive call at line~\ref{algoline:search:followDot} means that a dot link was followed. There are at most $\mathcal{O}(m^k)$ places where a dot link can be followed while descending a string~\footnote{For $k=1$ each point in the string. For $k>1$, each path for $k-1$, can now have at most $m$ extra branches.}. Following one path in the tree takes $\mathcal{O}(m)$ time. Therefore, the total time is $\mathcal{O}(m^{k+1})$ without the reporting of occurences (which can be done in time linear to the number of occurences).
+The recursive call at line~\ref{algoline:search:followDot} means that a dot link was followed. There are at most $\mathcal{O}(m^k)$ places where a dot link can be followed while descending a string~\footnote{For $k=1$ each point in the string. For $k>1$, each path for $k-1$, can now have at most $m$ extra branches.}. Following one path in the tree takes $\mathcal{O}(m)$ time. Therefore, the total time is $\mathcal{O}(m^{k+1})$ without the reporting of occurrences (which can be done in time linear to the number of occurrences).
