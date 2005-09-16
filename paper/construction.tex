@@ -44,13 +44,13 @@ One can construct the error tree for any node if the tree for the node pointed t
 
 \input{construct-algo}
 
-To add dot links at every node, we need to add the dot link at the root and then for every node call the procedure addDotLink. This is shown in Figure~\ref{algo:construct-1}. The \textit{foreach} loop at line~\ref{algoline:construct-1:foreach} can be implemented using Depth First Search on the tree. In fact, the procedure addDotLink only needs to be called for certain nodes (those who do not posses an incoming suffix link). However, there is no readily available way to access only these nodes and the procedure above does little extra work.
+To add dot links at every node, we need to add the dot link at the root and then for every node call the procedure addDotLink. This is shown in Figure~\ref{algo:construct-1}. The \textit{foreach} loop at line~\ref{algoline:construct-1:foreach} can be implemented using Depth First Search on the tree. In fact, the procedure addDotLink only needs to be called for certain nodes (those which do not possess an incoming suffix link). However, there is no readily available way to access only these nodes and the procedure above does little extra work.
 
 \subsubsection{Time cost}
 
 If the number of nodes in the final tree is $N$ and the alphabet $\Sigma$, then the above algorithm runs in time $\mathcal{O}(N|\Sigma|)$.
 
-The root's error tree is created in time proportional to the number of nodes it contains. Every other error tree is constructed by looking at an existing one and copying it. Each of these copies need time proportional to the original error tree. Since there are at maximum $|\Sigma|$ incoming suffix links to a node~\cite{}, each error tree is \emph{looked at} a maximum of $|\Sigma|$ times. The sum of all these operations is therefore bounded by $|\Sigma|N$.
+The error tree at the root is created in time proportional to the number of nodes it contains. Every other error tree is constructed by looking at an existing one and copying it. Each of these copies need time proportional to the original error tree. Since there are at maximum $|\Sigma|$ incoming suffix links to a node~\cite{}, each error tree is \emph{looked at} a maximum of $|\Sigma|$ times. The sum of all these operations is therefore bounded by $|\Sigma|N$.
 
 \subsection{Extension to any number of errors}\label{subsec:construct-k-larger-1}
 
@@ -66,7 +66,7 @@ The code for the copy is shown in Figure~\ref{algo:copy-subtree-with-dot-link} w
 
 The final algorithm for constructing k-error trees is shown in Figure~\ref{algo:construct-k}.
 
-We note that the method of removing the existing error trees can be improved in practice (the asymptotic bound remains the same) the following way: While making a copy of the tree for construction of the root's error tree, instead of following a dot link to make a copy, move the error tree to its destination and make the necessary adjustments in place (this move will probably be just an adjustment of pointer depending on the exact implementation). Using this method only leafs labeled one need to be removed (as well as any internal node which becomes unnecessary).
+We note that the method of removing the existing error trees can be improved in practice (the asymptotic bound remains the same) the following way: While making a copy of the tree for construction of the error tree at the root, instead of following a dot link to make a copy, move the error tree to its destination and make the necessary adjustments in place (this move will probably be just an adjustment of pointer depending on the exact implementation). Using this method only leafs labeled one need to be removed (as well as any internal node which becomes unnecessary).
 
 
 \begin{definition}

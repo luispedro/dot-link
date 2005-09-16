@@ -8,7 +8,7 @@ To search a string with at maximum k errors in a k-error dotted tree, we need to
 
 To understand the pseudo-code, it is important to understand that suffix trees are normally implemented so that each node tracks the string on the edge leading to it by keeping the start and end indices on the original string (all strings on the trees presented here are substrings of the original one). On Figure~\ref{fig:mississippi-nodes} we show an example of this structure (for the now familiar \putstring{mississippi}) where the string each node references is shown explicitly.
 
-When presenting the algorithm, we take the liberty of using $s+j$ where $s$ is a string and $j$ an integer to mean the suffix of $s$ starting at position $j$ as happens in the C~Programming Language.
+When presenting the algorithm, we take the liberty of using $s+j$ where $s$ is a string and $j$ an integer to mean the suffix of $s$ starting at position $j$ (as happens in the C~Programming Language).
 
 \input{search-algo}
 

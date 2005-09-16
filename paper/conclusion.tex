@@ -1,4 +1,4 @@
-We have presented an indexing structure for approximate text matching which takes $\mathcal{O}(n\log^k n)$ space in the average case (this can be seen either in a theoretical or experimentally). This structure allows matches in $\mathcal{O}(m^{k+1})$ time and can be constructed in $\mathcal{O}(kN|\Sigma|)$ time ($N$ being the actual number of nodes). The structure and the algorithms to construct it are very simple and should be easily implemented.
+We have presented an indexing structure for approximate text matching which takes $\mathcal{O}(n\log^k n)$ space in the average case. This complexity was analyzed theoretically and observed experimentally. This structure allows matches in $\mathcal{O}(m^{k+1})$ time and can be constructed in $\mathcal{O}(kN|\Sigma|)$ time ($N$ being the actual number of nodes). The structure and the algorithms to construct it are very simple and should be easily implemented.
 
 The biggest drawback of this structure is the amount of space it takes which might limit its applicability. Future research along these lines might address this issue (see below). 
 
