@@ -1,18 +1,20 @@
 #!/bin/zsh
 
-max=100000
 step=100
-k=1
 function do_test() {
 	[[ -d output ]] || mkdir output
-	input=textes/$1
-	tinput=tmp/input
-	toutput=tmp/output
-	output=output/"machine=`hostname`.in=$1.k=$k.results"
+	echo do_test $@
+	local input=textes/$1
+	local tinput=tmp/input
+	local toutput=tmp/output
+	local k=$2
+	local max=$3
+	local i
+	local output=output/"machine=`hostname`.in=$1.k=$k.max=$max.results"
 	[[ -f $output ]] && rm $output
 	for (( i=$step; i<$max+1; i=i+$step )); do
 		echo -n .
-		./textes/get-bytes $i < $input >$tinput
+		./textes/get-bytes.py $i < $input >$tinput
 		./src/suffixtree $k $tinput CACC >$toutput
 		string_size=`grep 'String size:' $toutput | sed 's,[^0-9],,g'`
 		nodes_without=`grep 'Nodes without' $toutput| sed 's,[^0-9],,g'`
@@ -27,9 +29,15 @@ function do_test() {
 	rm $toutput
 }
 
+files=(english)
+ks=(3)
+maxs=(100000)
+
 [[ -d tmp ]] || mkdir tmp
-do_test dna
-do_test random
-do_test english
+for f in $files; do
+	for (( i=1; i <= $#ks; i=i+1 )); do
+		do_test $f $ks[$i] $maxs[$i]
+	done
+done
 rmdir tmp
 
