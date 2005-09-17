@@ -21,19 +21,22 @@ function plot() {
 function ratios() {
 	dataset=$1
 	input="pasted-in=$dataset.tmp"
-	paste *.in=$dataset.*.results >$input
+	paste *.in=$dataset*max=100000*.results >$input
 	gnuplot <<-END
 		set terminal $gnuplotterminal
-		set title 'Ratio'
+		set title 'No errors to 1 error'
 		set xlabel 'Number of Characters'
 		set ylabel 'Ratio'
+		set yrange[0:]
 
 		set output "ratio-in=$dataset-0-1.$ext"
-		plot '$input' using 1:(\$3/\$2) with lines title 'No errors to 1 error'
+		plot '$input' using 1:(\$3/\$2) with lines title 'Nodes'
 
+		set title '1 error to 2 errors'
 		set output "ratio-in=$dataset-1-2.$ext"
-		plot '$input' using 1:(\$8/\$3) with lines title '1 Errors to 2 Errors'
+		plot '$input' using 1:(\$8/\$3) with lines title 'Nodes'
 
+		set title '2 error to 3 errors'
 		set output "ratio-in=$dataset-2-3.$ext"
 		plot '$input' using 1:(\$13/\$8) with lines title '2 Errors to 3 Errors'
 	END
@@ -52,7 +55,7 @@ fi
 cd $d
 
 for f in *.results; do
-	plot $f
+	echo plot $f
 done
 
 for f in english dna random; do
