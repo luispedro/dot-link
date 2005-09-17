@@ -140,7 +140,8 @@ DBL_WORD ST_FindSubstring(SUFFIX_TREE*      tree,   /* The suffix array */
                           DBL_WORD          P);     /* The length of W */
 DBL_WORD ST_FindSubstringWithErrors(SUFFIX_TREE*      tree,   /* The suffix array */
                           const char*    W,      /* The substring to find */
-                          DBL_WORD          P);     /* The length of W */
+                          DBL_WORD          P,     /* The length of W */
+			  const char* acc_name = 0 );
 
 /******************************************************************************/
 /*

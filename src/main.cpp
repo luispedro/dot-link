@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <iostream>
+#include <exception>
 #include <boost/format.hpp>
 
 /**************************************************************************************************/
@@ -26,12 +27,13 @@ void PrintUsage()
 void find_substring( SUFFIX_TREE* tree, const char* string, CummulativeTimer* m = 0 ) {
 	Timer match( "match" );
 	if ( m ) m->start();
-	unsigned i = ST_FindSubstringWithErrors(tree, string, strlen(string));
+	unsigned i = ST_FindSubstringWithErrors(tree, string, strlen(string),
+			( m ? m->name(): static_cast<const char*>( 0 ) ) );
 	match.stop();
 	if ( m ) m->stop();
 
 	if(i == ST_ERROR)
-		printf("\nResults: String is not a substring.\n\n");
+		printf("\nResults: String[-%s-] is not a substring.\n\n", string);
 	else
 		std::cout << boost::format( "\nResults:   Substring exists in position %s.\n\n" ) % i;
 }
@@ -50,7 +52,7 @@ char* read_file( const char* fname )
 	fseek(file, 0, SEEK_END);
 	int len = ftell(file);
 	fseek(file, 0, SEEK_SET);
-	res = (char*)malloc(len);
+	res = (char*)malloc(len+1);
 	if ( !res ) 
 	{
 		printf("\nOut of memory.\n");
@@ -58,6 +60,7 @@ char* read_file( const char* fname )
 	}
 	fread(res, 1, len, file);
 	fclose( file );
+	res[len] = '\0';
 	return res;
 }
 
@@ -68,35 +71,47 @@ int main(int argc, char* argv[])
 	int k = atoi( argv[ 1 ] );
 	char* str = read_file( argv[ 2 ] );
 	
-	Timer full( "full-tree-construction" );
-	Timer dots( "add-dot-links" );
-	full.start();
-	tree = ST_CreateTree(str);
-	dots.start();
-	ST_AddDotLinks( tree, k );
-	full.stop();
-	dots.stop();
-	
-	
-	if ( strcmp( argv[ 3 ], "-" ) ) {
-		find_substring( tree, argv[ 3 ] );
-	} else {
-		std::string tmp;
-		CummulativeTimer* cummul = 0;
-		while ( std::getline( std::cin, tmp ) ) {
-			if ( tmp.substr( 0, 5 ) == "timer" ) {
-				delete cummul;
-				cummul = new CummulativeTimer( tmp.substr( 6,std::string::npos ).c_str() );
-			} else find_substring( tree, tmp.c_str(), cummul );
-		}
+	try { 
+		Timer full( "full-tree-construction" );
+		Timer dots( "add-dot-links" );
+		full.start();
+		tree = ST_CreateTree(str);
+		dots.start();
+		ST_AddDotLinks( tree, k );
+		full.stop();
+		dots.stop();
+	} catch ( const std::exception& e ) {
+		std::cerr << "Error [construction]: (exception): " << e.what() << std::endl;
 	}
-	std::cout << boost::format( "String size: %s \n" ) % ( tree->length - 1 );
-	std::cout << boost::format( "Nodes without dot links: %s \n" ) % ST_CountNodes( tree, false );
-	std::cout << boost::format( "Nodes with dot links: %s \n" ) % ST_CountNodes( tree, true );
+	
+	
+	try {
+		if ( strcmp( argv[ 3 ], "-" ) ) {
+			find_substring( tree, argv[ 3 ] );
+		} else {
+			std::string tmp;
+			CummulativeTimer* cummul = 0;
+			while ( std::getline( std::cin, tmp ) ) {
+				if ( tmp.substr( 0, 5 ) == "timer" ) {
+					delete cummul;
+					cummul = new CummulativeTimer( tmp.substr( 6,std::string::npos ).c_str() );
+				} else find_substring( tree, tmp.c_str(), cummul );
+			}
+		}
+	} catch ( const std::exception& e ) {
+		std::cerr << "Error [matching]: (exception): " << e.what() << std::endl;
+	}
+	try {
+		std::cout << boost::format( "String size: %s \n" ) % ( tree->length - 1 );
+		std::cout << boost::format( "Nodes without dot links: %s \n" ) % ST_CountNodes( tree, false );
+		std::cout << boost::format( "Nodes with dot links: %s \n" ) % ST_CountNodes( tree, true );
 
-	stats::print();
+		stats::print();
 
-	free(str);
-	ST_DeleteTree(tree);
+		free(str);
+		ST_DeleteTree(tree);
+	} catch ( const std::exception& e ) {
+		std::cerr << "Error [statting]: (exception): " << e.what() << std::endl;
+	}
 	return 0;
 }

@@ -591,11 +591,11 @@ DBL_WORD ST_FindSubstring(
 
 
 namespace {
-DBL_WORD find_string( SUFFIX_TREE* tree, NODE* node, const char* W, DBL_WORD P, int d ) {
+DBL_WORD find_string( SUFFIX_TREE* tree, NODE* node, const char* W, DBL_WORD P, int d, const char* acc_name ) {
 	if ( !node ) return ST_ERROR;
 	if ( !P ) return node->path_position;
 	if ( d ) {
-		DBL_WORD follow_dot_link = find_string( tree, node->dot_link, W + 1, P - 1, d - 1 );
+		DBL_WORD follow_dot_link = find_string( tree, node->dot_link, W + 1, P - 1, d - 1, acc_name );
 		if ( follow_dot_link != ST_ERROR ) return follow_dot_link;
 	}
 	node = find_son( tree, node, W[ 0 ] );
@@ -606,10 +606,11 @@ DBL_WORD find_string( SUFFIX_TREE* tree, NODE* node, const char* W, DBL_WORD P, 
 	const unsigned len = std::min( P, get_node_label_length( tree, node ) );
 	while ( d >= 0 ) {
 		while ( j < len && W[ j ] == tree->tree_string[ start + j ] ) {
+			if ( acc_name ) stats::count_one( acc_name );
 			++j;
 		}
 		if ( j == len ) {
-			return find_string( tree, node, W + j, P - j, d );
+			return find_string( tree, node, W + j, P - j, d, acc_name );
 		}
 		--d;
 		++j;
@@ -629,9 +630,10 @@ DBL_WORD ST_FindSubstringWithErrors(
 		/* The substring to find */
 		const char*  W,         
 		/* The length of W */
-		DBL_WORD        P)         
+		DBL_WORD        P,
+		const char* acc_name )         
 {
-	return find_string( tree, tree->root, W, P, tree->k );
+	return find_string( tree, tree->root, W, P, tree->k, acc_name );
 }
 
 
