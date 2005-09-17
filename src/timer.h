@@ -23,6 +23,7 @@ class CummulativeTimer {
 		~CummulativeTimer();
 		void start();
 		void stop();
+		const char* name() const { return id.c_str(); }
 
 	private:
 		const std::string id;
