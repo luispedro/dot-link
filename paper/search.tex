@@ -1,18 +1,18 @@
 To search a string with at maximum k errors in a k-error dotted tree, we need to descend the tree. Whenever we find a node we follow both the dot link and the edge which matches the current position of the string we are searching. If we have a mismatch in the middle of an edge, we continue, decreasing the amount of errors permitted.
 
+Before introducing the pseudo-code, it is important to understand that suffix trees are normally implemented so that each node consists of only two indices into the original string which are the start and end position of its incoming edge. Figure~\ref{fig:mississippi-nodes} shows an example of this structure (for the now familiar \putstring{mississippi}).
+
 \begin{figure}
 \includegraphics[width=\textwidth]{figures/mississippi-nodes}
 \caption{Suffix Tree for the string \putstring{mississippi}}%
 \label{fig:mississippi-nodes}
 \end{figure}
 
-To understand the pseudo-code, it is important to understand that suffix trees are normally implemented so that each node tracks the string on the edge leading to it by keeping the start and end indices on the original string (all strings on the trees presented here are substrings of the original one). On Figure~\ref{fig:mississippi-nodes} we show an example of this structure (for the now familiar \putstring{mississippi}) where the string each node references is shown explicitly.
-
 When presenting the algorithm, we take the liberty of using $s+j$ where $s$ is a string and $j$ an integer to mean the suffix of $s$ starting at position $j$ (as happens in the C~Programming Language).
 
 \input{search-algo}
 
-The search algorithm is presented in Figure~\ref{algo:search}. Reporting of the leafs below a certain node can be done by a simple Depth First Search reporting any leafs found. If one is interested in knowing only whether the string occurs, then the lines which report the matches can be substituted by simple early exist returning true.
+The search algorithm is presented in Figure~\ref{algo:search}. Reporting of the leafs below a certain node can be done by a Depth First Search reporting any leafs found. If one is interested in knowing only whether the string occurs, then the lines which report the matches can be substituted by early exits returning true.
 
 This algorithm runs in time $\mathcal{O}(m^{k+1})$:
 

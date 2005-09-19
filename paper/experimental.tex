@@ -1,8 +1,6 @@
 \subsection{Implementation and Data Sets}
 
-The code was implemented in the C~Language, starting from an open-source implementation~\cite{ansicimplementation}.
-
-Three data sets were used:
+The code was implemented in the C~Language, starting from an open-source implementation of suffix trees~\cite{ansicimplementation}. Three data sets were used:
 
 \begin{enumerate}
 \item The English translation of ``Democracy in America'' by Alexis de Tocqueville as natural language example
@@ -10,31 +8,15 @@ Three data sets were used:
 \item Randomly generated text by a uniform distribution
 \end{enumerate}
 
-The machine used for testing was an Intel Pentium~IV at 2.40GHz with 4Gb of main memory.
+The machine used for testing was an Intel Pentium~IV running at~2.40GHz with~4GB of main memory.
 
 \subsection{Indexing Time and Size}
 
-We report the indexing time and size (as a count of the nodes in the structure) as a function of the number of character (by using larger and larger suffixes of the datasets).
+We report the indexing time and size (as a count of the nodes in the structure) as a function of the number of character (by using larger and larger prefixes of the datasets).
 
 \begin{figure}%
 \centering
-\subfigure[English Text]{
-\includegraphics[width=.25\textwidth]{ratio-in=english-0-1.eps}%
-\includegraphics[width=.25\textwidth]{ratio-in=english-1-2.eps}%
-\includegraphics[width=.25\textwidth]{ratio-in=english-2-3.eps}%
-}
-\\
-\subfigure[DNA]{
-\includegraphics[width=.25\textwidth]{ratio-in=dna-0-1.eps}%
-\includegraphics[width=.25\textwidth]{ratio-in=dna-0-1.eps}%
-\includegraphics[width=.25\textwidth]{ratio-in=dna-1-2.eps}%
-}
-\\
-\subfigure[Random Text]{
-\includegraphics[width=.25\textwidth]{ratio-in=random-0-1.eps}%
-\includegraphics[width=.25\textwidth]{ratio-in=random-0-1.eps}%
-\includegraphics[width=.25\textwidth]{ratio-in=random-1-2.eps}%
-}
+\includegraphics[width=.7\textwidth]{ratio-in=english-01-12.eps}%
 \caption{Ratios of k-error and (k+1)-error dotted trees}\label{fig:ratios}%
 \end{figure}
 
@@ -45,7 +27,8 @@ To experimentally verify the average case, we show in Figures~\ref{fig:ratios} t
 For searching, the full texts were first indexed and then online searches were performed on top of the structure. To generate input patterns, randomly chosen bits of the text were taken. These patterns were then altered by substituting a character at random. To generate mismatches, one character too many was altered~\footnote{Since the characters used were not present in the original text, there is no risk of generating a string which \emph{does appear} in the text.}. The search algorithm performed an early exit, without reporting of occurrences (ie, it only reported whether the string exists in the text). Therefore, the number of occurrences had no influence on the search time.
 
 \begin{figure}
-\includegraphics[width=\textwidth]{search-time-vary-m.k=2.in=english-100k.eps}
+\centering
+\includegraphics[width=.7\textwidth]{search-vary-N.in=all.eps}
 \caption{Search time versus pattern size}\label{fig:search-vary-m}
 \end{figure}
 

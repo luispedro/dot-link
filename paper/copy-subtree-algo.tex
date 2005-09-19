@@ -6,7 +6,7 @@
 
 \KwIn{A node in a suffix tree $\overline{w}$}
 \KwIn{An optional character $a$ (not given when copying the root)}
-\SetKwData{String}{string}
+\KwData{The original string \String}
 
 \Copy \Assign copy($\overline{w}$)\;
 \If{$\overline{w}$ is a leaf}{
@@ -23,9 +23,7 @@
 		\Copy.sons \Assign \Copy.sons $\cup$ \SonCopy\;
 	}
 }
-\If{\Copy.sons is empty}{
-	\Return null
-}
+\lIf{\Copy.sons is empty}{ \Return null }
 \If{\Copy.sons has only one element}{
 	\nllabel{algoline:copy-subtree:merge}\emph{merge \Copy.sons into \Copy and return that}\;
 }

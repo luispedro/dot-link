@@ -1,14 +1,15 @@
 \subsection{Intuition}
 
 \begin{figure}
-\includegraphics[width=\textwidth]{figures/mississippi-0}
+\centering
+\includegraphics[width=.75\textwidth]{figures/mississippi-0}
 \caption{Suffix Tree for the string \putstring{mississippi}}%
 \label{fig:mississippi-0}
 \end{figure}
 
 Suffix Trees have become a well known structure since their introduction in 1973~\cite{DBLP:conf/focs/Weiner73}. The example in Figure~\ref{fig:mississippi-0} shows the suffix tree for the string \putstring{mississippi}.
 
-To extend the suffix tree, we will consider that a node in the suffix tree corresponds to several points in the string at the same time (those points where the string on the path to the node occurs). We now add to each node an extra edge which corresponds to moving one character forward in all these points.
+To extend the suffix tree, we consider that a node in the suffix tree corresponds to several points in the string simultaneously (those points where the string on the path to the node occurs). To each node we add an extra edge corresponding to moving one character forward in all these points.
 
 \subsection{Formal definition}
 
@@ -20,7 +21,7 @@ Given a set $\Sigma$, we say that $s$ is a \emph{string over $\Sigma$} if $s$ is
 The set of all strings is denoted by $\Sigma^*$ and $\Sigma^+=\Sigma^*-\{\epsilon\}$.
 \end{definition}
 
-For denoting characters we shall use letters from the beginning of the roman alphabet ($a$, $b$, $c$,\ldots) and for strings, we shall use letters from the end of the alphabet ($w$, $z$, \ldots).
+For denoting characters we shall use letters from the beginning of the roman alphabet ($a$, $b$, $c$,\ldots) and for strings, we shall use letters from the end of the alphabet ($w$, $z$, \ldots). In what follows we assume that there are two symbols (\$ and $.$) which are not part of $\Sigma$.
 
 \begin{definition}
 $wx$ will denote the string formed by all the characters of $w$ followed by all the characters of $x$ (the usual concatenation operation). $aw$ ($wa$) shall denote the string formed by the character $a$ before (after) the characters of $w$.
@@ -36,14 +37,12 @@ Each node in a Patricia tree has a path leading to it which forms a string. If t
 
 %The name Patricia is sometimes spelled PATRICIA, since it was formed from the initial of Practical Algorithm to Retrieve Information Coded in Alphanumeric~\cite{DBLP:journals/jacm/Morrison68}.
 %
-In what follows we will assume that there are two symbols (\$ and $.$) which are not part of $\Sigma$.
 
-In this paper, we will be interested in substitution distance (aka Hamming distance):
+In this paper, we are interested in the substitution distance (aka Hamming distance):
 
 \begin{definition}[Aproximate Match]
-We say that the string $s$ matches the string $t$ at position $p$ with $k$ errors if we can make $k$ substitutions in $s$ such that $s$ is a substring of $t$ at position $p$.
+We say that the string $s$ matches the string $t$ at position $p$ with $k$ errors if we can make $k$ substitutions in $s$ to obtain $s'$ is a substring of $t$ at position $p$.
 \end{definition}
-
 
 \begin{definition}[Pattern]
 A pattern is a string over the extended alphabet $\Sigma\cup\{.\}$. We say that a pattern $s$ matches a string $t$ at position $p$, if for each dot in the pattern we can replace it by a character in the original alphabet to obtain $s'$ which is a substring of $t$ at position $p$.
@@ -57,7 +56,14 @@ A \emph{suffix tree} for a string $S$ is a Patricia tree whose leaf nodes (those
 A suffix link in a suffix tree is a link from the node $\overline{aw}$ to the node $\overline{w}$. This node has the label $a$.
 \end{definition}
 
-In a suffix tree, it is possible to define a suffix link for each internal node. Both Ukkonen's~\cite{ukkonen92constructing} and McCreight's~\cite{mccreight} algorithms are linear time algorithms for constructing a suffix tree which includes suffix links. The suffix links are shown in Figure~\ref{fig:mississippi-0} as dotted links.
+In a suffix tree, it is possible to define a suffix link for each internal node. Both Ukkonen's~\cite{ukkonen92constructing} and McCreight's~\cite{mccreight} algorithms are linear time algorithms for constructing a suffix tree which includes suffix links. The suffix links are shown in Figure~\ref{fig:mississippi-0} as dashed arrows with the label in italic.
+
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{figures/mississippi-1.eps}
+\caption{1-error dotted tree for \putstring{mississippi}}%
+\label{fig:mississippi-1}
+\end{figure}
 
 \begin{definition}[Occurence Set]
 Given a node $\overline{w}$ in a suffix tree, we call its \emph{occurrence set} the set of indexes in the original string where the string $w$ occurs.
@@ -67,15 +73,13 @@ Given a node $\overline{w}$ in a suffix tree, we call its \emph{occurrence set} 
 Given a node $\overline{w}$ in a suffix tree, its \emph{position set} is the set formed by taking its occurrence set and adding the length of $w$ to each element.
 \end{definition}
 
-For example, in the node $\overline{issi}$ in the suffix tree of Figure~\ref{fig:mississippi-0}, the occurrence set is $\{2, 5\}$ and its position set is $\{6, 9\}$. In a sense, one can say that being at node $\overline{issi}$ is being at positions 6 and~9 simultaneously. Note that for each node, the tree below it is the Patricia tree of the suffixes starting at the positions in its position set.
-
-In a leaf, the occurrence set is a singleton, and we label the leaf by its element.
+For example, in the node $\overline{issi}$ in the suffix tree of Figure~\ref{fig:mississippi-0}, the occurrence set is $\{2, 5\}$ and its position set is $\{6, 9\}$. In a sense, one can say that being at node $\overline{issi}$ is being at positions 6 and~9 simultaneously. For each node, the tree below it is the Patricia tree of the suffixes starting at the positions in its position set. In a leaf, the occurrence set is a singleton, and we label the leaf by its element.
 
 \begin{lemma}[Position set at the suffix node]\label{lemma:suffix-error}
 Given two nodes $\overline{aw}$ and $\overline{w}$ (connected by a suffix link, labeled $a$), if one takes position set of $\overline{w}$, subtracts one from each element, resulting a superset of the position set of $\overline{w}$. The items shared by both sets are those positions of the string which contain an $a$.
 \end{lemma}
 
-The lemma is fairly obvious given that the position set of $\overline{aw}$ contains all the positions where $aw$ occurs which will be exactly one minus those positions where $w$ occurs following $a$.
+The lemma is fairly obvious given that the position set of $\overline{aw}$ contains all the positions where $aw$ occurs which are exactly those positions where $w$ occurs preceded by $a$.
 
 \begin{definition}[Error Tree]
 For any node $w$ its error tree is the Patricia tree formed by taking its position set, adding one to each element and forming the Patricia tree of the suffixes of the suffixes starting at those positions. If the position set includes the end of the string, that element is removed.
@@ -89,14 +93,7 @@ For example, in the above mentioned node $\overline{issi}$, the error tree is fo
 We define a \emph{1-error dotted tree} as the tree which is formed by adding to each node in a suffix tree, a new edge labeled by \putstring{.} which points to its error tree. The edge labeled \putstring{.} shall be called a \emph{dot link}.
 \end{definition}
 
-\begin{figure} 
-\includegraphics[width=\textwidth]{figures/mississippi-1.eps}
-% mississippi-1.eps: 300dpi, width=6.08cm, height=1.63cm, bb=0 0 718 193
-\caption{1-error dotted tree for \putstring{mississippi}}%
-\label{fig:mississippi-1}
-\end{figure}
-
-The one-error dotted tree for \putstring{mississippi} is shown in Figure~\ref{fig:mississippi-1}. The nodes are connected to their error trees by thick diagonal links.
+The 1-error dotted tree for \putstring{mississippi} is shown in Figure~\ref{fig:mississippi-1}. The nodes are connected to their error trees by thick diagonal links.
 
 The paths in the dotted tree are paths in the extended alphabet $\Sigma\cup\{.,\$\}$. The notions of \emph{occurrence set}, \emph{position set} and \emph{error tree} are valid for all nodes in a dotted tree considering that a node path may contain dot elements which match any other character.
 
