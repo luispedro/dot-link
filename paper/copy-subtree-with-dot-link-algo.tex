@@ -1,4 +1,5 @@
 \begin{algorithm}
+\dontprintsemicolon
 \caption{Copying a sub tree}\label{algo:copy-subtree-with-dot-link}
 \SetKwData{Copy}{copy}
 \SetKwData{SonCopy}{copy of son}
@@ -8,7 +9,7 @@
 \KwIn{An optional character $a$ (not given when copying the root)}
 \KwData{The original string \String}
 
-\Copy \Assign $\overline{w}$\;
+\Copy \Assign make-copy($\overline{w}$)\;
 \If{$\overline{w}$ is a leaf}{
 	$p$ \Assign $\overline{w}$.label\;
 	\lIf{$p = 1$}{\Return null}\;

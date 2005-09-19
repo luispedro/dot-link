@@ -3,8 +3,8 @@
 Constructing the tree is very simple. We start with a suffix tree which includes suffix links and add error trees to it. First, we construct the error tree for the root. This tree is almost a copy of the entire tree, except for two properties:
 
 \begin{enumerate}
-\item It does not have the leaf labeled 1 in the original tree. Keeping this leaf would have resulted in the \putstring{.s\$} which does not occur in original string (it is one character too large).
-\item For any other leaf $\overline{w\$}$ which occurred at position $p$ in the string, we have a new leaf $\overline{.w\$}$ which occurs at position $p-1$ in the string. Therefore, we adjust the labels.
+\item It does not have the leaf labeled 1 in the original tree. Keeping this leaf would have resulted in a leaf labeled \putstring{.s\$} which does not occur in original string (it is one character too long).
+\item For any other leaf $\overline{w\$}$ occuring at position $p$ in the string, we have a new leaf $\overline{.w\$}$ which occurs at position $p-1$ in the string. Therefore, we adjust the labels.
 
 \end{enumerate}
 
@@ -16,7 +16,7 @@ For any other node $\overline{aw}$, the error tree is a copy of the error tree a
 \item A leaf labeled $p$ is included only if $s_{p-1}$ equals the label of the suffix link.
 \end{enumerate}
 
-These conditions are an expression of Lemma~\ref{lemma:suffix-error} and a an extension of the conditions for the root. Both are implemented by Algorithm~\ref{algo:copy-subtree}.
+These conditions are an expression of Lemma~\ref{lemma:suffix-error} and an extension of the conditions for the root. Both are implemented by Algorithm~\ref{algo:copy-subtree}.
 
 \input{copy-subtree-algo}
 
@@ -29,7 +29,7 @@ The only point to note is line~\ref{algoline:copy-subtree:merge}. Since we filte
 \label{fig:merge}
 \end{figure}
 
-As discussed above, suffix trees are implemented such that each node is actually just a pair of indices into the original string (examplified in Figure~\ref{fig:mississippi-nodes}). To merge a child with its parent, we just need to replace both by a node whose starting index is the starting index of the original child minus the length of the parent edge. This process is illustrated in Figure~\ref{fig:merge}.
+As discussed above, suffix trees are implemented such that each node is actually just a pair of indices into the original string (exemplified in Figure~\ref{fig:mississippi-nodes}). To merge a child with its parent, we just need to replace both by a node whose starting index is the starting index of the original child minus the length of the parent edge. This process is illustrated in Figure~\ref{fig:merge}.
 
 The construction of the tree using either Ukonnen's or McCreight's algorithm assures that this operation is correct due to the way that the indices are created.
 
@@ -55,9 +55,7 @@ The above algorithm can be used to construct trees with any number of errors by 
 
 \input{construct-k-algo}
 
-The code for the subtree copy is Algorithm~\ref{algo:copy-subtree-with-dot-link} which differs from Algorithm~\ref{algo:copy-subtree} in that dot link are also followed while copying the tree.
-
-The final procedure for constructing k-error trees is Algorithm~\ref{algo:construct-k}.
+The code for the subtree copy is Algorithm~\ref{algo:copy-subtree-with-dot-link} which differs from Algorithm~\ref{algo:copy-subtree} in that dot link are also followed while copying the tree. The final procedure for constructing k-error trees is Algorithm~\ref{algo:construct-k}.
 
 We note that the method of removing the existing error trees can be improved in practice (the asymptotic bound remains the same) the following way: While making a copy of the tree for construction of the error tree at the root, instead of following a dot link to make a copy, move the error tree to its destination and make the necessary adjustments in place (this move will probably be just an adjustment of pointer depending on the exact implementation). Using this method only leafs labeled one need to be removed (as well as any internal node which becomes unnecessary).
 

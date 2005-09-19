@@ -18,11 +18,11 @@ The machine used for testing was an Intel Pentium~IV running at~2.40GHz with~4GB
 \caption{Ratio of number of nodes in k-error and (k+1)-error dotted trees}\label{fig:ratios}%
 \end{figure*}
 
-To experimentally verify the average case prediction, we show in Figures~\ref{fig:ratios} the ratios between the k-error and the (k+1)-error dotted trees, for english text (the other datasets show similiar behaviour). We can easily see that the experimental values do resemble a logarithm as predicted.
+To experimentally verify the average case prediction, we show in Figures~\ref{fig:ratios} the ratios between the k-error and the (k+1)-error dotted trees, for English text (the other datasets show similar behaviour). We can easily see that the experimental values do resemble a logarithm as predicted.
 
 \subsection{Search Time}
 
-For searching, the full texts were first indexed and then online searches were performed on top of the structure. To generate input patterns, randomly chosen snippets of the text were taken. These patterns were then altered by substituting a character at random. To generate mismatches, one character too many was altered~\footnote{Since the characters used were not present in the original text, there is no risk of generating a string which \emph{does appear} in the text.}. The search algorithm performed an early exit, without reporting of occurrences (ie, it only reported whether the string exists in the text). Therefore, the number of occurrences had no influence on the search time.
+For searching, the texts were first indexed and then online searches were performed on top of the structure. To generate input patterns, randomly chosen snippets of the text were taken. These patterns were then altered by substituting a few characters at random. To generate mismatches, one character too many was altered\,\footnote{Since the characters used were not present in the original text, there is no risk of generating a string which \emph{does appear} in the text.}. The search algorithm performed an early exit, without reporting of occurrences (ie, it only reported whether the string exists in the text). Therefore, the number of occurrences had no influence on the search time.
 
 \begin{figure*}
 \centering

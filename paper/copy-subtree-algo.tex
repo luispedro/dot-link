@@ -1,4 +1,5 @@
 \begin{algorithm}
+\dontprintsemicolon
 \caption{Copying a sub tree}\label{algo:copy-subtree}
 \SetKwData{Copy}{copy}
 \SetKwData{SonCopy}{copy of son}
@@ -8,7 +9,7 @@
 \KwIn{An optional character $a$ (not given when copying the root)}
 \KwData{The original string \String}
 
-\Copy \Assign copy($\overline{w}$)\;
+\Copy \Assign make-copy($\overline{w}$)\;
 \If{$\overline{w}$ is a leaf}{
 	$p$ \Assign $\overline{w}$.label\;
 	\lIf{$p = 1$}{\Return null}\;
@@ -23,7 +24,7 @@
 		\Copy.sons \Assign \Copy.sons $\cup$ \SonCopy\;
 	}
 }
-\lIf{\Copy.sons is empty}{ \Return null }\;
+\lIf{\Copy.sons is empty}{ \Return null}\;
 \If{\Copy.sons has only one element}{
 	\nllabel{algoline:copy-subtree:merge}\emph{merge \Copy.sons into \Copy and return that}\;
 }

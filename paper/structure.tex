@@ -16,14 +16,14 @@ To extend the suffix tree, we consider that a node in the suffix tree correspond
 We assume that the reader is familiar with the basic concepts of suffix trees and strings and present the definitions below mainly to introduce the particular notation and terminology used in this paper.
 
 \begin{definition}[Character, string]
-Given a set $\Sigma$, we say that $s$ is a \emph{string over $\Sigma$} if $s$ is a (possibly empty) sequence of elements of $\Sigma$. The elements of the set $\Sigma$ are also called \emph{characters}. The length of the string, denoted by $|s|$ is the number of elements it contains. We shall write $s_i$ for the $i$th element of the string. For the empty string, we write $\epsilon$.
+Given a set $\Sigma$, we say that $s$ is a \emph{string over $\Sigma$} if $s$ is a (possibly empty) sequence of elements of $\Sigma$. The elements of the set $\Sigma$ are also called \emph{characters}. The length of the string, denoted by $|s|$ is the number of elements it contains. We shall write $s_i$ for the $i$th element of the string. For the empty string, we write $\varepsilon$.
 
-The set of all strings is denoted by $\Sigma^*$ and $\Sigma^+=\Sigma^*-\{\epsilon\}$.
+The set of all strings is denoted by $\Sigma^*$ and $\Sigma^+=\Sigma^*-\{\varepsilon\}$.
 \end{definition}
 
 For denoting characters we shall use letters from the beginning of the roman alphabet ($a$, $b$, $c$,\ldots) and for strings, we shall use letters from the end of the alphabet ($w$, $z$, \ldots). In what follows we assume that there are two symbols (\$ and $.$) which are not part of $\Sigma$.
 
-\begin{definition}
+\begin{definition}[Concatenation]
 $wx$ will denote the string formed by all the characters of $w$ followed by all the characters of $x$ (the usual concatenation operation). $aw$ ($wa$) shall denote the string formed by the character $a$ before (after) the characters of $w$.
 
 If $s = wxy$, then $w$ is a \emph{prefix} of $s$, $x$ is a \emph{substring} of $s$ (at position $|w|$) and $y$ is a \emph{suffix} of $s$ (at position $|wx|$).
@@ -41,7 +41,7 @@ Each node in a Patricia tree has a path leading to it which forms a string. If t
 In this paper, we are interested in the substitution distance (aka Hamming distance):
 
 \begin{definition}[Aproximate Match]
-We say that the string $s$ matches the string $t$ at position $p$ with $k$ errors if we can make $k$ substitutions in $s$ to obtain $s'$ is a substring of $t$ at position $p$.
+We say that the string $s$ matches the string $t$ at position $p$ with $k$ errors if we can make $k$ substitutions in $s$ to obtain $s'$ which is a substring of $t$ at position $p$.
 \end{definition}
 
 \begin{definition}[Pattern]
@@ -64,7 +64,7 @@ In a suffix tree, it is possible to define a suffix link for each internal node.
 \label{fig:mississippi-nodes}
 \end{figure*}
 
-It is important to understand that suffix trees are normally implemented so that each node consists of only two indices into the original string which are the start and end position of its incoming edge. Figure~\ref{fig:mississippi-nodes} illustrates this.
+Suffix trees are normally implemented so that each node consists of only two indices into the original string which are the start and end position of its incoming edge. Figure~\ref{fig:mississippi-nodes} illustrates this.
 
 \begin{definition}[Occurence Set]
 Given a node $\overline{w}$ in a suffix tree, we call its \emph{occurrence set} the set of indexes in the original string where the string $w$ occurs.
@@ -77,13 +77,13 @@ Given a node $\overline{w}$ in a suffix tree, its \emph{position set} is the set
 For example, in the node $\overline{issi}$ in the suffix tree of Figure~\ref{fig:mississippi-0}, the occurrence set is $\{2, 5\}$ and its position set is $\{6, 9\}$. In a sense, one can say that being at node $\overline{issi}$ is being at positions 6 and~9 simultaneously. For each node, the tree below it is the Patricia tree of the suffixes starting at the positions in its position set. In a leaf, the occurrence set is a singleton, and we label the leaf by its element.
 
 \begin{lemma}[Position set at the suffix node]\label{lemma:suffix-error}
-Given two nodes $\overline{aw}$ and $\overline{w}$ (connected by a suffix link, labeled $a$), if one takes position set of $\overline{w}$, subtracts one from each element, resulting a superset of the position set of $\overline{w}$. The items shared by both sets are those positions of the string which contain an $a$.
+Given two nodes $\overline{aw}$ and $\overline{w}$ (connected by a suffix link, labeled $a$), if one takes position set of $\overline{w}$, subtracts one from each element, one obtains a superset of the position set of $\overline{w}$. The items shared by both sets are those positions of the string which contain an $a$.
 \end{lemma}
 
 The lemma is fairly obvious given that the position set of $\overline{aw}$ contains all the positions where $aw$ occurs which are exactly those positions where $w$ occurs preceded by $a$.
 
 \begin{definition}[Error Tree]
-For any node $w$ its error tree is the Patricia tree formed by taking its position set, adding one to each element and forming the Patricia tree of the suffixes of the suffixes starting at those positions. If the position set includes the end of the string, that element is removed.
+For any node $w$, its error tree is the Patricia tree formed by taking its position set, adding one to each element and forming the Patricia tree of the suffixes of the suffixes starting at those positions. If the position set includes the end of the string, that element is removed.
 
 The leafs are labeled by the position of the string in which their paths occur minus $|w| + 1$.
 \end{definition}
