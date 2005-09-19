@@ -1,19 +1,8 @@
-To search a string with at maximum k errors in a k-error dotted tree, we need to descend the tree. Whenever we find a node we follow both the dot link and the edge which matches the current position of the string we are searching. If we have a mismatch in the middle of an edge, we continue, decreasing the amount of errors permitted.
-
-Before introducing the pseudo-code, it is important to understand that suffix trees are normally implemented so that each node consists of only two indices into the original string which are the start and end position of its incoming edge. Figure~\ref{fig:mississippi-nodes} shows an example of this structure (for the now familiar \putstring{mississippi}).
-
-\begin{figure}
-\includegraphics[width=\textwidth]{figures/mississippi-nodes}
-\caption{Suffix Tree for the string \putstring{mississippi}}%
-\label{fig:mississippi-nodes}
-\end{figure}
-
+To search a string with at maximum k errors in a k-error dotted tree, we descend the tree. Whenever we find a node we follow both the dot link and the edge which matches the current position of the string we are searching. If we find a mismatch in the middle of an edge, we continue, decreasing the amount of errors permitted.
 When presenting the algorithm, we take the liberty of using $s+j$ where $s$ is a string and $j$ an integer to mean the suffix of $s$ starting at position $j$ (as happens in the C~Programming Language).
 
 \input{search-algo}
 
-The search algorithm is presented in Figure~\ref{algo:search}. Reporting of the leafs below a certain node can be done by a Depth First Search reporting any leafs found. If one is interested in knowing only whether the string occurs, then the lines which report the matches can be substituted by early exits returning true.
+The process just described is Algorithm~\ref{algo:search}. Reporting of the leafs below a certain node can be done by a Depth First Search. If one is interested in knowing only whether the string occurs, then the lines which report the matches can be substituted by early exits returning true.
 
-This algorithm runs in time $\mathcal{O}(m^{k+1})$:
-
-The recursive call at line~\ref{algoline:search:followDot} means that a dot link was followed. There are at most $\mathcal{O}(m^k)$ places where a dot link can be followed while descending a string~\footnote{For $k=1$ each point in the string. For $k>1$, each path for $k-1$, can now have at most $m$ extra branches.}. Following one path in the tree takes $\mathcal{O}(m)$ time. Therefore, the total time is $\mathcal{O}(m^{k+1})$ without the reporting of occurrences (which can be done in time linear to the number of occurrences).
+This algorithm runs in time $\mathcal{O}(m^{k+1})$: The recursive call at line~\ref{algoline:search:followDot} corresponds to following a dot link. There are at most ${m \choose k}=\mathcal{O}(m^k)$ different paths which must be followed. Following one path in the tree takes $\mathcal{O}(m)$ time. Therefore, the total time is $\mathcal{O}(m^{k+1})$ without the reporting of occurrences (which can be done in time linear to the number of occurrences).

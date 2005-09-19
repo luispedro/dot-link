@@ -1,5 +1,5 @@
 \begin{algorithm}
-\caption{Algorithm for copying a sub tree}\label{algo:copy-subtree-with-dot-link}
+\caption{Copying a sub tree}\label{algo:copy-subtree-with-dot-link}
 \SetKwData{Copy}{copy}
 \SetKwData{SonCopy}{copy of son}
 \SetKwData{String}{string}
@@ -24,7 +24,7 @@
 		\Copy.sons \Assign \Copy.sons $\cup$ \SonCopy\;
 	}
 }
-\lIf{\Copy.sons is empty}{ \Return null }
+\lIf{\Copy.sons is empty}{ \Return null }\;
 \If{\Copy.sons has only one element}{
 	\emph{merge \Copy.sons into \Copy and return that}\;
 }

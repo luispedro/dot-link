@@ -4,6 +4,11 @@ import sys
 import random
 import os
 
+if len(argv) < 5:
+	print "usage:"
+	print sys.argv[0], " inputfile [ begin | . ] lenght errors [ repeats ]"
+	sys.exit(0)
+
 inputfile=argv[1]
 filelen=os.stat(inputfile)[6]
 
@@ -12,8 +17,14 @@ k=int(argv[4])
 
 f=open(inputfile,'r')
 repeats=1
+
 if len(argv) > 5:
 	repeats=int(argv[5])
+
+if lenght > filelen:
+	print "File %s is too small!" % inputfile
+	sys.exit(1)
+	
 
 def get_string(f,begin,lenght,k):
 	f.seek(begin)

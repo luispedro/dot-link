@@ -2,8 +2,8 @@
 
 \begin{figure}
 \centering
-\includegraphics[width=.75\textwidth]{figures/mississippi-0}
-\caption{Suffix Tree for the string \putstring{mississippi}}%
+\includegraphics[width=.45\textwidth]{figures/mississippi-0}
+\caption{Suffix tree representation for the string \putstring{mississippi}}%
 \label{fig:mississippi-0}
 \end{figure}
 
@@ -32,7 +32,7 @@ If $s = wxy$, then $w$ is a \emph{prefix} of $s$, $x$ is a \emph{substring} of $
 \begin{definition}[Patricia tree]
 $T$ is a Patricia tree if $T$ is a rooted tree with edge labels from $\Sigma^+$. For each $a \in \Sigma$ and every node $n$ in $T$, there is at most one edge leaving $n$ whose label is $aw$.
 
-Each node in a Patricia tree has a path leading to it which forms a string. If the node $n$ has the leading path $w$, we shall also refer to $n$ as $\overline{w}$one .
+Each node in a Patricia tree has a path leading to it which forms a string. If the node $n$ has the leading path $w$, we shall also refer to $n$ as $\overline{w}$.
 \end{definition}
 
 %The name Patricia is sometimes spelled PATRICIA, since it was formed from the initial of Practical Algorithm to Retrieve Information Coded in Alphanumeric~\cite{DBLP:journals/jacm/Morrison68}.
@@ -58,12 +58,13 @@ A suffix link in a suffix tree is a link from the node $\overline{aw}$ to the no
 
 In a suffix tree, it is possible to define a suffix link for each internal node. Both Ukkonen's~\cite{ukkonen92constructing} and McCreight's~\cite{mccreight} algorithms are linear time algorithms for constructing a suffix tree which includes suffix links. The suffix links are shown in Figure~\ref{fig:mississippi-0} as dashed arrows with the label in italic.
 
-\begin{figure}
-\centering
-\includegraphics[width=\textwidth]{figures/mississippi-1.eps}
-\caption{1-error dotted tree for \putstring{mississippi}}%
-\label{fig:mississippi-1}
-\end{figure}
+\begin{figure*}
+\includegraphics[width=\textwidth]{figures/mississippi-nodes}
+\caption{Suffix Tree for the string \putstring{mississippi}}%
+\label{fig:mississippi-nodes}
+\end{figure*}
+
+It is important to understand that suffix trees are normally implemented so that each node consists of only two indices into the original string which are the start and end position of its incoming edge. Figure~\ref{fig:mississippi-nodes} illustrates this.
 
 \begin{definition}[Occurence Set]
 Given a node $\overline{w}$ in a suffix tree, we call its \emph{occurrence set} the set of indexes in the original string where the string $w$ occurs.
@@ -92,6 +93,13 @@ For example, in the above mentioned node $\overline{issi}$, the error tree is fo
 \begin{definition}[1-error dotted Tree]
 We define a \emph{1-error dotted tree} as the tree which is formed by adding to each node in a suffix tree, a new edge labeled by \putstring{.} which points to its error tree. The edge labeled \putstring{.} shall be called a \emph{dot link}.
 \end{definition}
+
+\begin{figure*}
+\centering
+\includegraphics[width=\textwidth]{figures/mississippi-1.eps}
+\caption{1-error dotted tree for \putstring{mississippi}}%
+\label{fig:mississippi-1}
+\end{figure*}
 
 The 1-error dotted tree for \putstring{mississippi} is shown in Figure~\ref{fig:mississippi-1}. The nodes are connected to their error trees by thick diagonal links.
 

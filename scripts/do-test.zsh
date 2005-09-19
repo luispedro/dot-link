@@ -30,8 +30,8 @@ function do_test() {
 }
 
 files=(english)
-ks=(3)
-maxs=(100000)
+ks=(1 2 3)
+maxs=(100000 100000 50000)
 
 [[ -d tmp ]] || mkdir tmp
 for f in $files; do

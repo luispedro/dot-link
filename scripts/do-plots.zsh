@@ -1,7 +1,7 @@
 #!/bin/zsh
 
 ext=eps
-gnuplotterminal='postscript eps enhanced color'
+gnuplotterminal='postscript eps enhanced'
 
 function plot() {
 	output="$1.plot.$ext"
@@ -20,27 +20,49 @@ function plot() {
 
 function ratios() {
 	dataset=$1
-	input="pasted-in=$dataset.tmp"
-	paste *.in=$dataset*max=100000*.results >$input
+	local tinput="pasted-in=$dataset.tmp"
+	paste machine=gauss.in=$dataset.k=*.max=100000.results >$tinput
 	gnuplot <<-END
 		set terminal $gnuplotterminal
-		set title 'No errors to 1 error'
+		unset title
 		set xlabel 'Number of Characters'
 		set ylabel 'Ratio'
+		set key bottom right reverse Left
 		set yrange[0:]
+		set size 1,.75
+		set format x "%3gk"
 
-		set output "ratio-in=$dataset-0-1.$ext"
-		plot '$input' using 1:(\$3/\$2) with lines title 'Nodes'
+		set output "ratio-in=$dataset-01-12.$ext"
 
-		set title '1 error to 2 errors'
-		set output "ratio-in=$dataset-1-2.$ext"
-		plot '$input' using 1:(\$8/\$3) with lines title 'Nodes'
-
-		set title '2 error to 3 errors'
-		set output "ratio-in=$dataset-2-3.$ext"
-		plot '$input' using 1:(\$13/\$8) with lines title '2 Errors to 3 Errors'
+		plot '$tinput' using (\$1/1000):(\$3/\$2) with lines title 'No errors to one error', \
+			'$tinput' using (\$1/1000):(\$8/\$3) with lines title '1 error to 2 errors'
 	END
-	rm $input
+	rm $tinput
+}
+
+function search() { 
+	local input1="search-vary-N-machine=boole.in=dna.k=2.max=100000.results"
+	local input2="search-vary-N-machine=boole.in=english.k=2.max=100000.results"
+	local input3="search-vary-N-machine=boole.in=random.k=2.max=100000.results"
+	gnuplot <<-END
+		set terminal $gnuplotterminal
+		set output 'search-vary-N.in=all.$ext'
+		unset title
+		set yrange[0:]
+		set xlabel 'Text Size'
+		set ylabel 'Character Comparisons (average)'
+		set format x "%3gk"
+		set ytics
+		set key bottom right reverse Left
+		set size 1,.75
+
+		plot 	'$input1' using (\$1/1000):(\$2/10000) with lp title 'Existing strings, {/Italic dna}', \
+			'$input2' using (\$1/1000):(\$2/10000) with lp title 'Existing strings, {/Italic english}', \
+			'$input3' using (\$1/1000):(\$2/10000) with lp title 'Existing strings, {/Italic random text}', \
+			'$input1' using (\$1/1000):(\$4/10000) with lp title 'Non-existing strings, {/Italic dna}', \
+			'$input2' using (\$1/1000):(\$4/10000) with lp title 'Non-existing strings, {/Italic english}', \
+			'$input3' using (\$1/1000):(\$4/10000) with lp title 'Non-existing strings, {/Italic random text}'
+	END
 }
 
 if test -d ../output; then
@@ -62,4 +84,6 @@ for f in english dna random; do
 	ratios $f
 done
 
+
+search
 
