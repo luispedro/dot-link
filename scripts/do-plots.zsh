@@ -84,6 +84,5 @@ for f in english dna random; do
 	ratios $f
 done
 
-
 search
 
