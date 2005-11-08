@@ -1,0 +1,280 @@
+\documentclass{beamer}
+
+\usepackage{pgf,pgfarrows,pgfnodes,pgfautomata,pgfheaps,pgfshade}
+\usepackage{amsmath,amssymb}
+\usepackage[latin1]{inputenc}
+\usepackage{colortbl}
+\usepackage[english]{babel}
+
+\title{Dotted Suffix Trees\\A Structure for Approximate Text Indexing}
+\author{Lu\'{\i}s Pedro Coelho \and Arlindo L. Oliveira}
+\date{}
+
+\graphicspath{{figures/}{../paper/figures}}
+
+\begin{document}
+\frame{\titlepage}
+\frame{\tableofcontents}
+\section{Suffix Trees}
+\frame{
+\frametitle{Suffixes of a String}
+
+$\mathcal{T}=$mississippi
+
+\begin{minipage}{18em}	
+\begin{flushright}	
+\texttt{mississippi\$}\\
+ \texttt{ississippi\$}\\
+  \texttt{ssissippi\$}\\
+   \texttt{sissippi\$}\\
+    \texttt{issippi\$}\\
+     \texttt{ssippi\$}\\
+      \texttt{sippi\$}\\
+       \texttt{ippi\$}\\
+        \texttt{ppi\$}\\
+         \texttt{pi\$}\\
+          \texttt{i\$}\\
+           \texttt{\$}\\
+\end{flushright}
+\end{minipage}
+}
+
+\frame{
+
+\frametitle{Suffix Tree}
+$\mathcal{T}=$mississippi
+
+\centering\includegraphics[width=.8\textwidth]{mississippi-0-no-sl}
+}
+\frame{
+
+\frametitle{Suffix Tree (with suffix-links}
+
+\centering\includegraphics[width=.8\textwidth]{mississippi-0}
+
+Can be built in $\mathcal{O}(n)$ time.
+}
+
+
+\frame{
+\frametitle{Searching in Suffix Trees}
+
+$\mathcal{T}=$ mississippi\$\\
+$\mathcal{P}=$ ssi
+
+\bigskip
+
+\centering \includegraphics[width=.8\textwidth]{mississippi-0-no-sl}
+
+}
+
+\section{Approximate Matching}
+\frame{
+\frametitle{Approximatte Matching}
+
+Substituition (aka Hamming) distance
+
+Example: $\mathcal{P}=$ \texttt{sxi}
+
+
+
+$\mathcal{T}= $\texttt{mississippi}\$\\
+$\mathcal{P}= $\texttt{\ \ sxi\ sxi}
+
+}
+
+\frame{
+
+\frametitle{First Intuition}
+
+\begin{itemize}
+\item It doesn't matter what the substituting character is
+\item The pattern can be divided into
+\begin{itemize}
+\item \texttt{sxi}
+\item \texttt{.si}
+\item \texttt{s.i}
+\item \texttt{sx.}
+\end{itemize}
+\end{itemize}
+
+}
+
+\frame{
+\frametitle{First Intituion (Text Transformation)}
+
+The same transformation can be applied to the text.
+
+\begin{itemize}
+\item \texttt{mississippi}
+\item \texttt{.ississippi}
+\item \texttt{m.ssissippi}
+\item \texttt{mi.sissippi}
+\item \texttt{mis.issippi}
+\item \texttt{miss.ssippi}
+\item \texttt{missi.sippi}
+\item \texttt{missis.ippi}
+\item \texttt{mississ.ppi}
+\item \texttt{mississi.pi}
+\item \texttt{mississip.i}
+\item \texttt{mississipp.}
+\end{itemize}
+
+Na\"\i{}ve tree generation: $\mathcal{O}(n^{k+1})$ nodes.
+
+}
+
+\frame{
+\frametitle{Generated Tree (Multiple Branched Nodes)}
+
+\begin{center}
+\includegraphics[width=.8\textwidth]{needed-nodes}
+\end{center}
+
+These nodes are needed.
+}
+\frame{
+\frametitle{Generated Tree (Dot-Only Branched Nodes)}
+
+\begin{center}
+\includegraphics[width=.7\textwidth]{unneeded}
+\end{center}
+
+These nodes can be removed.
+}
+
+
+\frame{
+\frametitle{Generated Tree (compression)}
+\centering \includegraphics[height=.5\textheight]{half-implicit}
+
+}
+\frame{
+\frametitle{Generated Tree (implicit nodes)}
+
+\centering \includegraphics[height=.4\textheight]{fully-implicit}
+
+}
+
+\frame{
+\frametitle{Dotted Suffix Tree}
+\includegraphics[width=.8\textwidth]{mississippi-1-no-sl}
+
+}
+
+
+\frame{
+\frametitle{Dotted Suffix Tree (space cost)}
+
+\begin{itemize}
+\item Traditional worst-case analysis: $\mathcal{O}(n^{k+1})$
+\item Expected case (under \emph{very general} assumptions): $\mathcal{O}(n \log^k(n))$
+\end{itemize}
+
+}
+
+
+\section{Searching}
+
+\frame{
+
+\frametitle{Searching}
+
+$\mathcal{P}=\mathit{sxip}$
+	
+Looking for \texttt{sxip}, \texttt{.xip}, \texttt{s.ip}, \texttt{sx.p}, and \texttt{sxi.}
+
+\includegraphics[width=.8\textwidth]{mississippi-1-no-sl}
+
+}
+
+\frame{
+
+\frametitle{Search Time}
+
+\begin{itemize}
+\item $sum_{i=0}^{k}C_i^m=\mathcal{O}(m^k)$ paths
+\item $\mathcal{O}(m)$ per path
+\item $\mathcal{O}(m^{k+1})$ total
+\end{itemize}
+}
+
+\section{Construction}
+
+\frame{
+\frametitle{A look at the tree}
+
+\centering\includegraphics[width=.8\textwidth]{mississippi-1}
+
+}
+
+
+\frame{
+\frametitle{A close look at the tree}
+
+\begin{center}
+\includegraphics[width=.8\textwidth]{suffix-link}
+\end{center}
+
+Only leafs which correspond to positions in the string where the suffix-label occurrs are retained.
+
+}
+
+\frame{
+\frametitle{Transformations}
+
+\begin{itemize}
+\item Leafs are labeled \textit{original - 1}
+\item Leaf 1 is dropped
+\item Only some leafs are retained (filter)
+\end{itemize}
+
+}
+
+\frame{
+\frametitle{Construction I}
+
+\centering\includegraphics[width=.8\textwidth]{mississippi-1-i}
+}
+\frame{
+\frametitle{Construction II}
+\centering\includegraphics[width=.8\textwidth]{mississippi-1-ii}
+
+}\frame{
+\frametitle{Construction III}
+
+\centering\includegraphics[width=.8\textwidth]{mississippi-1-iii}
+}\frame{
+\frametitle{Construction IV}
+\centering\includegraphics[width=.8\textwidth]{mississippi-1-iv}
+}\frame{
+\frametitle{Construction V}
+\begin{center}
+\includegraphics[width=.8\textwidth]{mississippi-1-v}
+\end{center}
+
+Construction Time: $\mathcal{O}(kN|\Sigma|)$
+}
+
+\frame{
+
+\frametitle{Deepest node}
+\begin{center}
+\includegraphics[width=.8\textwidth]{deepest}
+\end{center}
+
+Expected deepest node depth: $\mathcal{O}(\log n)$
+}
+
+\frame{
+\frametitle{Summary}
+
+\begin{itemize}
+\item Size $\mathcal{O}(n\log^k n)$
+\item Search time $\mathcal{O}(m\log^{k+1})$
+\item Construction $\mathcal{O}(kn\log^k n|\Sigma|)$
+\end{itemize}
+}
+
+\end{document}
+
