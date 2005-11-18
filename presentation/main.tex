@@ -1,6 +1,6 @@
 \documentclass{beamer}
 
-\usetheme{PaloAlto}
+\usetheme{Darmstadt}
 
 \usepackage{pgf,pgfarrows,pgfnodes,pgfautomata,pgfheaps,pgfshade}
 \usepackage{amsmath,amssymb}
@@ -13,15 +13,27 @@
 \date{}
 
 \graphicspath{{figures/}{../paper/figures}}
+\newcommand*{\puttree}[1]{\begin{center}\rotatebox{270}{\includegraphics[height=.8\textwidth]{#1}}\end{center}}
+
+
+
+\AtBeginSection[] % Do nothing for \subsection*
+{
+	\begin{frame}<beamer>
+		\frametitle{Outline}
+		\tableofcontents[currentsection,currentsubsection]
+	\end{frame}
+}
+
 
 \begin{document}
 \frame{\titlepage}
 \frame{\tableofcontents}
 \section{Suffix Trees}
 \frame{
-\frametitle{Suffixes of a String}
+%\frametitle{Suffixes of a String}
 
-$\mathcal{T}=$mississippi
+\begin{block}{$\mathcal{T}=$mississippi}
 
 \begin{minipage}{18em}	
 \begin{flushright}	
@@ -39,58 +51,66 @@ $\mathcal{T}=$mississippi
            \texttt{\$}\\
 \end{flushright}
 \end{minipage}
+\end{block}
 }
 
 \frame{
 
-\frametitle{Suffix Tree}
-$\mathcal{T}=$mississippi
+%\frametitle{Suffix Tree}
 
-\centering\includegraphics[width=.8\textwidth]{mississippi-0-no-sl}
+\begin{block}{Suffix Tree for $\mathcal{T}=$mississippi}
+\centering\puttree{mississippi-0-no-sl}
+\end{block}
 }
 \frame{
 
-\frametitle{Suffix Tree (with suffix-links}
+%\frametitle{Suffix Tree (with suffix-links)}
 
-\centering\includegraphics[width=.8\textwidth]{mississippi-0}
+\begin{block}{Suffix Tree for $\mathcal{T}=$mississippi}
+\centering\puttree{mississippi-0}
+\end{block}
 
 Can be built in $\mathcal{O}(n)$ time.
 }
 
 
 \frame{
-\frametitle{Searching in Suffix Trees}
+%\frametitle{Searching in Suffix Trees}
 
+\begin{block}{%
 $\mathcal{T}=$ mississippi\$\\
-$\mathcal{P}=$ ssi
-
-\bigskip
-
-\centering \includegraphics[width=.8\textwidth]{mississippi-0-no-sl}
+$\mathcal{P}=$ ssi}
+\centering\puttree{mississippi-0-no-sl}
+\end{block}
 
 }
 
 \section{Approximate Matching}
 \frame{
-\frametitle{Approximatte Matching}
+%\frametitle{Approximatte Matching}
 
-Substituition (aka Hamming) distance
+\begin{block}{Substituition (aka Hamming) distance}
+$\mathcal{P}$ matches $\mathcal{T}$ with up to $k$ substitutions iff we can change
+$k$ (or less) characters in $\mathcal{P}$ so that it matches $\mathcal{T}$
+\end{block}
 
-Example: $\mathcal{P}=$ \texttt{sxi}
-
-
-
+\begin{block}{Example: $\mathcal{P}=$ \texttt{sxi}}
 $\mathcal{T}= $\texttt{mississippi}\$\\
 $\mathcal{P}= $\texttt{\ \ sxi\ sxi}
+\end{block}
 
 }
 
 \frame{
 
-\frametitle{First Intuition}
-
+\begin{block}{First Intuition}
 \begin{itemize}
 \item It doesn't matter what the substituting character is
+\end{itemize}
+\end{block}
+
+\begin{block}{Pattern $\mathcal{P}=$sxi}
+\begin{itemize}
 \item The pattern can be divided into
 \begin{itemize}
 \item \texttt{sxi}
@@ -99,14 +119,14 @@ $\mathcal{P}= $\texttt{\ \ sxi\ sxi}
 \item \texttt{sx.}
 \end{itemize}
 \end{itemize}
+\end{block}
 
 }
 
 \frame{
-\frametitle{First Intituion (Text Transformation)}
+%\frametitle{First Intituion (Text Transformation)}
 
-The same transformation can be applied to the text.
-
+\begin{block}{Same Transformation on $\mathcal{T}=$mississippi}
 \begin{itemize}
 \item \texttt{mississippi}
 \item \texttt{.ississippi}
@@ -121,57 +141,61 @@ The same transformation can be applied to the text.
 \item \texttt{mississip.i}
 \item \texttt{mississipp.}
 \end{itemize}
+\flushright{}Na\"\i{}ve tree: $\mathcal{O}(n^{k+1})$ nodes
+\end{block}
 
-Na\"\i{}ve tree generation: $\mathcal{O}(n^{k+1})$ nodes.
 
 }
 
 \frame{
 \frametitle{Generated Tree (Multiple Branched Nodes)}
 
-\begin{center}
-\includegraphics[width=.8\textwidth]{needed-nodes}
-\end{center}
+\begin{block}{Needed Nodes}
+\puttree{needed-nodes}
+\end{block}
 
-These nodes are needed.
 }
 \frame{
 \frametitle{Generated Tree (Dot-Only Branched Nodes)}
 
-\begin{center}
-\includegraphics[width=.7\textwidth]{unneeded}
-\end{center}
+\begin{block}{Unneeded Nodes}
+\puttree{unneeded}
+\end{block}
 
-These nodes can be removed.
 }
 
 
 \frame{
-\frametitle{Generated Tree (compression)}
+%\frametitle{Generated Tree (compression)}
+\begin{block}{Compressing Nodes}
 \centering \includegraphics[height=.5\textheight]{half-implicit}
+\end{block}
 
 }
 \frame{
-\frametitle{Generated Tree (implicit nodes)}
+%\frametitle{Generated Tree (implicit nodes)}
 
-\centering \includegraphics[height=.4\textheight]{fully-implicit}
+\begin{block}{Implicit Nodes}
+\centering \includegraphics[angle=90,height=.4\textheight]{fully-implicit}
+\end{block}
+}
+\frame{
+\begin{block}{Resulting Tree: Dotted Suffix Tree}
+\puttree{mississippi-1-no-sl}
+\end{block}
 
 }
 
-\frame{
-\frametitle{Dotted Suffix Tree}
-\includegraphics[width=.8\textwidth]{mississippi-1-no-sl}
-
-}
-
 
 \frame{
-\frametitle{Dotted Suffix Tree (space cost)}
+%\frametitle{Dotted Suffix Tree (space cost)}
 
+\begin{block}{Number of nodes}
 \begin{itemize}
 \item Traditional worst-case analysis: $\mathcal{O}(n^{k+1})$
 \item Expected case (under \emph{very general} assumptions): $\mathcal{O}(n \log^k(n))$
 \end{itemize}
+\end{block}
 
 }
 
@@ -180,102 +204,136 @@ These nodes can be removed.
 
 \frame{
 
-\frametitle{Searching}
+%\frametitle{Searching}
 
-$\mathcal{P}=\mathit{sxip}$
-	
+\begin{block}{$\mathcal{P}=\mathit{sxip}$}
 Looking for \texttt{sxip}, \texttt{.xip}, \texttt{s.ip}, \texttt{sx.p}, and \texttt{sxi.}
+\end{block}
 
-\includegraphics[width=.8\textwidth]{mississippi-1-no-sl}
+\begin{block}{$\mathcal{T}=$mississippi}
+\puttree{mississippi-1-no-sl}
+\end{block}
 
 }
 
 \frame{
 
-\frametitle{Search Time}
+%\frametitle{Search Time}
 
+\begin{block}{Search Time}
 \begin{itemize}
 \item $sum_{i=0}^{k}C_i^m=\mathcal{O}(m^k)$ paths
 \item $\mathcal{O}(m)$ per path
 \item $\mathcal{O}(m^{k+1})$ total
 \end{itemize}
+\end{block}
 }
 
 \section{Construction}
 
 \frame{
-\frametitle{A look at the tree}
+%\frametitle{A look at the tree}
 
-\centering\includegraphics[width=.8\textwidth]{mississippi-1}
+\begin{block}{Dotted Tree}
+\puttree{mississippi-1}
+\end{block}
 
 }
 
 
 \frame{
-\frametitle{A close look at the tree}
+%\frametitle{A close look at the tree}
 
-\begin{center}
-\includegraphics[width=.8\textwidth]{suffix-link}
-\end{center}
+\begin{block}{Close-up}
+\puttree{suffix-link}
+\end{block}
 
-Only leafs which correspond to positions in the string where the suffix-label occurrs are retained.
-
+%\onslide<1->
+%\begin{block}{Conclusion}
+%Only leafs which correspond to positions in the string where the suffix-label occurrs are retained.
+%\end{block}
+	
 }
 
 \frame{
-\frametitle{Transformations}
+%\frametitle{Transformations}
 
+\begin{block}{Rules}
 \begin{itemize}
 \item Leafs are labeled \textit{original - 1}
 \item Leaf 1 is dropped
 \item Only some leafs are retained (filter)
 \end{itemize}
+\end{block}
 
 }
 
 \frame{
-\frametitle{Construction I}
+%\frametitle{Construction I}
 
-\centering\includegraphics[width=.8\textwidth]{mississippi-1-i}
+\begin{block}{Copy Root}
+\puttree{mississippi-1-i}
+\end{block}
 }
 \frame{
-\frametitle{Construction II}
-\centering\includegraphics[width=.8\textwidth]{mississippi-1-ii}
+%\frametitle{Construction II}
+\begin{block}{Copy First Level}
+\puttree{mississippi-1-ii}
+\end{block}
 
 }\frame{
-\frametitle{Construction III}
-
-\centering\includegraphics[width=.8\textwidth]{mississippi-1-iii}
+%\frametitle{Construction III}
+\begin{block}{Copy Second Level}
+\puttree{mississippi-1-iii}
+\end{block}
 }\frame{
-\frametitle{Construction IV}
-\centering\includegraphics[width=.8\textwidth]{mississippi-1-iv}
+%\frametitle{Construction IV}
+\begin{block}{Copy Third Level}
+\puttree{mississippi-1-iv}
+\end{block}
 }\frame{
-\frametitle{Construction V}
-\begin{center}
-\includegraphics[width=.8\textwidth]{mississippi-1-v}
-\end{center}
-
-Construction Time: $\mathcal{O}(kN|\Sigma|)$
+%\frametitle{Construction V}
+\begin{block}{Final Tree}
+\puttree{mississippi-1}
+\flushright{}Construction Time: $\mathcal{O}(kN|\Sigma|)$
+\end{block}
 }
 
 \frame{
 
-\frametitle{Deepest node}
-\begin{center}
-\includegraphics[width=.8\textwidth]{deepest}
-\end{center}
-
+%\frametitle{Deepest node}
+\begin{block}{Deepest Node Schematics}
+\puttree{deepest}
 Expected deepest node depth: $\mathcal{O}(\log n)$
+\end{block}
 }
 
-\frame{
-\frametitle{Summary}
+\section{Summary}
 
+\frame{
+
+\begin{block}{Main Results}
 \begin{itemize}
 \item Size $\mathcal{O}(n\log^k n)$
 \item Search time $\mathcal{O}(m\log^{k+1})$
 \item Construction $\mathcal{O}(kn\log^k n|\Sigma|)$
 \end{itemize}
+\end{block}
+}
+
+\frame{
+\begin{block}{If you have any questions...}
+...I will try to answer them.
+\end{block}
+}
+\frame[b]{
+	
+\flushright
+thank you.
+
+\bigskip
+\bigskip
+
 }
 
 \end{document}
