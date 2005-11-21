@@ -4,4 +4,4 @@ To search a string with at maximum k errors in a k-error dotted tree, we descend
 
 The process just described is Algorithm~\ref{algo:search}. Reporting of the leafs below a certain node can be done by a Depth First Search. If one is interested in knowing only whether the string occurs, then the lines which report the matches can be substituted by early exits returning true.
 
-This algorithm runs in time $\mathcal{O}(m^{k+1})$: There are at most $\sum_{i=0}{k}{m \choose i}=\mathcal{O}(m^k)$ different paths which must be followed. Following one path in the tree takes $\mathcal{O}(m)$ time. Therefore, the total time is $\mathcal{O}(m^{k+1})$ without the reporting of occurrences (which can be done in time linear to the number of occurrences).
+This algorithm runs in time $\mathcal{O}(m^{k+1})$: There are at most $\sum_{i=0}^{k}{m \choose i}=\mathcal{O}(m^k)$ different paths which must be followed. Following one path in the tree takes $\mathcal{O}(m)$ time. Therefore, the total time is $\mathcal{O}(m^{k+1})$ without the reporting of occurrences (which can be done in time linear to the number of occurrences).
