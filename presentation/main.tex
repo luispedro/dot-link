@@ -59,18 +59,17 @@
 %\frametitle{Suffix Tree}
 
 \begin{block}{Suffix Tree for $\mathcal{T}=$mississippi}
-\centering\puttree{mississippi-0-no-sl}
+\begin{overprint}
+\centering
+\onslide<1>\puttree{mississippi-0-no-sl}
+\onslide<2>\puttree{mississippi-0}
+\onslide<3>\puttree{mississippi-0}
+\end{overprint}
+\smallskip
+\flushright
+\onslide<3>Can be built in $\mathcal{O}(n)$ time.
 \end{block}
-}
-\frame{
 
-%\frametitle{Suffix Tree (with suffix-links)}
-
-\begin{block}{Suffix Tree for $\mathcal{T}=$mississippi}
-\centering\puttree{mississippi-0}
-\end{block}
-
-Can be built in $\mathcal{O}(n)$ time.
 }
 
 
@@ -80,36 +79,64 @@ Can be built in $\mathcal{O}(n)$ time.
 \begin{block}{%
 $\mathcal{T}=$ mississippi\$\\
 $\mathcal{P}=$ ssi}
-\centering\puttree{mississippi-0-no-sl}
+\begin{overprint}
+\centering
+\onslide<1>\puttree{mississippi-0-no-sl}
+\onslide<2>\puttree{search-i}
+\onslide<3>\puttree{search-ii}
+\onslide<4>
+\puttree{search-ii}
+
+\flushright{}ssi found!
+\end{overprint}
 \end{block}
 
 }
 
 \section{Approximate Matching}
+\newlength{\pequals}
+\newcommand*{\now}{$\mathcal{P}= $\texttt{\ \ \ sxi}}
 \frame{
 %\frametitle{Approximatte Matching}
+\settowidth{\pequals}{\now}
 
-\begin{block}{Substituition (aka Hamming) distance}
+\begin{block}<1->{Substituition (aka Hamming) distance}
 $\mathcal{P}$ matches $\mathcal{T}$ with up to $k$ substitutions iff we can change
 $k$ (or less) characters in $\mathcal{P}$ so that it matches $\mathcal{T}$
 \end{block}
 
-\begin{block}{Example: $\mathcal{P}=$ \texttt{sxi}}
-$\mathcal{T}= $\texttt{mississippi}\$\\
-$\mathcal{P}= $\texttt{\ \ sxi\ sxi}
+\begin{block}<2->{Example: $\mathcal{P}=$ \texttt{sxi}}
+$\mathcal{T}=$\texttt{\ mississippi}\$\\
+\visible<3>{\now${}_1$\\}
+\visible<4>{\hspace{\pequals}\texttt{\texttt{sxi}${}_2$}}
+%\visible<5->{\hspace{\pequals}\texttt{\ \texttt{sxi}${}_3$}}
 \end{block}
 
 }
 
 \frame{
+\begin{block}{Traditional Way}
+Search for \emph{all the possible strings}
 
-\begin{block}{First Intuition}
+\begin{itemize}
+\item mxi, pxi, sxi, ixi\dots
+\item smi, spi, ssi, sii\dots
+\item sxm, sxp, sss, sxi\dots
+\end{itemize}
+\end{block}
+
+Number of possibilities: $\mathcal{O}(m|\Sigma|^{C_m^k})$
+}
+
+\frame{
+
+\begin{block}<1->{First Intuition}
 \begin{itemize}
 \item It doesn't matter what the substituting character is
 \end{itemize}
 \end{block}
 
-\begin{block}{Pattern $\mathcal{P}=$sxi}
+\begin{block}<2->{Pattern $\mathcal{P}=$sxi}
 \begin{itemize}
 \item The pattern can be divided into
 \begin{itemize}
@@ -159,7 +186,7 @@ $\mathcal{P}= $\texttt{\ \ sxi\ sxi}
 \frametitle{Generated Tree (Dot-Only Branched Nodes)}
 
 \begin{block}{Unneeded Nodes}
-\puttree{unneeded}
+\centering \includegraphics[height=.5\textheight,angle=270]{unneeded}
 \end{block}
 
 }
@@ -168,7 +195,7 @@ $\mathcal{P}= $\texttt{\ \ sxi\ sxi}
 \frame{
 %\frametitle{Generated Tree (compression)}
 \begin{block}{Compressing Nodes}
-\centering \includegraphics[height=.5\textheight]{half-implicit}
+\centering \includegraphics[height=.5\textheight,angle=270]{half-implicit}
 \end{block}
 
 }
@@ -176,7 +203,7 @@ $\mathcal{P}= $\texttt{\ \ sxi\ sxi}
 %\frametitle{Generated Tree (implicit nodes)}
 
 \begin{block}{Implicit Nodes}
-\centering \includegraphics[angle=90,height=.4\textheight]{fully-implicit}
+\centering \includegraphics[height=.4\textheight,angle=270]{fully-implicit}
 \end{block}
 }
 \frame{
@@ -193,7 +220,7 @@ $\mathcal{P}= $\texttt{\ \ sxi\ sxi}
 \begin{block}{Number of nodes}
 \begin{itemize}
 \item Traditional worst-case analysis: $\mathcal{O}(n^{k+1})$
-\item Expected case (under \emph{very general} assumptions): $\mathcal{O}(n \log^k(n))$
+\item Expected case (under \emph{very general} assumptions): $\mathcal{O}(n \log^k n)$
 \end{itemize}
 \end{block}
 
@@ -211,7 +238,13 @@ Looking for \texttt{sxip}, \texttt{.xip}, \texttt{s.ip}, \texttt{sx.p}, and \tex
 \end{block}
 
 \begin{block}{$\mathcal{T}=$mississippi}
-\puttree{mississippi-1-no-sl}
+\begin{overprint}
+\onslide<1>\puttree{mississippi-1}
+\onslide<2>\puttree{mississippi-1-s}
+\onslide<3>\puttree{mississippi-1-s_}
+\onslide<4>\puttree{mississippi-1-s_i}
+\onslide<5>\puttree{mississippi-1-s_ip}
+\end{overprint}
 \end{block}
 
 }
@@ -222,7 +255,7 @@ Looking for \texttt{sxip}, \texttt{.xip}, \texttt{s.ip}, \texttt{sx.p}, and \tex
 
 \begin{block}{Search Time}
 \begin{itemize}
-\item $sum_{i=0}^{k}C_i^m=\mathcal{O}(m^k)$ paths
+\item $\sum_{i=0}^{k}C_i^m=\mathcal{O}(m^k)$ paths
 \item $\mathcal{O}(m)$ per path
 \item $\mathcal{O}(m^{k+1})$ total
 \end{itemize}
@@ -268,6 +301,7 @@ Looking for \texttt{sxip}, \texttt{.xip}, \texttt{s.ip}, \texttt{sx.p}, and \tex
 
 }
 
+
 \frame{
 %\frametitle{Construction I}
 
@@ -279,32 +313,93 @@ Looking for \texttt{sxip}, \texttt{.xip}, \texttt{s.ip}, \texttt{sx.p}, and \tex
 %\frametitle{Construction II}
 \begin{block}{Copy First Level}
 \puttree{mississippi-1-ii}
+
+\invisible{Construction Time: $\mathcal{O}(kN|\Sigma|)$}
 \end{block}
 
 }\frame{
 %\frametitle{Construction III}
 \begin{block}{Copy Second Level}
 \puttree{mississippi-1-iii}
+
+\invisible{Construction Time: $\mathcal{O}(kN|\Sigma|)$}
 \end{block}
 }\frame{
 %\frametitle{Construction IV}
 \begin{block}{Copy Third Level}
 \puttree{mississippi-1-iv}
+
+\invisible{Construction Time: $\mathcal{O}(kN|\Sigma|)$}
 \end{block}
 }\frame{
 %\frametitle{Construction V}
 \begin{block}{Final Tree}
 \puttree{mississippi-1}
-\flushright{}Construction Time: $\mathcal{O}(kN|\Sigma|)$
+
+\visible<2->{\flushright{}Construction Time: $\mathcal{O}(kN|\Sigma|)$}
 \end{block}
 }
+
+\frame{
+\begin{block}{Another Look}
+\begin{itemize}
+\item Look again
+\item Count the number of created nodes per step
+\item Count the steps
+\end{itemize}
+\end{block}
+}
+
+\frame{
+\begin{block}{$\mathcal{O}(n)$ nodes}
+\puttree{mississippi-1-i}
+\end{block}
+}
+\frame{
+\begin{block}{Add $\mathcal{O}(n)$ nodes}
+\begin{overprint}
+\onslide<1>
+\puttree{mississippi-1-ii}
+
+\flushright{}
+Number Nodes: $\mathcal{O}(2n)$
+
+\onslide<2>
+\puttree{mississippi-1-iii}
+
+\flushright
+Number Nodes: $\mathcal{O}(3n)$
+
+\onslide<3>
+\puttree{mississippi-1-iv}
+
+\flushright
+Number Nodes: $\mathcal{O}(4n)$
+
+\onslide<4>
+\puttree{mississippi-1}
+
+\flushright
+Number Nodes: $\mathcal{O}(5n)$
+\onslide<5>
+\puttree{mississippi-1}
+
+\flushright
+Number Nodes: $\mathcal{O}(d_{\mathrm{max}}n)$
+\end{overprint}
+\end{block}
+}
+
 
 \frame{
 
 %\frametitle{Deepest node}
 \begin{block}{Deepest Node Schematics}
-\puttree{deepest}
-Expected deepest node depth: $\mathcal{O}(\log n)$
+{\puttree{deepest}}
+\begin{align*}
+\mathrm{Worst Case}(d_\mathrm{max}) &=& n - 1\\
+\mathrm{Expected Case}(d_\mathrm{max}) &=&\mathcal{O}(\log n)
+\end{align*}
 \end{block}
 }
 
