@@ -60,9 +60,9 @@ struct position {
 
 struct tree {
 	public:
-		tree(const char* str, char dollar, char dot):
-			string_(strdup(str)),
-			lenght_(strlen(str)),
+		tree(const char* str, unsigned len, char dollar, char dot):
+			string_(str),
+			lenght_(len),
 			dollar_(dollar),
 			dot_(dot)
 		{}
