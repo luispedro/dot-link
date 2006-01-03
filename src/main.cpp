@@ -1,4 +1,4 @@
-#include "suffix_tree.h"
+#include "dottree.h"
 #include "timer.h"
 #include "stats.h"
 #include <stdio.h>
@@ -24,15 +24,16 @@ void PrintUsage()
 	exit(0);
 }
 
-void find_substring( SUFFIX_TREE* tree, const char* string, CummulativeTimer* m = 0 ) {
+void find_substring( dottree::tree* tree, const char* string, CummulativeTimer* m = 0 ) {
 	Timer match( "match" );
 	if ( m ) m->start();
-	unsigned i = ST_FindSubstringWithErrors(tree, string, strlen(string),
+	unsigned i = 0;/* ST_FindSubstringWithErrors(tree, string, strlen(string),
 			( m ? m->name(): static_cast<const char*>( 0 ) ) );
+*/
 	match.stop();
 	if ( m ) m->stop();
 
-	if(i == ST_ERROR)
+	if(i < 0)
 		printf("\nResults: String[-%s-] is not a substring.\n\n", string);
 	else
 		std::cout << boost::format( "\nResults:   Substring exists in position %s.\n\n" ) % i;
@@ -66,7 +67,7 @@ char* read_file( const char* fname )
 
 int main(int argc, char* argv[])
 {
-	SUFFIX_TREE* tree;
+	std::auto_ptr<dottree::tree> tree;
 	if(argc < 4) PrintUsage();
 	int k = atoi( argv[ 1 ] );
 	char* str = read_file( argv[ 2 ] );
@@ -75,9 +76,9 @@ int main(int argc, char* argv[])
 		Timer full( "full-tree-construction" );
 		Timer dots( "add-dot-links" );
 		full.start();
-		tree = ST_CreateTree(str);
+		tree = dottree::build_tree(str);
 		dots.start();
-		ST_AddDotLinks( tree, k );
+		//ST_AddDotLinks( tree, k );
 		full.stop();
 		dots.stop();
 	} catch ( const std::exception& e ) {
@@ -87,7 +88,7 @@ int main(int argc, char* argv[])
 	
 	try {
 		if ( strcmp( argv[ 3 ], "-" ) ) {
-			find_substring( tree, argv[ 3 ] );
+			find_substring( tree.get(), argv[ 3 ] );
 		} else {
 			std::string tmp;
 			CummulativeTimer* cummul = 0;
@@ -95,23 +96,23 @@ int main(int argc, char* argv[])
 				if ( tmp.substr( 0, 5 ) == "timer" ) {
 					delete cummul;
 					cummul = new CummulativeTimer( tmp.substr( 6,std::string::npos ).c_str() );
-				} else find_substring( tree, tmp.c_str(), cummul );
+				} else find_substring( tree.get(), tmp.c_str(), cummul );
 			}
 		}
 	} catch ( const std::exception& e ) {
 		std::cerr << "Error [matching]: (exception): " << e.what() << std::endl;
 	}
 	try {
-		std::cout << boost::format( "String size: %s \n" ) % ( tree->length - 1 );
-		std::cout << boost::format( "Nodes without dot links: %s \n" ) % ST_CountNodes( tree, false );
+		std::cout << boost::format( "String size: %s \n" ) % ( tree->length() - 1 );
+		/*std::cout << boost::format( "Nodes without dot links: %s \n" ) % ST_CountNodes( tree, false );
 		std::cout << boost::format( "Nodes with dot links: %s \n" ) % ST_CountNodes( tree, true );
-
+*/
 		stats::print();
 
 		free(str);
-		ST_DeleteTree(tree);
 	} catch ( const std::exception& e ) {
 		std::cerr << "Error [statting]: (exception): " << e.what() << std::endl;
 	}
 	return 0;
 }
+
