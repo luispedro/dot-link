@@ -1,6 +1,6 @@
 sinclude MakeVars
 
-CXXFLAGS += -I/sw/include -g -Wall
+CXXFLAGS += -g3 -Wall
 PROGRAM=suffixtree
 LIBS=
 
