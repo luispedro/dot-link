@@ -15,11 +15,7 @@ struct node {
 			next_(0),
 			suffixlink_(0)
 		{}
-		void add_child(node* c) {
-			c->parent_ = this;
-			c->next_ = children_;
-			children_ = c;
-		}
+		void add_child(const char*,node* c);
 		void remove_child(node* c) {
 			if (c == children_) children_ = c->next_;
 			else {
@@ -48,12 +44,20 @@ struct node {
 		node* suffixlink() const { return suffixlink_;}
 		node* suffixlink(node* s) { std::swap(s, suffixlink_); return s; }
 
+		bool is_leaf() const { return !children_; }
+		
 		unsigned sdepth() const { return sdepth_; }
 		unsigned sdepth(unsigned s) { std::swap(s, sdepth_); return s; }
 
 		unsigned start() const { return head() + parent_->sdepth(); }
 		unsigned length() const { assert(parent_); return sdepth_ - parent_->sdepth(); }
+		class visitor {
+			public: 
+				virtual ~visitor() { }
+				virtual void visit_node(node*) = 0;
+		};
 	private:
+		void dfs(visitor* visitor);
 		friend class tree;
 		unsigned head_;
 		unsigned sdepth_;
@@ -61,6 +65,12 @@ struct node {
 		node* children_;
 		node* next_;
 		node* suffixlink_;
+};
+
+
+class print_leafs : public node::visitor {
+	public:
+		void visit_node(node* c) { if (c->is_leaf()) std::cout << c->head()<< std::endl; }
 };
 
 struct position {
@@ -99,6 +109,8 @@ struct tree {
 			while (cur && string_[cur->start()] != ch) cur = cur->next_;
 			return cur;
 		}
+
+		void dfs(node::visitor* visitor) const { root_->dfs(visitor); }
 
 		/**
 		 * Advances pos by ch

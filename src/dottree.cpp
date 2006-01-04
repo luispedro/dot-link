@@ -68,14 +68,14 @@ class mcreight_builder {
 				<< head << ", " << advance << " )\n";
 			dottree::node* leaf = new dottree::node(head, tree_->length() - head);
 			if (pos.at_end()) {
-				pos.curnode()->add_child(leaf);
+				pos.curnode()->add_child(str_,leaf);
 			} else {
 				dottree::node* top = new dottree::node(head, advance);
 				dottree::node* cur = pos.curnode();
-				cur->parent()->add_child(top);
+				cur->parent()->add_child(str_,top);
 				cur->parent()->remove_child(cur);
-				top->add_child(cur);
-				top->add_child(leaf);
+				top->add_child(str_,cur);
+				top->add_child(str_,leaf);
 				if (suffixless_) {
 					suffixless_->suffixlink(top);
 					suffixless_ = 0;
@@ -135,6 +135,31 @@ void dottree::node::print(const char* str, std::ostream& out, std::string prefix
 	if (!recurs) return;
 	if (children_) children_->print(str,out,prefix + "   ");
 	if (next_) next_->print(str,out,prefix);
+}
+
+void dottree::node::dfs(dottree::node::visitor* visit) {
+	visit->visit_node(this);
+	if (children_) children_->dfs(visit);
+	if (next_) next_->dfs(visit);
+}	
+
+void dottree::node::add_child(const char* str, node* c) {
+	c->parent_ = this;
+	if (!children_) {
+		children_ = c;
+		c->next_ = 0;
+	} else {
+		const char ch = str[c->start()];
+		dottree::node* prev = children_;
+		if (str[prev->start()] > ch) {
+			c->next_ = prev;
+			children_ = c;
+		} else {
+			while (prev->next_ && str[prev->next_->start()] < str[c->start()]) prev = prev->next_;
+			c->next_ = prev->next_;
+			prev->next_ = c;
+		}
+	}
 }
 
 std::auto_ptr<dottree::tree> dottree::build_tree(const char* orig, char dollar, char dot) {

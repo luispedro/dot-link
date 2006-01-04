@@ -76,6 +76,7 @@ int main(int argc, char* argv[])
 		full.start();
 		tree = dottree::build_tree(str);
 		dots.start();
+		tree->dfs(new dottree::print_leafs);
 		//ST_AddDotLinks( tree, k );
 		full.stop();
 		dots.stop();
