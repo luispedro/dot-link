@@ -27,16 +27,14 @@ void PrintUsage()
 void find_substring( dottree::tree* tree, const char* string, CummulativeTimer* m = 0 ) {
 	Timer match( "match" );
 	if ( m ) m->start();
-	unsigned i = 0;/* ST_FindSubstringWithErrors(tree, string, strlen(string),
-			( m ? m->name(): static_cast<const char*>( 0 ) ) );
-*/
+	int res = tree->match(string);
 	match.stop();
 	if ( m ) m->stop();
 
-	if(i < 0)
+	if(res < 0)
 		printf("\nResults: String[-%s-] is not a substring.\n\n", string);
 	else
-		std::cout << boost::format( "\nResults:   Substring exists in position %s.\n\n" ) % i;
+		std::cout << boost::format( "\nResults:   Substring exists in position %s.\n\n" ) % res;
 }
 
 char* read_file( const char* fname )
