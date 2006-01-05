@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
 {
 	std::auto_ptr<dottree::tree> tree;
 	if(argc < 4) PrintUsage();
-	int k = atoi( argv[ 1 ] );
+	//int k = atoi( argv[ 1 ] );
 	char* str = read_file( argv[ 2 ] );
 	
 	try { 
