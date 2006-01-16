@@ -1,3 +1,6 @@
+#ifndef LPC_DOTTREE_H1137158521_INCLUDE_GUARD_
+#define LPC_DOTTREE_H1137158521_INCLUDE_GUARD_
+
 #include <memory>
 #include <iostream>
 #include <string>
@@ -30,7 +33,8 @@ struct nodep_or_idx {
 		bool is_ptr() const { return int(d) >= 0; }
 		bool is_int() const { return int(d) < 0; }
 
-		bool is_null() const { return d == 0; }
+		bool is_null() const { return !valid(); }
+		bool valid() const { return d; }
 		bool operator !() const { return is_null(); }
 		bool operator == (const nodep_or_idx& other) const {
 			return d == other.d;
@@ -94,11 +98,16 @@ struct position {
 			offset_(o)
 		{}
 		unsigned offset() const { return offset_; }
+		void one_down() { ++offset_; }
 		node* parent() const { return parent_; }
 		nodep_or_idx curnode() const { return node_; }
+
 		bool at_end() const { return curnode().is_ptr() && offset() == curnode().as_ptr()->length(parent_); }
 		bool at_leaf() const { return curnode().is_int(); }
+		bool is_leaf() const { return curnode().is_int(); }
+		bool is_dotnode() const { return !is_leaf() && curnode().as_ptr()->head() == unsigned(-1); }
 	private:
+		tree* tree_;
 		node* parent_;
 		nodep_or_idx node_;
 		unsigned offset_;
@@ -225,6 +234,7 @@ struct tree {
 			else leafs_[cur.as_index()] = next;
 		}
 		nodep_or_idx* leafs_;
+		//node_pod* nodes_;
 		void dfs(node*, nodep_or_idx, node_visitor* ) const;
 		void print_leafvector() const;
 };
@@ -232,3 +242,6 @@ struct tree {
 std::auto_ptr<tree> build_tree(const char* str, char dollar = '$', char dot = '.');
 }
 
+
+
+#endif /* LPC_DOTTREE_H1137158521_INCLUDE_GUARD_ */

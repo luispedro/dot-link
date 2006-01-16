@@ -1,6 +1,7 @@
 #include "dottree.h"
 #include "timer.h"
 #include "stats.h"
+#include "add_dottree.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -57,7 +58,7 @@ int main(int argc, char* argv[])
 {
 	std::auto_ptr<dottree::tree> tree;
 	if(argc < 4) usage();
-	//int k = atoi( argv[ 1 ] );
+	int k = atoi( argv[ 1 ] );
 	char* str = read_file( argv[ 2 ] );
 	
 	try { 
@@ -65,6 +66,7 @@ int main(int argc, char* argv[])
 		Timer dots( "add-dot-links" );
 		full.start();
 		tree = dottree::build_tree(str);
+		add_dotlinks(tree.get(),k);
 		dots.start();
 		tree->dfs(new dottree::print_leafs);
 		//ST_AddDotLinks( tree, k );

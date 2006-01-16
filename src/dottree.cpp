@@ -148,6 +148,7 @@ bool dottree::tree::descend(dottree::position& pos, char ch) const {
 
 void dottree::tree::dfs(dottree::node* par, dottree::nodep_or_idx node, dottree::node_visitor* visit) const {
 	//std::cout << "dottree::tree::dfs( " << node << ", . )\n";
+	if (head(node) == unsigned(-1)) return;
 	visit->visit_node(dottree::position(par,node,0));
 	if (node.is_int()) visit->visit_leaf(head(node));
 	visit->down();
@@ -206,8 +207,9 @@ dottree::nodep_or_idx dottree::tree::child(node* n, char ch) {
 	std::cout << "child( " << n << ", \'" << ch << "\' )\n";
 	nodep_or_idx cur = n->children_;
 	std::cout << "Starting at: " << cur << " (gotten from " << n << "->children_)\n";
-	while (!cur.is_null() && string_[start(cur,n)] != ch) {
-		std::cout << "Looking at " << cur << " (\'" << at(start(cur,n)) << "\')\n";
+	while (cur.valid() && (head(cur) == unsigned(-1) || string_[start(cur,n)] != ch)) {
+		if (head(cur) != unsigned(-1)) std::cout << "Looking at " << cur << " (\'" << at(start(cur,n)) << "\')\n";
+		else std::cout << "Skipping dot node\n";
 		cur = next(cur);
 	}
 	std::cout << "returning " << cur << '\n';
@@ -225,8 +227,7 @@ void dottree::tree::print_leafvector() const {
 void dottree::print_all::visit_node(dottree::position p) {
 	std::cout << prefix_
 		<< p << ": (" << tree_->head(p) << "-" << tree_->sdepth(p) << ") "
-		<< "[\"" << std::string(tree_->string(),tree_->start(p),tree_->length(p)) << "\"]"
-		" ^" << p.parent();
+		<< "[\"" << std::string(tree_->string(),tree_->start(p),tree_->length(p)) << "\"]";
 	if (!p.at_leaf()) std::cout << " suflink: " << p.curnode().as_ptr()->suffixlink();
 	std::cout << " ==> " << tree_->next(p);
 	std::cout << std::endl;
@@ -243,6 +244,7 @@ std::auto_ptr<dottree::tree> dottree::build_tree(const char* orig, char dollar, 
 	fixed[len + 1] = '\0';
 	mcreight_builder builder(fixed, dollar, dot);
 	std::auto_ptr<dottree::tree> res = builder.build();
+	std::cout << "Final Tree:\n";
 	res->print(std::cout);
 	return res;
 }
