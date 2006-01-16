@@ -8,17 +8,7 @@
 #include <exception>
 #include <boost/format.hpp>
 
-/**************************************************************************************************/
-
-/*Prints all possible command-line arguments and then exits the program.
-
-  Input : None:
-
-  Output: A printout of all the command-line options to the screen.*/
-
-
-/**************************************************************************************************/
-void PrintUsage()
+void usage()
 {
 	printf(	"usage: suffixtree k filename searchstring\n" );
 	exit(0);
@@ -66,7 +56,7 @@ char* read_file( const char* fname )
 int main(int argc, char* argv[])
 {
 	std::auto_ptr<dottree::tree> tree;
-	if(argc < 4) PrintUsage();
+	if(argc < 4) usage();
 	//int k = atoi( argv[ 1 ] );
 	char* str = read_file( argv[ 2 ] );
 	

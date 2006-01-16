@@ -2,6 +2,11 @@
 
 namespace {
 
+std::ostream& operator << ( std::ostream& out, dottree::nodep_or_idx n ) {
+	if ( n.is_ptr() ) return out << "ptr(" << n.as_ptr() << ")";
+	return out << "idx(" << n.as_index() << ")";
+}
+
 std::ostream& operator << (std::ostream& out, const dottree::position& p) {
 	return out << "[" << p.curnode() << "+" << p.offset() << " (^" << p.parent() << ")]";
 }
@@ -18,7 +23,7 @@ class mcreight_builder {
 			tree_ = std::auto_ptr<dottree::tree>(new dottree::tree(str_,strlen(str_),dollar_, dot_));
 			tree_->root_ = new dottree::node(0, 0);
 			tree_->root_->suffixlink(tree_->root_);
-			dottree::position pos(tree_->root_,tree_->root_, 0);
+			dottree::position pos(tree_->root_,dottree::nodep_or_idx(tree_->root_), 0);
 			unsigned sdepth = 0;
 			for (unsigned head = 0; head != tree_->length(); ++head) {
 				if (sdepth) --sdepth;
@@ -35,68 +40,70 @@ class mcreight_builder {
 			std::cout << "starting fast_suffix_link at: " << pos << '\n';
 			assert(pos.at_end());
 			assert(!pos.at_leaf());
-			if (pos.curnode()->suffixlink()) {
+			if (!pos.at_leaf() && pos.curnode().as_ptr()->suffixlink()) {
 				std::cout << "easy...\n";
-				return dottree::position(pos.parent()->suffixlink(),pos.curnode()->suffixlink(),0);
+				return dottree::position(
+						pos.parent()->suffixlink(),
+						dottree::nodep_or_idx(pos.curnode().as_ptr()->suffixlink()),
+						0);
 			}
-			if (pos.curnode()->sdepth() == 1) {
+			if (tree_->sdepth(pos.curnode()) == 1) {
 				std::cout << "I'm at the root...\n";
-				return dottree::position(tree_->root_, tree_->root_, 0);
+				return dottree::position(tree_->root_, dottree::nodep_or_idx(tree_->root_), 0);
 			}
-			unsigned str_start = pos.curnode()->start(pos.parent());
-			unsigned to_skip = pos.offset();
-			dottree::node* cur = pos.parent();
-			assert(cur);
-			std::cout << cur << " == "  << tree_->root_ << " \n";
-			if (cur == tree_->root_) {
+			unsigned str_start = tree_->start(pos.curnode(),pos.parent());
+			const unsigned target = tree_->sdepth(pos.curnode()) - 1;
+			dottree::nodep_or_idx cur = dottree::nodep_or_idx(pos.parent());
+			assert(!cur.is_null());
+			std::cout << cur.as_ptr() << " == "  << tree_->root_ << " \n";
+			if (cur.as_ptr() == tree_->root_) {
 				std::cout << "cur == tree_->root_\n";
-				--to_skip;
 				++str_start;
-			} else cur = cur->suffixlink();
-			assert(cur);
-			std::cout << "Skipping: \"" << std::string(str_,str_start,to_skip) 
-				<< "\" (" << to_skip << ") starting at " << cur << "\n";
-			assert(to_skip);
+			} else cur.set(cur.as_ptr()->suffixlink());
+			assert(!cur.is_null());
+			std::cout << "Skipping: \"" << std::string(str_,str_start,target) 
+				<< "\" (" << int(target) << ") starting at " << cur << "\n";
 
 			dottree::node* par;
-			while (1) {
-				par = cur;
-				cur = tree_->child(cur,str_[str_start]);
-				assert(cur);
-				std::cout << "STEP( \'" << str_[str_start] << "\' ) => "
-					<< cur << " (" << cur->length(par) << ") to_go: " << to_skip << "\n";
-				if (to_skip <= cur->length(par)) break;
-				to_skip -= cur->length(par);
-				str_start += cur->length(par);
+			while (tree_->sdepth(cur) < target ) {
+				par = cur.as_ptr();
+				cur = tree_->child(cur.as_ptr(),str_[str_start]);
+				assert(!cur.is_null());
+				str_start += tree_->length(cur,par);
 			}
-			std::cout << "Result: " << dottree::position(par,cur, to_skip) << '\n';
-			return dottree::position(par,cur, to_skip);
+			return dottree::position(par,cur, tree_->sdepth(cur) - target);
 		}
 			
-		void add_branch(dottree::position& pos, unsigned head, unsigned advance) {
-			std::cout << "add_branch( { " << pos.curnode() << "; " << pos.offset() << " } , "
-				<< head << ", " << advance << " )\n";
-			dottree::node* leaf = new dottree::node(head, tree_->length() - head);
+		void add_branch(dottree::position& pos, unsigned head, unsigned sdepth) {
+			std::cout << "add_branch( " << pos << head << ", " << sdepth << " )\n";
+			dottree::nodep_or_idx leaf = tree_->leaf(head);
+			std::cout << "built: " << leaf << '\n';
 			dottree::node* parent = pos.parent();
 			if (pos.at_end()) {
-				pos.curnode()->add_child(str_,leaf);
+				tree_->add_child(pos.curnode().as_ptr(),leaf);
 			} else {
-				dottree::node* top = new dottree::node(head, advance);
-				dottree::node* cur = pos.curnode();
-				parent->add_child(str_,top);
-				parent->remove_child(cur);
-				top->add_child(str_,cur);
-				top->add_child(str_,leaf);
+				dottree::node* top = new dottree::node(head, sdepth);
+				dottree::nodep_or_idx cur = pos.curnode();
+				tree_->add_child(parent,dottree::nodep_or_idx(top));
+				std::cout << "BEFORE REMOVE CHILD\n";
+				tree_->print(std::cout);
+
+				tree_->remove_child(parent,cur);
+				std::cout << "AFTER REMOVE CHILD\n";
+				tree_->print(std::cout);
+
+				tree_->add_child(top,cur);
+				tree_->add_child(top,leaf);
 				if (suffixless_) {
 					suffixless_->suffixlink(top);
 					suffixless_ = 0;
 				}
 				if (top->sdepth() == 1) top->suffixlink(tree_->root_);
 				else suffixless_ = top;
-				pos = dottree::position(parent,top, top->length(parent));
+				pos = dottree::position(parent, dottree::nodep_or_idx(top), top->length(parent));
 			}
-			leaf->print(str_,pos.curnode(),std::cout, "built: ", false);
-			tree_->root_->print(str_,tree_->root_,std::cout, "tree so far: ");
+			std::cout << "SOFAR:\n";
+			tree_->print(std::cout);
 		}
 			
 		std::auto_ptr<dottree::tree> tree_;
@@ -109,10 +116,10 @@ class mcreight_builder {
 
 int dottree::tree::match(const char* pat) const {
 	assert(pat);
-	dottree::position pos = dottree::position(root_,root_,0);
+	dottree::position pos = dottree::position(root_,dottree::nodep_or_idx(root_),0);
 	while ( *pat && descend(pos,*pat)) ++pat;
 	if (*pat) return -1;
-	return pos.curnode()->head();
+	return head(pos.curnode());
 }
 
 /**
@@ -124,53 +131,105 @@ int dottree::tree::match(const char* pat) const {
 bool dottree::tree::descend(dottree::position& pos, char ch) const {
 	std::cout << "descend( " << pos << ", '" << ch << "' )\n";
 	if (pos.at_end()) {
+		if (pos.at_leaf()) return false;
 		std::cout << "at end!\n";
-		dottree::node* next = const_cast<dottree::tree*>(this)->child(pos.curnode(), ch);
+		dottree::nodep_or_idx next = const_cast<dottree::tree*>(this)->child(pos.curnode().as_ptr(), ch);
 		if (!next) return false;
-		pos = dottree::position(pos.curnode(),next, 1);
+		pos = dottree::position(pos.curnode().as_ptr(),next, 1);
 		return true;
 	}
-	if (this->at(pos.curnode()->start(pos.parent()) + pos.offset()) == ch) {
+	std::cout << this->at(start(pos.curnode(),pos.parent()) + pos.offset()) << " =?= " << ch << "\n";
+	if (this->at(start(pos.curnode(),pos.parent()) + pos.offset()) == ch) {
 		pos = dottree::position(pos.parent(),pos.curnode(), pos.offset() + 1);
 		return true;
 	}
 	return false;
 }
 
-void dottree::node::print(const char* str, const node* par, std::ostream& out, std::string prefix, bool recurs) const {
-	out << prefix
-		<< this << ": (head: " << head() << "; sdepth: " << sdepth() 
-			<< "; " << start(par) << '-' << length(par) << ") \t"
-		<< "[\"" << std::string(str,head(),sdepth()-length(par)) 
-			<< '_' << std::string(str,start(par),length(par)) << "\"] "
-		<< " suffixlink: " << suffixlink() << std::endl;
-	if (!recurs) return;
-	if (children_) children_->print(str,this,out,prefix + "   ");
-	if (next_) next_->print(str,par,out,prefix);
-}
-
-void dottree::tree::dfs(dottree::node* node, dottree::node_visitor* visit) const {
-	visit->visit_node(node);
-	if (node->children_) dfs(node->children_, visit);
-	if (node->next_) dfs(node->next_, visit);
+void dottree::tree::dfs(dottree::node* par, dottree::nodep_or_idx node, dottree::node_visitor* visit) const {
+	//std::cout << "dottree::tree::dfs( " << node << ", . )\n";
+	visit->visit_node(dottree::position(par,node,0));
+	if (node.is_int()) visit->visit_leaf(head(node));
+	visit->down();
+	if (node.is_ptr() && !node.as_ptr()->children_.is_null()) dfs(node.as_ptr(),node.as_ptr()->children_, visit);
+	visit->up();
+	if (!next(node).is_null()) dfs(par,next(node), visit);
 }	
 
-void dottree::node::add_child(const char* str, node* c) {
-	if (!children_) {
-		children_ = c;
-		c->next_ = 0;
+void dottree::tree::add_child(dottree::node* par, dottree::nodep_or_idx n) {
+	std::cout << "add_child( " << par << ", " << n << ")\n";
+	print_leafvector();
+	if (!par->children_) {
+		std::cout << "setting: " << par << "->children_ to " << n << " (was null)\n";
+		par->children_ = n;
+		next(n,nodep_or_idx());
 	} else {
-		const char ch = str[c->head() + sdepth()];
-		dottree::node* prev = children_;
-		if (str[prev->start(this)] > ch) {
-			c->next_ = prev;
-			children_ = c;
+		const char ch = string_[start(n,par)];
+		dottree::nodep_or_idx prev = par->children_;
+		if (at(start(prev,par)) > ch) {
+			par->children_ = n;
+			std::cout << "setting: " << par << "->children_ to " << n << " (was " << prev << ")\n";
+			next(n,prev);
 		} else {
-			while (prev->next_ && str[prev->next_->start(this)] < ch) prev = prev->next_;
-			c->next_ = prev->next_;
-			prev->next_ = c;
+			while (!next(prev).is_null() && string_[start(next(prev), par)] < ch) prev = next(prev);
+			std::cout << "setting: " << n << " between " << prev << " and " << next(prev) << '\n';
+			next(n,next(prev));
+			next(prev,n);
 		}
 	}
+	print_leafvector();
+}
+
+void dottree::tree::remove_child(dottree::node* par, dottree::nodep_or_idx child) {
+	std::cout << "remove_child( " << par << ", " << child << ")\n";
+	print_leafvector();
+	if (child == par->children_) {
+		std::cout << "setting " << par << "->children_ to " <<  next(child) << '\n';
+		par->children_ = next(par->children_);
+	}
+	else {
+		dottree::nodep_or_idx bef = par->children_;
+		while (!bef.is_null() && next(bef) != child) bef = next(bef);
+		if (!bef.is_null()) {
+			std::cout << "setting (" << bef<< ") to " <<  next(next(bef)) << '\n';
+			next(bef, next(next(bef)));
+			next(child,nodep_or_idx());
+		} else {
+			std::cout << child << " not found!\n";
+		}
+	}
+	print_leafvector();
+}
+
+
+dottree::nodep_or_idx dottree::tree::child(node* n, char ch) {
+	std::cout << "child( " << n << ", \'" << ch << "\' )\n";
+	nodep_or_idx cur = n->children_;
+	std::cout << "Starting at: " << cur << " (gotten from " << n << "->children_)\n";
+	while (!cur.is_null() && string_[start(cur,n)] != ch) {
+		std::cout << "Looking at " << cur << " (\'" << at(start(cur,n)) << "\')\n";
+		cur = next(cur);
+	}
+	std::cout << "returning " << cur << '\n';
+	return cur;
+}
+
+void dottree::tree::print_leafvector() const {
+	for (unsigned i = 0; i != length(); ++i) {
+		std::cout << leafs_[i] << ' ';
+	}
+	std::cout << std::endl;
+}
+
+
+void dottree::print_all::visit_node(dottree::position p) {
+	std::cout << prefix_
+		<< p << ": (" << tree_->head(p) << "-" << tree_->sdepth(p) << ") "
+		<< "[\"" << std::string(tree_->string(),tree_->start(p),tree_->length(p)) << "\"]"
+		" ^" << p.parent();
+	if (!p.at_leaf()) std::cout << " suflink: " << p.curnode().as_ptr()->suffixlink();
+	std::cout << " ==> " << tree_->next(p);
+	std::cout << std::endl;
 }
 
 std::auto_ptr<dottree::tree> dottree::build_tree(const char* orig, char dollar, char dot) {
