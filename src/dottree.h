@@ -11,10 +11,15 @@ typedef unsigned int uint;
 struct node;
 struct tree;
 
+const unsigned dot_node_marker = unsigned(-2345);
+
 struct nodep_or_idx {
 	public:
 		nodep_or_idx() { reset(); }
 		nodep_or_idx(node* n) { set(n); }
+		nodep_or_idx(const nodep_or_idx& other):
+			d(other.d)
+		{ }
 		explicit nodep_or_idx(unsigned i) { set(i); }
 		node* as_ptr() const {
 			assert(is_ptr());
@@ -43,9 +48,15 @@ struct nodep_or_idx {
 			return d != other.d;
 		}
 
+		nodep_or_idx operator = (const nodep_or_idx& other) {
+			d = other.d;
+			return *this;
+		}
+
 	private:
 		unsigned d;
 };
+std::ostream& operator << (std::ostream& , const nodep_or_idx&);
 struct node {
 	public:
 		node(unsigned h, unsigned sd):
@@ -105,13 +116,15 @@ struct position {
 		bool at_end() const { return curnode().is_ptr() && offset() == curnode().as_ptr()->length(parent_); }
 		bool at_leaf() const { return curnode().is_int(); }
 		bool is_leaf() const { return curnode().is_int(); }
-		bool is_dotnode() const { return !is_leaf() && curnode().as_ptr()->head() == unsigned(-1); }
+		bool is_dotnode() const { return !is_leaf() && curnode().as_ptr()->head() == dot_node_marker; }
 	private:
 		tree* tree_;
 		node* parent_;
 		nodep_or_idx node_;
 		unsigned offset_;
 };
+
+std::ostream& operator << (std::ostream& , const position&);
 
 class node_visitor {
 	public: 
@@ -133,18 +146,20 @@ class print_leafs : public node_visitor {
 class print_all: public node_visitor {
 	public:
 		explicit print_all(const tree* t):
-			tree_(t)
+			tree_(t),
+			out_(std::cout)
 		{}
 		void visit_node(position p);
 		void visit_leaf(unsigned h) {
 		
 		}
 		void finished() { delete this; }
-		void up() { prefix_ = prefix_.substr(0,prefix_.size() - 4); }
-		void down() { prefix_+= "    "; }
+		void up() { prefix_ = prefix_.substr(0,prefix_.size() - 5); }
+		void down() { prefix_+= "    |"; }
 	private:
 		const tree* tree_;
 		std::string prefix_;
+		std::ostream& out_;
 };
 
 
@@ -163,10 +178,12 @@ struct tree {
 		}
 		const char* string() const { return string_; }
 		node* root() { return root_; }
+		position rootp() { return position(root_, root_, 0); }
 		unsigned length() const { return length_; }
 		char at(unsigned idx) const { assert(idx < length()); return string()[idx]; }
 
 		nodep_or_idx leaf(unsigned h) { return dottree::nodep_or_idx(h); }
+		nodep_or_idx new_node();
 		void print(std::ostream& out) const {
 			const tree* tthis = this;
 			const_cast<tree*>(tthis)->dfs(new print_all(this));
@@ -175,6 +192,11 @@ struct tree {
 		void add_child(node* c, nodep_or_idx n);
 		void remove_child(node* n, nodep_or_idx child);
 		nodep_or_idx child(node* n, char ch);
+		nodep_or_idx child(nodep_or_idx n, char ch) {
+			if (n.is_ptr()) return child(n.as_ptr(), ch);
+			return nodep_or_idx();
+		}
+		node* dot_link(nodep_or_idx n);
 
 		unsigned sdepth(position p) const { return sdepth(p.curnode()); }
 		unsigned sdepth(nodep_or_idx n) const {
@@ -234,7 +256,7 @@ struct tree {
 			else leafs_[cur.as_index()] = next;
 		}
 		nodep_or_idx* leafs_;
-		//node_pod* nodes_;
+		node* nodes_;
 		void dfs(node*, nodep_or_idx, node_visitor* ) const;
 		void print_leafvector() const;
 };

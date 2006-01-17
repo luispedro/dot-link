@@ -15,10 +15,10 @@ void usage()
 	exit(0);
 }
 
-void find_substring( dottree::tree* tree, const char* string, CummulativeTimer* m = 0 ) {
+void find_substring( dottree::tree* tree, const char* string, unsigned k, CummulativeTimer* m = 0 ) {
 	Timer match( "match" );
 	if ( m ) m->start();
-	int res = tree->match(string);
+	int res = search(tree,string, k);
 	match.stop();
 	if ( m ) m->stop();
 
@@ -69,7 +69,6 @@ int main(int argc, char* argv[])
 		add_dotlinks(tree.get(),k);
 		dots.start();
 		tree->dfs(new dottree::print_leafs);
-		//ST_AddDotLinks( tree, k );
 		full.stop();
 		dots.stop();
 	} catch ( const std::exception& e ) {
@@ -79,7 +78,7 @@ int main(int argc, char* argv[])
 	
 	try {
 		if ( strcmp( argv[ 3 ], "-" ) ) {
-			find_substring( tree.get(), argv[ 3 ] );
+			find_substring( tree.get(), argv[ 3 ], k );
 		} else {
 			std::string tmp;
 			CummulativeTimer* cummul = 0;
@@ -87,7 +86,7 @@ int main(int argc, char* argv[])
 				if ( tmp.substr( 0, 5 ) == "timer" ) {
 					delete cummul;
 					cummul = new CummulativeTimer( tmp.substr( 6,std::string::npos ).c_str() );
-				} else find_substring( tree.get(), tmp.c_str(), cummul );
+				} else find_substring( tree.get(), tmp.c_str(), k, cummul );
 			}
 		}
 	} catch ( const std::exception& e ) {
