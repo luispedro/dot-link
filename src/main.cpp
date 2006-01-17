@@ -25,7 +25,7 @@ void find_substring( dottree::tree* tree, const char* string, unsigned k, Cummul
 	if(res < 0)
 		printf("\nResults: String[-%s-] is not a substring.\n\n", string);
 	else
-		std::cout << boost::format( "\nResults: String[-%s-] exists in position %s.\n\n" ) % string % res;
+		std::cout << boost::format( "\nResults: String[-%s-] exists %s times.\n\n" ) % string % res;
 }
 
 char* read_file( const char* fname )

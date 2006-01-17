@@ -235,6 +235,11 @@ struct tree {
 			dfs(root_, root(), visitor);
 			visitor->finished();
 		}
+		void dfs(position p, node_visitor* visitor) const {
+			visitor->start();
+			dfs(p.parent(),p.curnode(),visitor);
+			visitor->finished();
+		}
 
 		/**
 		 * Advances pos by ch
