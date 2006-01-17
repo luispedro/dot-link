@@ -176,7 +176,7 @@ class print_all: public node_visitor {
 
 struct tree {
 	public:
-		tree(const char* str, unsigned len, char dollar, char dot):
+		tree(const char* str, unsigned len, char dollar):
 			string_(str),
 			length_(len),
 			dollar_(dollar)
@@ -185,13 +185,15 @@ struct tree {
 			std::memset(leafs_,0,sizeof(leafs_[0]) * length_);
 		}
 		~tree() {
+			delete_subtree(root_);
+			free(const_cast<char*>(string_));
 			delete [] leafs_;
 		}
 		const char* string() const { return string_; }
 		node* root() { return root_; }
 		position rootp() { return position(root_, root_, 0); }
 		unsigned length() const { return length_; }
-		char at(unsigned idx) const { assert(idx < length()); return string()[idx]; }
+		char at(unsigned idx) const { assert(idx < length()); return string_[idx]; }
 		char at(position pos) const { return at(start(pos.curnode(),pos.parent()) + pos.offset()); }
 
 		nodep_or_idx leaf(unsigned h) { return dottree::nodep_or_idx(h); }
@@ -235,6 +237,11 @@ struct tree {
 			return sdepth(n) - par->sdepth();
 		}
 
+		nodep_or_idx children(nodep_or_idx n) const {
+			if (n.is_int()) return nodep_or_idx();
+			return n.as_ptr()->children();
+		}
+
 		nodep_or_idx next(position p) const { return next(p.curnode()); }
 		nodep_or_idx next(nodep_or_idx n) const {
 			if (n.is_ptr()) return n.as_nodep()->next();
@@ -267,6 +274,15 @@ struct tree {
 		unsigned length_;
 		node* root_;
 		char dollar_;
+
+		void delete_subtree(nodep_or_idx n) {
+			//std::cout << "delete_subtree( " << n << " )\n";
+			if (n.is_null()) return;
+			delete_subtree(children(n));
+			delete_subtree(next(n));
+			if (n.is_ptr()) delete n.as_ptr();
+		}
+
 	private:
 		void next(nodep_or_idx cur, nodep_or_idx next) const {
 			assert(!cur.is_null());
@@ -279,7 +295,7 @@ struct tree {
 		void print_leafvector() const;
 };
 
-std::auto_ptr<tree> build_tree(const char* str, char dollar = '$', char dot = '.');
+std::auto_ptr<tree> build_tree(const char* str, char dollar = '$');
 }
 
 

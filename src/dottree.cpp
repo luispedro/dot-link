@@ -15,14 +15,14 @@ std::ostream& operator << (std::ostream& out, const position& p) {
 namespace {
 class mcreight_builder {
 	public:
-		mcreight_builder(const char* str, char dollar, char dot):
+		mcreight_builder(const char* str, char dollar):
 			tree_(0),
 			str_(str),
 			suffixless_(0)
 		{ }
 
 		std::auto_ptr<dottree::tree> build() {
-			tree_ = std::auto_ptr<dottree::tree>(new dottree::tree(str_,strlen(str_),dollar_, dot_));
+			tree_ = std::auto_ptr<dottree::tree>(new dottree::tree(str_,strlen(str_),dollar_));
 			tree_->root_ = new dottree::node(0, 0);
 			tree_->root_->suffixlink(tree_->root_);
 			dottree::position pos(tree_->root_,dottree::nodep_or_idx(tree_->root_), 0);
@@ -252,16 +252,15 @@ void dottree::print_all::visit_node(dottree::position p) {
 	out_ << std::endl;
 }
 
-std::auto_ptr<dottree::tree> dottree::build_tree(const char* orig, char dollar, char dot) {
+std::auto_ptr<dottree::tree> dottree::build_tree(const char* orig, char dollar) {
 	assert(!strchr(orig,dollar));
-	assert(!strchr(orig,dot));
 	unsigned len = strlen(orig);
 
 	char* fixed = static_cast<char*>(malloc(len + 2));
 	strcpy(fixed,orig);
 	fixed[len] = dollar;
 	fixed[len + 1] = '\0';
-	mcreight_builder builder(fixed, dollar, dot);
+	mcreight_builder builder(fixed, dollar);
 	std::auto_ptr<dottree::tree> res = builder.build();
 	//std::cout << "Final Tree:\n";
 	//res->print(std::cout);

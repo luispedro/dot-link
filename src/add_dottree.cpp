@@ -103,20 +103,11 @@ node* copy_at(dottree::tree* t, dottree::node* n, char cond) {
 	//std::cout << "starting copy at: " << t->dot_link(n)->children() << "\n";
 	return copy_recursive(t,t->dot_link(n)->children(),cond);
 }
-
-void delete_subtree(node* n) {
-	//std::cout << "delete_subtree( " << n << " )\n";
-	if (!n) return;
-	delete_subtree(n->children().as_ptr());
-	delete_subtree(n->next().as_ptr());
-	delete n;
-}
-
 void remove_dot_link(dottree::tree* t, node* n) {
 	if (node* dot_link = t->dot_link(n)) {
 		n->children(t->next(n->children()));
 		dot_link->next(0);
-		delete_subtree(dot_link);
+		t->delete_subtree(dot_link);
 	}
 	assert(!has_dot_link(n));
 }
