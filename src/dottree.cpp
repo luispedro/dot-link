@@ -66,13 +66,14 @@ class mcreight_builder {
 			//std::cout << "Skipping: \"" << std::string(str_,str_start,target) 
 			//		<< "\" (" << int(target) << ") starting at " << cur << "\n";
 
-			dottree::node* par;
+			dottree::node* par = 0;
 			while (tree_->sdepth(cur) < target ) {
 				par = cur.as_ptr();
 				cur = tree_->child(cur.as_ptr(),str_[str_start]);
 				assert(!cur.is_null());
 				str_start += tree_->length(cur,par);
 			}
+			assert(par);
 			return dottree::position(par,cur, tree_->sdepth(cur) - target);
 		}
 			

@@ -14,6 +14,10 @@ struct tree;
 const unsigned dot_node_marker = unsigned(-2345);
 
 struct nodep_or_idx {
+	// Use low order bit:
+	// 0: ptr
+	// 1: int
+	//
 	public:
 		nodep_or_idx() { reset(); }
 		nodep_or_idx(node* n) { set(n); }
@@ -29,14 +33,14 @@ struct nodep_or_idx {
 		node* as_nodep() const { return as_ptr(); }
 		unsigned as_index() const {
 			assert(is_int());
-			return ~d - 1;
+			return d >> 1;
 		}
 		void reset() { d = 0; assert(is_null()); }
-		void set(unsigned v) { d = ~(v+1); assert(is_int()); }
-		void set(node* p) { d = reinterpret_cast<unsigned>(p); assert(is_ptr()); }
+		void set(unsigned v) { d = (v << 1) | 1; assert(is_int()); }
+		void set(node* p) { d = reinterpret_cast<unsigned>(p); assert(as_ptr() == p); }
 
-		bool is_ptr() const { return int(d) >= 0; }
-		bool is_int() const { return int(d) < 0; }
+		bool is_ptr() const { return !is_int(); }
+		bool is_int() const { return d & 1; }
 
 		bool is_null() const { return !valid(); }
 		bool valid() const { return d; }
@@ -90,6 +94,7 @@ struct node {
 		}
 		unsigned length(const node* par) const {
 			assert(par);
+			if (head() == dot_node_marker) return 0;
 			return sdepth_ - par->sdepth();
 		}
 	private:
@@ -110,6 +115,12 @@ struct position {
 		{}
 		unsigned offset() const { return offset_; }
 		void one_down() { ++offset_; }
+		position& operator ++() { one_down(); return *this; }
+		position operator + (unsigned int idx) {
+			position res = *this;
+			res.offset_ += idx;
+			return res;
+		}
 		node* parent() const { return parent_; }
 		nodep_or_idx curnode() const { return node_; }
 
@@ -181,6 +192,7 @@ struct tree {
 		position rootp() { return position(root_, root_, 0); }
 		unsigned length() const { return length_; }
 		char at(unsigned idx) const { assert(idx < length()); return string()[idx]; }
+		char at(position pos) const { return at(start(pos.curnode(),pos.parent()) + pos.offset()); }
 
 		nodep_or_idx leaf(unsigned h) { return dottree::nodep_or_idx(h); }
 		nodep_or_idx new_node();
@@ -218,6 +230,7 @@ struct tree {
 
 		unsigned length(position p) const { return length(p.curnode(),p.parent()); }
 		unsigned length(nodep_or_idx n, node* par) const {
+			if (head(n) == dot_node_marker) return 0;
 			if (n.is_ptr()) return n.as_ptr()->length(par);
 			return sdepth(n) - par->sdepth();
 		}

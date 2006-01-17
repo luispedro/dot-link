@@ -15,17 +15,31 @@ void usage()
 	exit(0);
 }
 
-void find_substring( dottree::tree* tree, const char* string, unsigned k, CummulativeTimer* m = 0 ) {
-	Timer match( "match" );
+typedef unsigned (*search_func)(dottree::tree*, const char*, unsigned);
+
+void find_substring( dottree::tree* tree,
+		const char* string,
+	       	unsigned k,
+		search_func search,
+		const char* name,
+		CummulativeTimer* m = 0 ) {
+	Timer match( "match_edit" );
 	if ( m ) m->start();
 	int res = search(tree,string, k);
 	match.stop();
 	if ( m ) m->stop();
 
 	if(res < 0)
-		printf("\nResults: String[-%s-] is not a substring.\n\n", string);
+		std::cout << boost::format("\nResults: String[-%s-] is not an %s substring.\n\n") % string %name;
 	else
-		std::cout << boost::format( "\nResults: String[-%s-] exists %s times.\n\n" ) % string % res;
+		std::cout << boost::format( "\nResults: String[-%s-] exists %s times (%s).\n\n" ) % string % res % name;
+}
+void find_substring( dottree::tree* tree,
+		const char* string,
+	       	unsigned k,
+		CummulativeTimer* m = 0 ) {
+	find_substring(tree, string,k, edit_search, "edit", m);
+	find_substring(tree, string,k, hamming_search, "hamming", m);
 }
 
 char* read_file( const char* fname )

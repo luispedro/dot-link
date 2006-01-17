@@ -105,7 +105,7 @@ node* copy_at(dottree::tree* t, dottree::node* n, char cond) {
 }
 
 void delete_subtree(node* n) {
-	std::cout << "delete_subtree( " << n << " )\n";
+	//std::cout << "delete_subtree( " << n << " )\n";
 	if (!n) return;
 	delete_subtree(n->children().as_ptr());
 	delete_subtree(n->next().as_ptr());
@@ -155,37 +155,68 @@ void add_dotlink_recur(dottree::tree* t, node* n) {
 		}
 	}
 }
-unsigned search(dottree::tree* t, dottree::position cur, const char* str, unsigned length, unsigned k) {
-	assert(std::strlen(str) == length);
-	if (!*str) {
-		std::vector<unsigned> leafs;
-		t->dfs(cur, new gather_leafs(t,leafs));
-		t->dfs(cur, new dottree::print_all(t));
-		return leafs.size();
-	}
-		
-	if (k > 0 && !cur.offset()) {
-		node* dot = t->dot_link(cur.curnode());
-		assert(dot);
-		unsigned here = search(t,dottree::position(cur.curnode().as_ptr(),dot,0),str+1,length-1,k-1);
-		if (here != unsigned(-1)) return here;
-	}
-
-	nodep_or_idx next = t->child(cur.curnode().as_ptr(), *str);
-	if (next.is_null()) return unsigned(-1);
-	unsigned len = std::min<unsigned>(t->length(next,cur.curnode().as_ptr()), length);
-	++str;
-	for(unsigned i = 1; i != len; ++i) {
-		if (*str++ != t->at(t->start(next,cur.curnode().as_ptr())+i)) {
-			if (!k) return unsigned(-1);
-			--k;
+struct searcher {
+	public:
+		searcher(dottree::tree* t, const char* str, bool edit = false):
+			tree_(t),
+			pat_(str),
+			len_(strlen(str)),
+			edit_(edit)
+		{ }
+		unsigned search(dottree::position pos, unsigned start, unsigned k) {
+			if (start == len_) return count_leafs(pos);
+			if (pos.at_end()) {
+				if (k > 0) {
+					unsigned here = search(
+							dottree::position(
+								pos.curnode().as_ptr(),
+								tree_->dot_link(pos.curnode()),
+								0),
+							start+1,
+							k - 1);
+					if (here != unsigned(-1)) return here;
+				}
+				nodep_or_idx child = tree_->child(pos.curnode(),pat_[start]);
+				if (child.valid()) {
+					return search(
+							dottree::position(
+								pos.curnode().as_ptr(),
+								child,
+								1),
+							start + 1,
+							k);
+				}
+				return unsigned(-1);
+			}
+			if (edit_ && k > 0) {
+				// deletion
+				unsigned here = search(pos, start + 1, k - 1);
+				if (here != unsigned(-1)) return here; 
+				//insertion
+				here = search(pos + 1, start, k - 1);
+				if (here != unsigned(-1)) return here; 
+			}
+			if (pat_[start] != tree_->at(pos)) {
+				if (k > 0) --k;
+				else return unsigned(-1);
+			}
+			++pos;
+			
+			return search(pos, start + 1, k);
 		}
-	}
-	return search(t,dottree::position(cur.curnode().as_ptr(),next,0),str, length - len, k);	
-}
-}
-
-
+	private:
+		unsigned count_leafs(dottree::position pos) {
+			std::vector<unsigned> leafs;
+			tree_->dfs(pos, new gather_leafs(tree_,leafs));
+			tree_->dfs(pos, new dottree::print_all(tree_));
+			return leafs.size();
+		}
+		dottree::tree* tree_;
+		const char* pat_;
+		const unsigned len_;
+		const bool edit_;
+};
+} // namespace
 	
 void add_dotlinks(dottree::tree *t, unsigned k) {
 	for (unsigned i = 0; i != k; ++i) {
@@ -203,14 +234,17 @@ void add_dotlinks(dottree::tree *t, unsigned k) {
 		//t->dfs(new dottree::print_all(t));
 		//t->dfs(new print_paths(t));
 		add_dotlink_recur(t,t->root());
-		std::cout << "\n\nADDED NEW LINKS:\n";
-		t->dfs(new dottree::print_all(t));
-		t->dfs(new print_paths(t));
+		//std::cout << "\n\nADDED NEW LINKS:\n";
+		//t->dfs(new dottree::print_all(t));
+		//t->dfs(new print_paths(t));
 	}
-	t->dfs(new dottree::print_all(t));
-	t->dfs(new print_paths(t));
+	//t->dfs(new dottree::print_all(t));
+	//t->dfs(new print_paths(t));
 }
-unsigned search(dottree::tree* t, const char* str, unsigned k) {
-	return search(t, t->rootp(), str, strlen(str), k);
+unsigned hamming_search(dottree::tree* t, const char* str, unsigned k) {
+	return searcher(t, str, false).search(t->rootp(), 0, k);
+}
+unsigned edit_search(dottree::tree* t, const char* str, unsigned k) {
+	return searcher(t, str, true).search(t->rootp(), 0, k);
 }
 
