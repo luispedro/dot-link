@@ -87,9 +87,14 @@ node* copy_recursive(dottree::tree* t, const nodep_or_idx n, const char cond) {
 
 	dottree::node* children = copy_recursive(t, n.as_ptr()->children(),cond);
 	if (!children) return copy_recursive(t,t->next(n), cond);
-	dottree::node* res = copy_simple(t,n);
+	dottree::node* res;
+	if (children->next().is_null() && t->head(n) != dot_node_marker) {
+		res = children;
+	} else {
+		res = copy_simple(t,n);
+		res->children(children);
+	}
 	res->next(copy_recursive(t,t->next(n),cond));
-	res->children(children);
 	return res;
 }
 
@@ -189,8 +194,8 @@ void add_dotlinks(dottree::tree *t, unsigned k) {
 		//t->dfs(new dottree::print_all(t));
 		//t->dfs(new print_paths(t));
 	}
-	//t->dfs(new dottree::print_all(t));
-	//t->dfs(new print_paths(t));
+	t->dfs(new dottree::print_all(t));
+	t->dfs(new print_paths(t));
 }
 unsigned search(dottree::tree* t, const char* str, unsigned k) {
 	return search(t, dottree::nodep_or_idx(t->root()), str, strlen(str), k);
