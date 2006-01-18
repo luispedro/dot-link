@@ -199,7 +199,7 @@ struct searcher {
 		unsigned count_leafs(dottree::position pos) {
 			std::vector<unsigned> leafs;
 			tree_->dfs(pos, new gather_leafs(tree_,leafs));
-			tree_->dfs(pos, new dottree::print_all(tree_));
+			//tree_->dfs(pos, new dottree::print_all(tree_));
 			return leafs.size();
 		}
 		dottree::tree* tree_;

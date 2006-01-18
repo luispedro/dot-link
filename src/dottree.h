@@ -124,7 +124,10 @@ struct position {
 		node* parent() const { return parent_; }
 		nodep_or_idx curnode() const { return node_; }
 
-		bool at_end() const { return curnode().is_ptr() && offset() == curnode().as_ptr()->length(parent_); }
+		bool at_end() const {
+			return offset() == unsigned(-1) ||
+				curnode().is_ptr() && offset() == curnode().as_ptr()->length(parent_);
+		}
 		bool at_leaf() const { return curnode().is_int(); }
 		bool is_leaf() const { return curnode().is_int(); }
 		bool is_dotnode() const { return !is_leaf() && curnode().as_ptr()->head() == dot_node_marker; }
@@ -198,7 +201,7 @@ struct tree {
 
 		nodep_or_idx leaf(unsigned h) { return dottree::nodep_or_idx(h); }
 		nodep_or_idx new_node();
-		void print(std::ostream& out) const {
+		void print(std::ostream& out = std::cout) const {
 			const tree* tthis = this;
 			const_cast<tree*>(tthis)->dfs(new print_all(this));
 		}
@@ -257,7 +260,11 @@ struct tree {
 		}
 		void dfs(position p, node_visitor* visitor) const {
 			visitor->start();
-			dfs(p.parent(),p.curnode(),visitor);
+			if (p.at_end()) {
+				dfs(p.curnode().as_ptr(),children(p.curnode()),visitor);
+			} else {
+				dfs(p.parent(),p.curnode(),visitor);
+			}
 			visitor->finished();
 		}
 

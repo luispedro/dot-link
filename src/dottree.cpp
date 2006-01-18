@@ -29,26 +29,24 @@ class mcreight_builder {
 			unsigned sdepth = 0;
 			for (unsigned head = 0; head != tree_->length(); ++head) {
 				if (sdepth) --sdepth;
-				 if (!sdepth)
-					while (tree_->descend(pos, tree_->at(head+sdepth))) ++sdepth;
+				while (tree_->descend(pos, tree_->at(head+sdepth))) ++sdepth;
 				// I'm at a breaking point
 				add_branch(pos, head, sdepth);
 				pos = fast_suffix_link(pos);
+				if (pos.at_end() && suffixless_) {
+					suffixless_->suffixlink(pos.curnode().as_ptr());
+					suffixless_ = 0;
+				}
 			}
 			return tree_;
 		}
 	private:
 		dottree::position fast_suffix_link(dottree::position pos) {
-			//std::cout << "starting fast_suffix_link at: " << pos << '\n';
+			//std::cout << "\n\n\n\nstarting fast_suffix_link at: " << pos << '\n';
+			//tree_->print();
 			assert(pos.at_end());
 			assert(!pos.at_leaf());
-			if (!pos.at_leaf() && pos.curnode().as_ptr()->suffixlink()) {
-				//std::cout << "easy...\n";
-				return dottree::position(
-						pos.parent()->suffixlink(),
-						dottree::nodep_or_idx(pos.curnode().as_ptr()->suffixlink()),
-						0);
-			}
+			if (pos.curnode() == tree_->root()) return pos;
 			if (tree_->sdepth(pos.curnode()) == 1) {
 				//std::cout << "I'm at the root...\n";
 				return dottree::position(tree_->root_, dottree::nodep_or_idx(tree_->root_), 0);
@@ -63,8 +61,9 @@ class mcreight_builder {
 				++str_start;
 			} else cur.set(cur.as_ptr()->suffixlink());
 			assert(!cur.is_null());
-			//std::cout << "Skipping: \"" << std::string(str_,str_start,target) 
-			//		<< "\" (" << int(target) << ") starting at " << cur << "\n";
+
+			//std::cout << "Skipping: \"" << std::string(str_,str_start,target - tree_->sdepth(cur)) 
+			//		<< "\" (" << int(target - tree_->sdepth(cur)) << ") starting at " << cur << "\n";
 
 			dottree::node* par = 0;
 			while (tree_->sdepth(cur) < target ) {
@@ -74,13 +73,12 @@ class mcreight_builder {
 				str_start += tree_->length(cur,par);
 			}
 			assert(par);
-			return dottree::position(par,cur, tree_->sdepth(cur) - target);
+			return dottree::position(par,cur, target - tree_->sdepth(par));
 		}
 			
 		void add_branch(dottree::position& pos, unsigned head, unsigned sdepth) {
-			//std::cout << "add_branch( " << pos << head << ", " << sdepth << " )\n";
+			//std::cout << "add_branch( " << pos << ", " << head << ", " << sdepth << " )\n";
 			dottree::nodep_or_idx leaf = tree_->leaf(head);
-			//std::cout << "built: " << leaf << '\n';
 			dottree::node* parent = pos.parent();
 			if (pos.at_end()) {
 				tree_->add_child(pos.curnode().as_ptr(),leaf);
@@ -112,7 +110,6 @@ class mcreight_builder {
 		std::auto_ptr<dottree::tree> tree_;
 		const char* str_;
 		char dollar_;
-		char dot_;
 		dottree::node* suffixless_;
 };
 }
@@ -121,7 +118,7 @@ int dottree::tree::match(const char* pat) const {
 	assert(pat);
 	dottree::position pos = dottree::position(root_,dottree::nodep_or_idx(root_),0);
 	while ( *pat && descend(pos,*pat)) ++pat;
-	if (*pat) return -1;
+//X 	if (*pat) return -1;
 	return head(pos.curnode());
 }
 
