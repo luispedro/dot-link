@@ -1,0 +1,36 @@
+\begin{algorithm}
+\dontprintsemicolon
+\caption{Function findString($\overline{w}$,$s$,$k$)}%
+\label{algo:search}
+\SetKwData{J}{j}
+\SetKwData{W}{s}
+\SetKwData{K}{k}
+\SetKwData{Len}{len}
+\SetKwData{Node}{node}
+\SetKwData{Start}{nodeStart}
+\SetKwData{String}{treeString}
+
+\KwIn{Current node \Node}
+\KwIn{String \W}
+\KwIn{Maximum errors \K}
+\KwData{The tree's string \String}
+
+\lIf{\W is empty}{
+	\emph{report all \Node's children}\;
+}
+\lIf{$\K > 0$}{
+	findString(\Node.dotLink, $\W+1$,$\K-1$)\nllabel{algoline:search:followDot}\;
+}
+\Node \Assign \Node.getSon($\W_0$)\;
+\Len \Assign min(length(\Node),length(\W))\;
+\For{\J \Assign 1 \KwTo \Len}{
+	\If{$\W_{\J} \not= \String_{\Start+\J}$}{
+		\lIf{$\K > 0$}{
+			\K \Assign $\K-1$\;
+		}\lElse{
+			\emph{return, the string was not found}%
+		}%
+	}%
+}%
+findString(\Node,$\W+\Len$,\K)
+\end{algorithm}
