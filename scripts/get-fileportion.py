@@ -7,6 +7,9 @@ import os
 if len(argv) < 5:
 	print "usage:"
 	print sys.argv[0], " inputfile [ begin | . ] lenght errors [ repeats ]"
+	print
+	print "set lenght to \"-1\" to get the whole file"
+	print "set begin to \".\" to get a random portion"
 	sys.exit(0)
 
 inputfile=argv[1]
@@ -21,8 +24,11 @@ repeats=1
 if len(argv) > 5:
 	repeats=int(argv[5])
 
+if lenght == -1:
+	lenght = filelen
+
 if lenght > filelen:
-	print "File %s is too small!" % inputfile
+	sys.stderr.write("File %s is too small!\n" % inputfile)
 	sys.exit(1)
 	
 
