@@ -1,12 +1,22 @@
 input=file('file')
-suffixes=[]
 
 string=input.readline().strip() + '$'
-for i in xrange(len(string)):
-    suffixes.append((string[i:],i))
 
-suffixes.sort()
-naive=[i for s,i in suffixes]
+naive=range(len(string))
+def sufcmp(a,b):
+	if a == b:
+		return 0
+	while a < len(string) and b < len(string) and string[a] == string[b]:
+		a += 1
+		b += 1
+	if a == len(string):
+		return 1
+	if b == len(string):
+		return -1
+	if string[a] < string[b]:
+		return -1
+	return 1
+naive.sort(sufcmp)
 	
 from os import popen
 import re
