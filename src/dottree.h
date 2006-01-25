@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <cassert>
+#include <ext/mt_allocator.h>
 
 namespace dottree {
 typedef unsigned int uint;
@@ -65,24 +66,18 @@ struct node {
 	public:
 		node(unsigned h, unsigned sd):
 			head_(h),
-			sdepth_(sd),
-			suffixlink_(0)
+			sdepth_(sd)
 		{}
+		//virtual ~node() { }
 		void print(const char*, const node*, std::ostream& out, std::string prefix, bool recurs = true) const;
 		
-		nodep_or_idx children() const { return children_;}
-		nodep_or_idx children(nodep_or_idx c) { std::swap(c,children_); return c; }
-
 		nodep_or_idx next() const { return next_;}
 		nodep_or_idx next(nodep_or_idx c) { std::swap(c,next_); return c; }
 
 		unsigned head() const { return head_; }
 		unsigned head(unsigned h) { std::swap(h, head_); return h; }
 
-		node* suffixlink() const { return suffixlink_;}
-		node* suffixlink(node* s) { std::swap(s, suffixlink_); return s; }
-
-		bool is_root() const { return suffixlink_ == this; }
+		nodep_or_idx children(nodep_or_idx c) { std::swap(c,children_); return c; }
 		bool is_leaf() const { return children_.is_null(); }
 		
 		unsigned sdepth() const { return sdepth_; }
@@ -97,15 +92,56 @@ struct node {
 			if (head() == dot_node_marker) return 0;
 			return sdepth_ - par->sdepth();
 		}
+		void* operator new (size_t s) {
+			assert(s == sizeof(node));
+			++cur_alloc_;
+			if (cur_alloc_ > max_alloc_) {
+			       	max_alloc_ = cur_alloc_;
+				//if (!(max_alloc_ % 1000)) std::cout << "max_alloc_: " << max_alloc_ << '\n';
+			}
+			return ::operator new(s);
+		}
+		void operator delete(void* p) {
+			--cur_alloc_;
+			::operator delete(p);
+		}
+		static unsigned allocated_nodes();
 	private:
+		static unsigned cur_alloc_;
+		static unsigned max_alloc_;
+		static __gnu_cxx::__mt_alloc<node> alloc_;
+
 		friend class tree;
 		unsigned head_;
 		unsigned sdepth_;
-		nodep_or_idx children_;
 		nodep_or_idx next_;
-		node* suffixlink_;
+		nodep_or_idx children_;
 };
 
+struct node_wsl : public node {
+	public:
+		node_wsl(unsigned h, unsigned sd):
+			node(h,sd),
+			suffixlink_(0)
+		{ }
+		node* suffixlink() const { return suffixlink_;}
+		node* suffixlink(node* s) { std::swap(s, suffixlink_); return s; }
+		void* operator new (size_t s) {
+			assert(s == sizeof(node_wsl));
+			++cur_alloc_;
+			if (cur_alloc_ > max_alloc_) max_alloc_ = cur_alloc_;
+			return alloc_.allocate(s);
+		}
+		void operator delete(void* p) {
+			
+		}
+		static unsigned allocated_nodes() { return max_alloc_; }
+	private:
+		static unsigned cur_alloc_;
+		static unsigned max_alloc_;
+		static __gnu_cxx::__mt_alloc<node_wsl> alloc_;
+		node* suffixlink_;
+};
 struct position {
 	public:
 		position(node* p, nodep_or_idx n, unsigned o):
@@ -240,9 +276,13 @@ struct tree {
 			return sdepth(n) - par->sdepth();
 		}
 
+		bool is_leaf(nodep_or_idx n) const {
+			return head(n) + sdepth(n) == length();
+		}
+
 		nodep_or_idx children(nodep_or_idx n) const {
-			if (n.is_int()) return nodep_or_idx();
-			return n.as_ptr()->children();
+			if (is_leaf(n)) return nodep_or_idx();
+			return n.as_ptr()->children_;
 		}
 
 		nodep_or_idx next(position p) const { return next(p.curnode()); }
@@ -303,6 +343,13 @@ struct tree {
 };
 
 std::auto_ptr<tree> build_tree(const char* str, char dollar = '$');
+}
+
+template <typename T, typename U>
+inline T checked_cast(U p) {
+
+	return static_cast<T>(p);
+	//return dynamic_cast<T>(p);
 }
 
 

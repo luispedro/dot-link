@@ -15,7 +15,7 @@ void usage()
 	exit(0);
 }
 
-typedef unsigned (*search_func)(dottree::tree*, const char*, unsigned);
+typedef unsigned (*search_func)(dottree::tree*, const char*, unsigned,const char*);
 
 void find_substring( dottree::tree* tree,
 		const char* string,
@@ -25,7 +25,7 @@ void find_substring( dottree::tree* tree,
 		CummulativeTimer* m = 0 ) {
 	Timer match( "match_edit" );
 	if ( m ) m->start();
-	int res = search(tree,string, k);
+	int res = search(tree,string, k, (m ? m->name(): ""));
 	match.stop();
 	if ( m ) m->stop();
 
@@ -37,9 +37,10 @@ void find_substring( dottree::tree* tree,
 void find_substring( dottree::tree* tree,
 		const char* string,
 	       	unsigned k,
-		CummulativeTimer* m = 0 ) {
-	find_substring(tree, string,k, edit_search, "edit", m);
-	find_substring(tree, string,k, hamming_search, "hamming", m);
+		CummulativeTimer* m1 = 0,
+	        CummulativeTimer* m2 = 0) {
+	find_substring(tree, string,k, edit_search, "edit", m1);
+	find_substring(tree, string,k, hamming_search, "hamming", m2);
 }
 
 char* read_file( const char* fname )
@@ -80,11 +81,12 @@ int main(int argc, char* argv[])
 		Timer dots( "add-dot-links" );
 		full.start();
 		tree = dottree::build_tree(str);
-		add_dotlinks(tree.get(),k);
+		std::cout << boost::format("Nodes 0-order: %s\n") % dottree::node::allocated_nodes();
 		dots.start();
-		tree->dfs(new dottree::print_leafs);
+		add_dotlinks(tree.get(),k);
 		full.stop();
 		dots.stop();
+		//tree->dfs(new dottree::print_leafs);
 	} catch ( const std::exception& e ) {
 		std::cerr << "Error [construction]: (exception): " << e.what() << std::endl;
 	}
@@ -95,23 +97,29 @@ int main(int argc, char* argv[])
 			find_substring( tree.get(), argv[ 3 ], k );
 		} else {
 			std::string tmp;
-			CummulativeTimer* cummul = 0;
-			while ( std::getline( std::cin, tmp ) ) {
-				if ( tmp.substr( 0, 5 ) == "timer" ) {
-					delete cummul;
-					cummul = new CummulativeTimer( tmp.substr( 6,std::string::npos ).c_str() );
-				} else find_substring( tree.get(), tmp.c_str(), k, cummul );
+			CummulativeTimer* cumm1 = 0;
+			CummulativeTimer* cumm2 = 0;
+			while (std::getline(std::cin, tmp,'\0')) {
+				if (tmp.substr(0, 5) == "timer") {
+					delete cumm1;
+					delete cumm2;
+					cumm1 = new CummulativeTimer((tmp.substr(6,std::string::npos) + ".subst").c_str());
+					cumm2 = new CummulativeTimer((tmp.substr(6,std::string::npos) + ".edit").c_str());
+				} else find_substring(tree.get(), tmp.c_str(), k, cumm1, cumm2);
 			}
 		}
 	} catch ( const std::exception& e ) {
 		std::cerr << "Error [matching]: (exception): " << e.what() << std::endl;
 	}
 	try {
-		std::cout << boost::format( "String size: %s \n" ) % ( tree->length() - 1 );
 		/*std::cout << boost::format( "Nodes without dot links: %s \n" ) % ST_CountNodes( tree, false );
 		std::cout << boost::format( "Nodes with dot links: %s \n" ) % ST_CountNodes( tree, true );
 */
 		stats::print();
+		std::cout << boost::format("Nodes Allocated: %s\n") % dottree::node::allocated_nodes();
+		std::cout << boost::format("sizeof(node): %s\n") % sizeof(dottree::node);
+		std::cout << boost::format("sizeof(node_wsl): %s\n") % sizeof(dottree::node_wsl);
+		std::cout << boost::format( "String size: %s \n" ) % ( tree->length() - 1 );
 
 		free(str);
 	} catch ( const std::exception& e ) {

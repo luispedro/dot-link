@@ -1,5 +1,15 @@
 #include "dottree.h"
 
+unsigned dottree::node::cur_alloc_;
+unsigned dottree::node::max_alloc_;
+unsigned dottree::node_wsl::cur_alloc_;
+unsigned dottree::node_wsl::max_alloc_;
+__gnu_cxx::__mt_alloc<dottree::node> dottree::node::alloc_;
+__gnu_cxx::__mt_alloc<dottree::node_wsl> dottree::node_wsl::alloc_;
+
+unsigned dottree::node::allocated_nodes() {
+	return max_alloc_ + dottree::node_wsl::allocated_nodes(); 
+}
 
 namespace dottree {
 std::ostream& operator << ( std::ostream& out, const nodep_or_idx& n ) {
@@ -23,8 +33,8 @@ class mcreight_builder {
 
 		std::auto_ptr<dottree::tree> build() {
 			tree_ = std::auto_ptr<dottree::tree>(new dottree::tree(str_,strlen(str_),dollar_));
-			tree_->root_ = new dottree::node(0, 0);
-			tree_->root_->suffixlink(tree_->root_);
+			tree_->root_ = new dottree::node_wsl(0, 0);
+			checked_cast<dottree::node_wsl*>(tree_->root_)->suffixlink(tree_->root_);
 			dottree::position pos(tree_->root_,dottree::nodep_or_idx(tree_->root_), 0);
 			unsigned sdepth = 0;
 			for (unsigned head = 0; head != tree_->length(); ++head) {
@@ -59,7 +69,7 @@ class mcreight_builder {
 			if (cur.as_ptr() == tree_->root_) {
 				//std::cout << "cur == tree_->root_\n";
 				++str_start;
-			} else cur.set(cur.as_ptr()->suffixlink());
+			} else cur.set(checked_cast<dottree::node_wsl*>(cur.as_ptr())->suffixlink());
 			assert(!cur.is_null());
 
 			//std::cout << "Skipping: \"" << std::string(str_,str_start,target - tree_->sdepth(cur)) 
@@ -83,7 +93,7 @@ class mcreight_builder {
 			if (pos.at_end()) {
 				tree_->add_child(pos.curnode().as_ptr(),leaf);
 			} else {
-				dottree::node* top = new dottree::node(head, sdepth);
+				dottree::node_wsl* top = new dottree::node_wsl(head, sdepth);
 				dottree::nodep_or_idx cur = pos.curnode();
 				tree_->add_child(parent,dottree::nodep_or_idx(top));
 				//std::cout << "BEFORE REMOVE CHILD\n";
@@ -110,7 +120,7 @@ class mcreight_builder {
 		std::auto_ptr<dottree::tree> tree_;
 		const char* str_;
 		char dollar_;
-		dottree::node* suffixless_;
+		dottree::node_wsl* suffixless_;
 };
 }
 
@@ -219,12 +229,8 @@ dottree::nodep_or_idx dottree::tree::child(node* n, char ch) {
 }
 
 dottree::node* dottree::tree::dot_link(nodep_or_idx n) {
-	if (
-			n.is_ptr() &&
-			n.as_ptr()->children().is_ptr() && 
-			head(n.as_ptr()->children()) == dot_node_marker
-	   ) 
-		return n.as_ptr()->children().as_ptr();
+	if (children(n).is_null()) return 0;
+	if (head(children(n)) == dot_node_marker) return children(n).as_ptr();
 	return 0;
 }
 
@@ -244,7 +250,7 @@ void dottree::print_all::visit_node(dottree::position p) {
 	} else {
 		out_ << "[\"" << std::string(tree_->string(),tree_->start(p),tree_->length(p)) << "\"]";
 	}
-	if (!p.at_leaf()) out_ << " suflink: " << p.curnode().as_ptr()->suffixlink();
+	//if (!p.at_leaf()) out_ << " suflink: " << p.curnode().as_ptr()->suffixlink();
 	out_ << " ==> " << tree_->next(p);
 	out_ << std::endl;
 }
