@@ -32,13 +32,13 @@ void stats::did_match( bool res ) {
 }
 
 void stats::proportion( std::string name, bool v ) {
-		proportioninfo& p = proportions[ name ];
-		++p.total;
-		if ( v ) ++p.positive;
+	proportioninfo& p = proportions[ name ];
+	++p.total;
+	if ( v ) ++p.positive;
 }
 
 stats::accumulator_type& stats::accumulator( std::string name ) {
-		return accumulators[ name ];
+	return accumulators[ name ];
 }
 
 void stats::count( std::string name, unsigned current, unsigned limit ) {
@@ -120,11 +120,11 @@ void stats::setfile( std::ostream& out ) {
 }
 
 void stats::average( std::string name, unsigned v ) {
-		averages[ name ].push_back( v );
+	averages[ name ].push_back( v );
 }
 
 void stats::average( std::string name, double v ) {
-		averagesf[ name ].push_back( v );
+	averagesf[ name ].push_back( v );
 }
 
 std::ostream& stats::file() {
@@ -133,8 +133,7 @@ std::ostream& stats::file() {
 
 void stats::printtime( const char* msg ) {
 	time_t now = time( 0 );
-	stats::file() << ( msg ? msg : "" )
-		<< ctime( &now ) << '\n';
+	stats::file() << ( msg ? msg : "" ) << ctime( &now ) << '\n';
 }
 
 
