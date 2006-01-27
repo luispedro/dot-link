@@ -89,6 +89,7 @@ int main(int argc, char* argv[])
 		//tree->dfs(new dottree::print_leafs);
 	} catch ( const std::exception& e ) {
 		std::cerr << "Error [construction]: (exception): " << e.what() << std::endl;
+		return 1;
 	}
 	
 	
@@ -110,6 +111,7 @@ int main(int argc, char* argv[])
 		}
 	} catch ( const std::exception& e ) {
 		std::cerr << "Error [matching]: (exception): " << e.what() << std::endl;
+		return 1;
 	}
 	try {
 		/*std::cout << boost::format( "Nodes without dot links: %s \n" ) % ST_CountNodes( tree, false );
@@ -124,6 +126,7 @@ int main(int argc, char* argv[])
 		free(str);
 	} catch ( const std::exception& e ) {
 		std::cerr << "Error [statting]: (exception): " << e.what() << std::endl;
+		return 1;
 	}
 	return 0;
 }
