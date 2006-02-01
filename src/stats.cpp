@@ -55,6 +55,10 @@ void stats::print() {
 	stats::print( stats::file() );
 }
 
+void stats::print_python() {
+	stats::print_python( stats::file() );
+}
+
 void stats::print( std::ostream& out ) {
 	if ( matches.total ) {
 		out << "Total matches: "<< matches.total
@@ -102,6 +106,62 @@ void stats::print( std::ostream& out ) {
 					float perc = double( cumm ) / total;
 					out << " count {" << f->first << "} [ " << i << " ] " <<  " = "
 							<< f->second[ i ] << " cumm = " << cumm << " ( " << perc << "% ) " << std::endl;
+			}
+	}
+}
+
+void stats::print_python( std::ostream& out ) {
+	out << "# proportion[name]=(prop,positive,total)\n"
+		"proportion={}\n";
+	for ( std::map< std::string, proportioninfo>::const_iterator f = proportions.begin(), e = proportions.end();
+			f != e;
+			++f ) {
+		out << "proportion [ \"" << f->first << "\" ] = ("
+			<< double( f->second.positive ) / f->second.total 
+			<< ", " << f->second.positive << ", " << f->second.total << " )\n";
+	}
+	out << "#average[name]=(avg,total)\n"
+		"average={}\n";
+	for ( std::map<std::string, std::vector<unsigned> >::const_iterator f = averages.begin(), e = averages.end();
+					f != e;
+					++f ) {
+			out << "average [ \"" << f->first << "\" ] = ("
+					<< std::accumulate( f->second.begin(), f->second.end(), 0.0 )
+						/ std::max<unsigned>( f->second.size(), 1 )
+					<< ", " << f->second.size() << ")\n";
+	}
+	for ( std::map<std::string, std::vector<double> >::const_iterator f = averagesf.begin(), e = averagesf.end();
+					f != e;
+					++f ) {
+			out << "average [ \"" << f->first << "\" ] = ("
+					<< std::accumulate( f->second.begin(), f->second.end(), 0.0 ) 
+						/ std::max<unsigned>( f->second.size(), 1 )
+					<< ", " << f->second.size() << ")\n";
+	}
+
+	out << "# accumulator[name]=total\n"
+		"accumulator={}\n";
+
+	for ( std::map<std::string, accumulator_type_open>::const_iterator f = accumulators.begin(), e = accumulators.end();
+					f != e;
+					++f ) {
+			out << "accumulator [\""  << f->first << "\"]=" << f->second.value() << std::endl;
+	}
+	
+	out << "#count[name][value]=(count,cummulative,percentage of total)\n";
+	out << "count={}\n";
+
+	for ( std::map<std::string, std::vector<unsigned> >::const_iterator f = counters.begin(), e = counters.end();
+					f != e;
+					++f ) {
+			unsigned cumm = 0;
+			unsigned total = std::accumulate( f->second.begin(), f->second.end(), 0 );
+			out << "count[\"" << f->first << "\"]={}";
+			for ( std::vector<unsigned>::size_type i = 0, len = f->second.size(); i != len; ++i ) {
+					cumm += f->second[ i ];
+					float perc = double( cumm ) / total;
+					out << " count[\"" << f->first << "\"][ " << i << " ] "
+						<< " = (" << f->second[ i ] << "," << cumm << ", " << perc << ") " << std::endl;
 			}
 	}
 

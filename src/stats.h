@@ -17,6 +17,8 @@ namespace stats {
 DECL( void did_match( bool res ) )
 DECL( void print() )
 DECL( void print( std::ostream& out ) )
+DECL( void print_python() )
+DECL( void print_python( std::ostream& out ) )
 
 DECL( void average( std::string, unsigned ) )
 DECL( void average( std::string, double ) )
