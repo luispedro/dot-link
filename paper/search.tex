@@ -1,7 +1,15 @@
-To search a string with at maximum k errors in a k-error dotted tree, we descend the tree. Whenever we find a node, we follow both the dot link and the edge which matches the current position of the string we are searching for. If we find a mismatch in the middle of an edge, we continue, decreasing the amount of errors permitted. When presenting the algorithm, we take the liberty of using $s+j$ where $s$ is a string and $j$ an integer to mean the suffix of $s$ starting at position $j$ (as happens in the C~Programming Language).
+Given a pattern to search for, we descend the tree point by point, following the pattern character by character. We represent this by keeping a node and an offset from the start of its incoming link. In an edge, we consider that there is an implicit dot link which goes forward one character. At each point, we can take four possible actions:
 
-\input{search-algo}
+\begin{description}
+\item[match] Where we descend the tree according to the pattern (may not be possible).
+\item[substitution] We follow the dot link (possibly implicit), moving in the pattern.
+\item[insertion] We follow the (possibly implicit) dot link, while not moving in the pattern.
+\item[deletion] We advance in the pattern, while not moving in the tree.
+\end{description}
 
-The process just described is Algorithm~\ref{algo:search}. Reporting of the leafs below a certain node can be done by a Depth First Search. If one is interested in knowing only whether the string occurs, then the lines which report the matches can be substituted by early exits returning true.
+\input{search-algo-edit}
+%
+Going down the tree can therefore be seen as a sequence of edition and matching operations: For example, for the string \putstring{ixsi}: \operation{match(i)}, \operation{substitution(x)}, \operation{match(s)}, \operation{match(i)}, where there are at most $k$ elements which are not \operation{match(c)}. There are at most $\sum_{i=1}^k{m \choose i}=\mathcal{O}(m^k)$ ways to combine $k$ edit operations into a string of size $m$. Since there are $3$ different operations (substitution, insertion, and deletion), we have at most $\mathcal{O}(3^k m^k)$ different edition sequences. Each sequence has at most $m+k=\bigO(m)$ (given that $k<m$) elements and therefore the total time to find matches is $\mathcal{O}(3^k m^{k+1})$. Once a match has been found in the tree, a Depth First Search can be used to report all the leaves below the node. This takes time proportional to the number of leaves, ie.\ proportional to the number of edit scripts which can be used to match the pattern to a substring of the text (which can be greater than the number of occurences~\footnote{As often happens, strings of the form $a^m$ serve as examples of pathological behaviour as they can match any position of a string of form $a^n$ in a large number of ways.}). The total search time is therefore $\bigO(3^k m^{k+1} + \mbox{\it ed})$.
 
-This algorithm runs in time $\mathcal{O}(m^{k+1})$: There are at most $\sum_{i=0}^{k}{m \choose i}=\mathcal{O}(m^k)$ different paths which must be followed. Following one path in the tree takes $\mathcal{O}(m)$ time. Therefore, the total time is $\mathcal{O}(m^{k+1})$ without the reporting of occurrences (which can be done in time linear to the number of occurrences).
+The code needs to distinguish whether we are at the end of a branch (ie.\ at a node) or in the middle of one. When presenting the algorithm, we take the liberty of using $s+j$ where $s$ is a string and $j$ an integer to mean the suffix of $s$ starting at position $j$ (as happens in the C~Programming Language). The process just described is Algorithm~\ref{algo:search}.
+

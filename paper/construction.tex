@@ -1,66 +1,48 @@
 \subsection{One-Error Dotted Tree}
 
-Constructing the tree is very simple. We start with a suffix tree which includes suffix links and add error trees to it. First, we construct the error tree for the root. This tree is almost a copy of the entire tree, except for two properties:
+Starting with a suffix tree which includes suffix links we add error trees to it. First, we construct the error tree for the root which is almost a copy of the entire tree, except for two properties:
 
 \begin{enumerate}
 \item It does not have the leaf labeled 1 in the original tree. Keeping this leaf would have resulted in a leaf labeled \putstring{.s\$} which does not occur in original string (it is one character too long).
-\item For any other leaf $\overline{w\$}$ occuring at position $p$ in the string, we have a new leaf $\overline{.w\$}$ which occurs at position $p-1$ in the string. Therefore, we adjust the labels.
-
+\item For any other leaf $\overline{w\$}$ occurring at position $p$ in the string, we have a new leaf $\overline{.w\$}$ which occurs at position $p-1$ in the string. Therefore, we adjust the labels.
 \end{enumerate}
 
 For any other node $\overline{aw}$, the error tree is a copy of the error tree at node $\overline{w}$ (the node pointed to by node $\overline{aw}$'s suffix link) with the following changes:
 
 \begin{enumerate}
 \item The leaf labeled 1 in the original error tree is not included.
-\item Leafs in the copy have a label which is the original label's value minus one.
-\item A leaf labeled $p$ is included only if $s_{p-1}$ equals the label of the suffix link.
+\item Leafs in the copy have a label which is the original value minus one.
+\item A leaf labeled $p$ is included only if $s_{p-1} = a$ ($a$ being the label of the suffix link).
 \end{enumerate}
 
-These conditions are an expression of Lemma~\ref{lemma:suffix-error} and an extension of the conditions for the root. Both are implemented by Algorithm~\ref{algo:copy-subtree}.
-
 \input{copy-subtree-algo}
+\input{adddotlink-algo}%
 
-The only point to note is line~\ref{algoline:copy-subtree:merge}. Since we filter some leafs, without a merging procedure, it would be possible to have nodes which possess only one child. These are removed by merging a child with its parent.
-
+These conditions are an expression of Lemma~\ref{lemma:suffix-error} and an extension of the conditions for the root. Both are implemented by Algorithm~\ref{algo:copy-subtree}. The only point to note is line~\ref{algoline:copy-subtree:merge}. Since we filter some leaves, without a merging procedure, it would be possible to have nodes which possess only one child. These are removed by merging a child with its parent.
 \begin{figure}
 \centering
 \includegraphics[width=.4\textwidth]{merge}
-\caption{Node Merging demonstration}%
+\caption{Node Merging example}%
 \label{fig:merge}
 \end{figure}
 
-As discussed above, suffix trees are implemented such that each node is actually just a pair of indices into the original string (exemplified in Figure~\ref{fig:mississippi-nodes}). To merge a child with its parent, we just need to replace both by a node whose starting index is the starting index of the original child minus the length of the parent edge. This process is illustrated in Figure~\ref{fig:merge}.
+As discussed above, suffix trees are implemented in a way such that each node stores the start and end indices of the substring on its incoming edge. To merge a child with its parent, we just need to replace both by a node whose starting index is the starting index of the original child minus the length of the parent edge. The construction of the tree using either Ukonnen's or McCreight's algorithm assures that this operation is correct due to the way that the indices are created.
 
-The construction of the tree using either Ukonnen's or McCreight's algorithm assures that this operation is correct due to the way that the indices are created.
+One can construct the error tree for any node if the tree for the node pointed to by the current node's suffix link has an error tree. This leads to a recursive definition implemented as Algorithm~\ref{algo:addDotLink}. This procedure needs to be called for all nodes, which can be done using a simple depth first search on the tree.
 
-\input{adddotlink-algo}
+\subsubsection*{Time Cost}
 
-One can construct the error tree for any node if the tree for the node pointed to by the current node's suffix link has an error tree. This leads to a recursive definition implemented as Algorithm~\ref{algo:addDotLink}. 
-
-\input{construct-algo}
-
-Algorithm~~\ref{algo:construct-1} constructs the 1-error dotted tree. The \textit{foreach} loop at line~\ref{algoline:construct-1:foreach} can be implemented using Depth First Search. In fact, the procedure addDotLink only needs to be called for certain nodes (those which do not possess an incoming suffix link). However, there is no readily available way to access only these nodes and the procedure above does little extra work.
-
-\subsubsection*{Time cost}
-
-If the number of nodes in the final tree is $N$ and the alphabet $\Sigma$, then the above algorithm runs in time $\mathcal{O}(N|\Sigma|)$.
-
-The error tree at the root is created in time proportional to the number of nodes it contains. Every other error tree is constructed by looking at an existing one and copying it. Each of these copies need time proportional to the original error tree. Since there are at maximum $|\Sigma|$ incoming suffix links to a node, each error tree is \emph{looked at} a maximum of $|\Sigma|$ times. The sum of all these operations is therefore bounded by $|\Sigma|N$.
+Copying a tree takes time proportional to the number of nodes it contains. The error tree at the root is a straightforward copy of the whole tree and every other tree is a copy of an existing one. Since each node can have at most $|\Sigma|$ incoming suffix links, each error tree is \emph{looked at\/} to be copied at most $|\Sigma|$ times. The sum of all these operations is therefore bounded by $|\Sigma|N$. Therefore, if the number of nodes in the final tree is $N$, then the above algorithm runs in time $\mathcal{O}(N|\Sigma|)$.
 
 \subsection{Extension to any number of errors}\label{subsec:construct-k-larger-1}
 
-\input{copy-subtree-with-dot-link-algo}
-
-The above algorithm can be used to construct trees with any number of errors by iterating it. To construct the (k+1)-error tree from the k-error tree, make an adjusted copy of the tree as above (adjusting leafs and filtering the leafs labeled one) and make this the new root error tree. Then, for every other node, remove the current error tree (it has a level too few). Finally, for every node except the root, construct its error tree as above (adjusting leafs, filtering the leafs labeled one or which do not correspond to positions in the suffix link's label). These error trees will now have the correct strings.
-
 \input{construct-k-algo}
+The above algorithm can be used to construct trees with any number of errors by iterating it. To construct the $(k+1)$-error tree from the $k$-error tree, make an adjusted copy of the tree as above (adjusting leaves and filtering the leaves with label~1) and make this the new root error tree. Then, for every other node, remove the current error tree (it has a level too few). Finally, for every node except the root, construct its error tree as above (adjusting leaves, filtering the leaves with label~1 or which do not correspond to positions in the suffix link's label). These error trees will now have the correct strings. The final procedure for constructing k-error trees is Algorithm~\ref{algo:construct-k}.
 
-The code for the subtree copy is Algorithm~\ref{algo:copy-subtree-with-dot-link} which differs from Algorithm~\ref{algo:copy-subtree} in that dot link are also followed while copying the tree. The final procedure for constructing k-error trees is Algorithm~\ref{algo:construct-k}.
-
-We note that the method of removing the existing error trees can be improved in practice (the asymptotic bound remains the same) the following way: While making a copy of the tree for construction of the error tree at the root, instead of following a dot link to make a copy, move the error tree to its destination and make the necessary adjustments in place (this move will probably be just an adjustment of pointer depending on the exact implementation). Using this method only leafs labeled one need to be removed (as well as any internal node which becomes unnecessary).
+We note that the method of removing the existing error trees can be improved in practice (the asymptotic bound remains the same) the following way: While making a copy of the tree for construction of the error tree at the root, instead of following a dot link to make a copy, move the error tree to its destination and make the necessary adjustments in place.% (this move will probably be just an adjustment of pointer depending on the exact implementation). Using this method only leaves labeled one need to be removed (as well as any internal node which becomes unnecessary).
 
 \begin{definition}
-We define $N_k$ to be the number of nodes of the k-error dotted tree. $N_0$ is the number of nodes of the suffix tree. If $k$ is known from context we write $N$ for $N_k$.
+We define $N_k$ to be the number of nodes of the $k$-error dotted tree. $N_0$ is the number of nodes of the suffix tree. We will use $N$ for $N_k$ if $k$ is known from context.
 \end{definition}
 
 The analysis for the time cost above remains valid. We now have that the time cost is $\mathcal{O}(N_1|\Sigma|+N_2|\Sigma|+\dots+N_k|\Sigma)=\mathcal{O}((N_1+N_2+\dots+N_k)|\Sigma|)=\mathcal{O}(kN|\Sigma|)$.

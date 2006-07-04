@@ -1,7 +1,34 @@
-Since their introduction~\cite{DBLP:conf/focs/Weiner73}, suffix trees have been one of the methods of choice for text indexing. Suffix trees can be used solve the following problem: given a text which has been preprocessed, and a pattern, efficiently find the places in the text where this pattern occurs.  However, for many real-life problems this is too restrictive. In this class of problems, one is interested in finding places in the text where an approximate form of the pattern occurs. Several algorithms have been proposed to solve this problem. Navarro presents a survey of the problem and existing approaches to solving it at the time that work was written~\cite{navarro:guided}. Recently there have been some further work in the field, notably the work of M.~Maa\ss{}~\cite{maass:text} which also contains an updated overview of methods for solving the problem in addition to presenting one itself.
+Since their introduction~\cite{DBLP:conf/focs/Weiner73}, suffix trees have been one of the methods of choice for text indexing. Suffix trees can be used to solve the following problem: given a text which has been preprocessed, and a pattern, efficiently find the places in the text where this pattern occurs.  However, for many real-life problems this is too restrictive. In this class of problems, one is interested in finding places in the text where an approximate form of the pattern occurs. Several algorithms have been proposed to solve this problem. Navarro {\it et al} present a survey of the problem and existing approaches to solving it at the time that work was written~\cite{navarro:guided}.
 
 In this work we present an approach which solves this problem based on an extension of suffix trees. The main advantage of this approach is that both the search and the index size are \emph{alphabet independent} (although the indexing time is not).
 
 \subsection{Related Work}
 
 Our work is related to efforts to index the text for approximate matching~\cite{maass:text,amir00oneerror}. The structure presented is superficially very similar to the one presented by Chattaraj~\cite{DBLP:journals/tcs/ChattarajP05} as an \textit{inexact suffix tree}, although that work is concerned with solving a different set of problems and the algorithms presented are fundamentally different.
+
+Amongst competing solutions for this problem, the most relevant is the
+work of M.~Maa\ss{}~\cite{maass:text}. His solution takes space
+$\bigO(|\Sigma|^k n\log^k n)$ (average case)~\footnote{Maa{\ss}
+considers $|\Sigma|$ and $k$ as constant and presents $\bigO(n\log^k
+n)$ as a complexity result. However, such analysis ignores the
+potentially large impact of alphabet size.} for a search time
+$\bigO(m)$. 
+
+This work is also related to the work of Cole {\it el
+al}~\cite{cole:dictionary} whose initial intuitions resemble
+ours. However, they make different time and space tradeoffs to achieve
+$\bigO(m+\log\log n+\mathit{occ})$ searching (Hamming distance) with
+$\bigO(n\frac{log^k n}{k!})$ space. They also propose an algorithm for
+searching using edit distance at a time cost of $\bigO(m+\frac{\log^k
+n \log\log n}{k!} +3^k \mathit{occ})$. We improve on that result,
+especially for edit distance, by totally removing the dependency
+on~$n$ while searching. 
+
+Very recently, Navarro and Chavez have presented a completely new
+approach based on metric spaces~\cite{navarro:metric}. This approach
+achieves, on average, $\mathcal{O}(m^{1+\epsilon})$ search time. Their
+structure takes however space $\bigO(m^{1+\sqrt{2}+\epsilon}n)$. In
+order to obtain such good bounds it also requires $m$ to be known at
+construction time. They have presented a variation which trades time
+for space to achieve $\bigO(n)$ space, but at a cost in construction
+and search time. 

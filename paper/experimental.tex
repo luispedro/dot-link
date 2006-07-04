@@ -1,35 +1,51 @@
 \subsection{Implementation and Data Sets}
 
-The code was implemented in the C~Language, starting from an open-source implementation of suffix trees~\cite{ansicimplementation}. Three data sets were used:
-
-\begin{enumerate}
-\item The English translation of ``Democracy in America'' by Alexis de Tocqueville as natural language example
-\item The DNA of S. Cerevesiae (first chromosome)
-\item Randomly generated text by a uniform distribution
-\end{enumerate}
-
-The machine used for testing was an Intel Pentium~IV running at~2.40GHz with~4GB of main memory.
+The code was implemented in the \CC~Language~\footnote{Code is available upon request.}. Three data sets were used: a set of English texts; the DNA of S. Cerevesiae; and randomly generated text (uniform distribution). For testing we used an Intel Pentium~IV running at~2.40GHz with~4GB of main memory.
 
 \subsection{Index Size}
 
 \begin{figure*}%
 \centering
-\includegraphics[width=.7\textwidth]{ratio-in=english-01-12.eps}%
+\subfigure[DNA]{\includegraphics[height=3cm,width=.45\textwidth]{ratio-in=dna-01-12.eps}}%
+\subfigure[English]{\includegraphics[height=3cm,width=.45\textwidth]{ratio-in=english-01-12.eps}}\\%
+\subfigure[Random]{\includegraphics[height=3cm,width=.45\textwidth]{ratio-in=random-01-12.eps}}%
 \caption{Ratio of number of nodes in k-error and (k+1)-error dotted trees}\label{fig:ratios}%
 \end{figure*}
-
-To experimentally verify the average case prediction, we show in Figures~\ref{fig:ratios} the ratios between the k-error and the (k+1)-error dotted trees, for English text (the other datasets show similar behaviour). We can easily see that the experimental values do resemble a logarithm as predicted.
-
+%
+To experimentally verify the average case prediction, we show in Figures~\ref{fig:ratios} the ratios between the $k$-error and the $(k+1)$-error dotted trees, for all datasets. We can easily see that the experimental values do resemble a logarithm as predicted.
+%
 \subsection{Search Time}
-
-For searching, the texts were first indexed and then online searches were performed on top of the structure. To generate input patterns, randomly chosen snippets of the text were taken. These patterns were then altered by substituting a few characters at random. To generate mismatches, one character too many was altered\,\footnote{Since the characters used were not present in the original text, there is no risk of generating a string which \emph{does appear} in the text.}. The search algorithm performed an early exit, without reporting of occurrences (ie, it only reported whether the string exists in the text). Therefore, the number of occurrences had no influence on the search time.
-
+%
 \begin{figure*}
 \centering
-\includegraphics[width=\textwidth]{search-vary-N.in=all.steps.eps}
+\subfigure[k=1]{\includegraphics[width=.75\textwidth,height=5cm]{search-vary-N.in=all.k=1.steps.eps}}\\
+\subfigure[k=2]{\includegraphics[width=.75\textwidth,height=5cm]{search-vary-N.in=all.k=2.steps.eps}\hspace{-1cm}}
 \caption{Search time versus text size}\label{fig:search-vary-N}
 \end{figure*}
+%
+For searching, the texts were first indexed and then searches were performed on top of the structure. The search algorithm performed an early exit, without reporting of occurrences (ie, it only reported whether the string exists in the text). Therefore, the number of occurrences had no influence on the search time.
+%
+%Figure~\ref{fig:search-vary-m} shows the search time for growing pattern lengths. It shows the case where the pattern exists and where it does not (an extra error is added). The fact that the search is done using an early-exit strategy explains why non existing patterns take longer than existing patterns. The value presented is the number of character comparisons the algorithm makes.
 
-%Figure~\ref{fig:search-vary-m} shows the search time for growing pattern lenghts. It shows the case where the pattern exists and where it does not (an extra error is added). The fact that the search is done using an early-exit strategy explains why non existing patterns take longer than existing patterns. The value presented is the number of character comparisons the algorithm makes.
+Figure~\ref{fig:search-vary-N} shows searching for a 15~character long sequences on a $k$-error dotted tree. Presented are the number of steps in the algorithm (averaged over 10\,000 such searches) while varying the text size. We see that after an initial small growth which is explained by the increasing density of the tree, the search time is roughly constant.
 
-Figure~\ref{fig:search-vary-N} shows searching for a 15~character long sequences on a 2-error dotted tree. Presented are the number of character comparisons performed (averaged over 10\,000 such searches) while varying the text size. We see that after an initial small growth which is explained by the increasing density of the tree, the search time is roughly constant.
+\subsection{Varying Alphabet Size}
+%
+\begin{figure*}
+\centering
+\subfigure[Nodes]{\includegraphics[width=.35\textwidth]{nodes-vary-E.eps}}
+%\subfigure[Time]{\includegraphics[width=.25\textwidth]{construction-time-vary-E.eps}}
+\subfigure[Ratio]{\label{subfig:nodes-vary-E-ratio}\includegraphics[width=.35\textwidth]{construction-time-ratio-vary-E.eps}}
+\caption{Construction time versus $|\Sigma|$}\label{fig:nodes-vary-E}
+\end{figure*}%
+%
+\begin{figure*}
+\centering
+\subfigure[Time]{\includegraphics[width=.35\textwidth]{search-time-vary-E.eps}}%
+\subfigure[Steps]{\includegraphics[width=.35\textwidth]{search-steps-vary-E.eps}}
+\caption{Searching versus $|\Sigma|$}\label{fig:search-vary-E}
+\end{figure*}%
+%
+We generated 100\,KB long strings using a uniform distribution. We varied the alphabet from binary through 100 and constructed a~2-error tree. As above, searches were for 15~character long strings, averaged over 10\,000 repetitions.
+
+As predicted, the time to construct one node in the tree (shown in Figure~\ref{subfig:nodes-vary-E-ratio}) grows in a roughly linear fashion. The search time (shown in Figure~\ref{fig:search-vary-E}) does not grow significantly with alphabet size.

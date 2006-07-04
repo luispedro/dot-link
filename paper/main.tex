@@ -1,22 +1,28 @@
 \documentclass{article}
-%\usepackage[letterpaper,hmargin=1in,vmargin=1in]{geometry}
 \usepackage{a4wide}
 \usepackage[vlined,linesnumbered,ruled]{algorithm2e}
 \input{figures/transfig}
 \usepackage[]{graphicx}
 \usepackage{amssymb}
+\usepackage{amsmath}
 \usepackage{subfigure}
-\usepackage{QED}
+%\usepackage{eepic}
 
 
-\newcommand*{\Assign}{\ensuremath\longleftarrow}
-\newcommand{\putstring}[1]{\textsl{#1}}
-\newtheorem{definition}{Definition}
-\newtheorem{lemma}{Lemma}
+\newcommand*{\CC}{C\nolinebreak\hspace{-.05em}\raisebox{.4ex}{\tiny\bf +}\nolinebreak\hspace{-.10em}\raisebox{.4ex}{\tiny\bf +}}
+\newcommand*{\Assign}{\ensuremath\leftarrow}
+\newcommand*{\putstring}[1]{\textsl{#1}}
+\newcommand*{\operation}[1]{\mbox{\textbf{#1}}}
+\newcommand*{\Node}{\ensuremath{\overline{w}}}
+\newcommand*{\bigO}{\mathcal{O}}
 \graphicspath{{figures/}{graphics/}}
+\newtheorem{lemma}{Lemma}
+\newtheorem{definition}{Definition}
 
 \title{Dotted Suffix Trees\\A Structure for Approximate Text Indexing}
 \author{Lu\'{\i}s Pedro Coelho \and Arlindo L. Oliveira}
+%\institute{INESC-ID/IST\\
+%\email{\{luis,aml\}@algos.inesc-id.pt}}
 \date{}
 
 \begin{document}
@@ -28,28 +34,20 @@
 
 \section{Introduction}\label{sec:introduction}
 \input{introduction}
-
 \section{The Indexing Structure}\label{sec:structure}
 \input{structure}
-
 \section{Searching}\label{sec:search}
 \input{search}
-
 \section{Constructing the Dotted Tree}\label{sec:construction}
 \input{construction}
-
 \section{Space Considerations}\label{sec:space}
 \input{space}
-
 \section{Experimental Results}\label{sec:experimental}
 \input{experimental}
-
 \section{Conclusions}\label{sec:conclusion}
 \input{conclusion}
-
 \bibliographystyle{alpha}
 \bibliography{biblio}
-
 %\clearpage
 %\section*{Appendix}
 %\clearpage
@@ -57,6 +55,5 @@
 %\section{Experimental Results (continued)}\label{appx:experimental}
 %
 %\input{appendices}
-
 \end{document}
 

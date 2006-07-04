@@ -1,12 +1,10 @@
-\subsection{Intuition}
-
-\begin{figure}
+\begin{figure*}
 \centering
-\includegraphics[width=.45\textwidth]{figures/mississippi-0}
+\includegraphics[width=.6\textwidth]{figures/mississippi-0}
 \caption{Suffix tree representation for the string \putstring{mississippi}}%
 \label{fig:mississippi-0}
-\end{figure}
-
+\end{figure*}
+\subsection{Intuition}
 Suffix Trees have become a well known structure since their introduction in 1973~\cite{DBLP:conf/focs/Weiner73}. The example in Figure~\ref{fig:mississippi-0} shows the suffix tree for the string \putstring{mississippi}.
 
 To extend the suffix tree, we consider that a node in the suffix tree corresponds to several points in the string simultaneously (those points where the string on the path to the node occurs). To each node we add an extra edge corresponding to moving one character forward in all these points.
@@ -21,56 +19,41 @@ Given a set $\Sigma$, we say that $s$ is a \emph{string over $\Sigma$} if $s$ is
 The set of all strings is denoted by $\Sigma^*$ and $\Sigma^+=\Sigma^*-\{\varepsilon\}$.
 \end{definition}
 
-For denoting characters we shall use letters from the beginning of the roman alphabet ($a$, $b$, $c$,\ldots) and for strings, we shall use letters from the end of the alphabet ($w$, $z$, \ldots). In what follows we assume that there are two symbols (\$ and $.$) which are not part of $\Sigma$.
+For denoting characters we shall use letters from the beginning of the roman alphabet ($a$, $b$, $c$,\ldots) and for strings, we shall use letters from the end of the alphabet ($w$, $z$, \ldots). In what follows we assume that there are two special symbols (\$ and $.$) which are not part of $\Sigma$.
 
 \begin{definition}[Concatenation]
-$wx$ will denote the string formed by all the characters of $w$ followed by all the characters of $x$ (the usual concatenation operation). $aw$ ($wa$) shall denote the string formed by the character $a$ before (after) the characters of $w$.
+$wx$ or $aw$ will denote the usual concatenation operation.
 
 If $s = wxy$, then $w$ is a \emph{prefix} of $s$, $x$ is a \emph{substring} of $s$ (at position $|w|$) and $y$ is a \emph{suffix} of $s$ (at position $|wx|$).
 \end{definition}
 
 \begin{definition}[Patricia tree]
-$T$ is a Patricia tree if $T$ is a rooted tree with edge labels from $\Sigma^+$. For each $a \in \Sigma$ and every node $n$ in $T$, there is at most one edge leaving $n$ whose label is $aw$.
-
-Each node in a Patricia tree has a path leading to it which forms a string. If the node $n$ has the leading path $w$, we shall also refer to $n$ as $\overline{w}$.
+$T$ is a Patricia tree if $T$ is a rooted tree with edge labels from $\Sigma^+$. For each $a \in \Sigma$ and every node $n$ in $T$, there is at most one edge leaving $n$ whose label starts with $a$. Each node in a Patricia tree has a path leading to it which forms a string. If the node $n$ has the leading path $w$, we shall also refer to $n$ as $\overline{w}$.
 \end{definition}
 
 %The name Patricia is sometimes spelled PATRICIA, since it was formed from the initial of Practical Algorithm to Retrieve Information Coded in Alphanumeric~\cite{DBLP:journals/jacm/Morrison68}.
 %
-
-In this paper, we are interested in the substitution distance (aka Hamming distance):
+In this work we are interested in approximate matching using edition (or Levenshtein) distance:
 
 \begin{definition}[Aproximate Match]
-We say that the string $s$ matches the string $t$ at position $p$ with $k$ errors if we can make $k$ substitutions in $s$ to obtain $s'$ which is a substring of $t$ at position $p$.
+We say that the string $s$ matches the string $t$ at position $p$ with $k$ errors if we can make $k$ modifications in $s$ to obtain $s'$ which is a substring of $t$ at position $p$. A modification is either deletion, insertion or substitution of one character.
 \end{definition}
 
-\begin{definition}[Pattern]
-A pattern is a string over the extended alphabet $\Sigma\cup\{.\}$. We say that a pattern $s$ matches a string $t$ at position $p$, if for each dot in the pattern we can replace it by a character in the original alphabet to obtain $s'$ which is a substring of $t$ at position $p$.
+\begin{definition}[Suffix Tree, Suffix Link]
+A \emph{suffix tree} for a string $S$ is a Patricia tree whose leaf nodes (those without children) have paths corresponding to all suffixes of the string $S\$ $. A suffix link in a suffix tree is a link from the node $\overline{aw}$ to the node $\overline{w}$. This link has the label $a$.
 \end{definition}
 
-\begin{definition}[Suffix Tree]
-A \emph{suffix tree} for a string $S$ is a Patricia tree whose leaf nodes (those without children) have paths corresponding to all suffixes of the string $S\$ $.
+In a suffix tree, all internal nodes have a well defined suffix link. Both Ukkonen's~\cite{ukkonen92constructing} and McCreight's~\cite{mccreight} algorithms are linear time algorithms for constructing a suffix tree which includes suffix links. The suffix links are shown in Figure~\ref{fig:mississippi-0} as dashed arrows with the label in italic.
+
+Suffix trees are normally implemented by associating with each node two indices into the original string which are the start and end position of its incoming edge.
+
+\begin{definition}[Point in a suffix tree]
+A \emph{point} in a suffix tree is either a node in the tree or a point in the middle of an edge.
 \end{definition}
 
-\begin{definition}[Suffix Link]
-A suffix link in a suffix tree is a link from the node $\overline{aw}$ to the node $\overline{w}$. This node has the label $a$.
-\end{definition}
-
-In a suffix tree, it is possible to define a suffix link for each internal node. Both Ukkonen's~\cite{ukkonen92constructing} and McCreight's~\cite{mccreight} algorithms are linear time algorithms for constructing a suffix tree which includes suffix links. The suffix links are shown in Figure~\ref{fig:mississippi-0} as dashed arrows with the label in italic.
-
-\begin{figure*}
-\includegraphics[width=\textwidth]{figures/mississippi-nodes}
-\caption{Suffix Tree for the string \putstring{mississippi}}%
-\label{fig:mississippi-nodes}
-\end{figure*}
-
-Suffix trees are normally implemented so that each node consists of only two indices into the original string which are the start and end position of its incoming edge. Figure~\ref{fig:mississippi-nodes} illustrates this.
-
-\begin{definition}[Occurence Set]
+\begin{definition}[Occurrence Set, Position Set]
 Given a node $\overline{w}$ in a suffix tree, we call its \emph{occurrence set} the set of indexes in the original string where the string $w$ occurs.
-\end{definition}
 
-\begin{definition}[Position Set]
 Given a node $\overline{w}$ in a suffix tree, its \emph{position set} is the set formed by taking its occurrence set and adding the length of $w$ to each element.
 \end{definition}
 
@@ -83,29 +66,28 @@ Given two nodes $\overline{aw}$ and $\overline{w}$ (connected by a suffix link, 
 The lemma is fairly obvious given that the position set of $\overline{aw}$ contains all the positions where $aw$ occurs which are exactly those positions where $w$ occurs preceded by $a$.
 
 \begin{definition}[Error Tree]
-For any node $w$, its error tree is the Patricia tree formed by taking its position set, adding one to each element and forming the Patricia tree of the suffixes of the suffixes starting at those positions. If the position set includes the end of the string, that element is removed.
+For any node $w$, its error tree is the Patricia tree formed by taking its position set, adding one to each element and forming the Patricia tree of the suffixes starting at those positions. If the position set includes the end of the string, that element is removed.
 
-The leafs are labeled by the position of the string in which their paths occur minus $|w| + 1$.
+The leaves are labeled by the position of the string in which their paths occur minus $|w| + 1$.
 \end{definition}
 
 For example, in the above mentioned node $\overline{issi}$, the error tree is formed by taking the strings starting at positions $\{7, 10\}$ (ie \putstring{sippi\$} and \putstring{pi\$}) in a Patricia tree.
 
 \begin{definition}[1-error dotted Tree]
-We define a \emph{1-error dotted tree} as the tree which is formed by adding to each node in a suffix tree, a new edge labeled by \putstring{.} which points to its error tree. The edge labeled \putstring{.} shall be called a \emph{dot link}.
+We define a \emph{1-error dotted tree} as the tree which is formed by adding to each node in a suffix tree, a new edge labeled by \putstring{$\cdot$} which points to its error tree. The edge labeled \putstring{$\cdot$} shall be called a \emph{dot link}.
 \end{definition}
 
 \begin{figure*}
 \centering
-\includegraphics[width=\textwidth]{figures/mississippi-1.eps}
+\includegraphics[width=\textwidth]{figures/mississippi-1.eps}%
 \caption{1-error dotted tree for \putstring{mississippi}}%
-\label{fig:mississippi-1}
-\end{figure*}
-
+\label{fig:mississippi-1}%
+\end{figure*}%
 The 1-error dotted tree for \putstring{mississippi} is shown in Figure~\ref{fig:mississippi-1}. The nodes are connected to their error trees by thick diagonal links.
 
-The paths in the dotted tree are paths in the extended alphabet $\Sigma\cup\{.,\$\}$. The notions of \emph{occurrence set}, \emph{position set} and \emph{error tree} are valid for all nodes in a dotted tree considering that a node path may contain dot elements which match any other character.
+The paths in the dotted tree are paths in the extended alphabet $\Sigma\cup\{.,\$\}$. The notions of \emph{occurrence set}, \emph{position set} and \emph{error tree} are valid for all nodes in a dotted tree.
 
 \begin{definition}[k-error dotted tree]
-We define a k-error dotted tree as the tree obtained by adding error trees to each node in the (k-1)-error dotted tree which does not already contain one.
+We define a $k$-error dotted tree as the tree obtained by adding error trees to each node in the $(k-1)$-error dotted tree which does not already contain one.
 \end{definition}
 

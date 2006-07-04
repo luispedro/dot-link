@@ -1,36 +1,36 @@
 \begin{algorithm}
 \dontprintsemicolon
-\caption{Function findString($\overline{w}$,$s$,$k$)}%
-\label{algo:search}
 \SetKwData{J}{j}
 \SetKwData{W}{s}
 \SetKwData{K}{k}
 \SetKwData{Len}{len}
-\SetKwData{Node}{node}
+\SetKwData{Offset}{offset}
+\SetKwData{Child}{child}
 \SetKwData{Start}{nodeStart}
 \SetKwData{String}{treeString}
+\caption{Function findString(\Node, offset, $s$, $k$)}%
+\label{algo:search}
 
 \KwIn{Current node \Node}
+\KwIn{Current offset \Offset}
 \KwIn{String \W}
 \KwIn{Maximum errors \K}
 \KwData{The tree's string \String}
 
+\lIf{$\K < 0$}{return \emph{string not found}\;}
 \lIf{\W is empty}{
 	\emph{report all \Node's children}\;
 }
-\lIf{$\K > 0$}{
-	findString(\Node.dotLink, $\W+1$,$\K-1$)\nllabel{algoline:search:followDot}\;
+findString(\Node,\Offset,$\W+1$,$\K-1$)\tcp{deletion}\;
+\eIf{$\Offset = \mathrm{length}(\Node)$}{
+	findString(\Node.dotLink, 0, $\W$,$\K-1$)\tcp{insertion}\;
+	findString(\Node.dotLink, 0, $\W+1$,$\K-1$)\tcp{substituition}\nllabel{algoline:search:followDot}\;
+	\Child \Assign \Node.getSon($\W_0$)\tcp{try matching}\;
+	\lIf{\Child isn't null}{findString(\Child, 0, $\W+1$,$\K$)\;}
+}{
+	findString(\Node,\Offset+1,$\W$,\K-1)\tcp{insertion}\;
+	\lIf{$\W_0 \not= \String_{\mathrm{start}(\Node)+\Offset}$}
+		{ \K \Assign $\K-1$\;}
+	findString(\Node,\Offset+1,$\W+1$,\K)\tcp{either match or substituition}\;
 }
-\Node \Assign \Node.getSon($\W_0$)\;
-\Len \Assign min(length(\Node),length(\W))\;
-\For{\J \Assign 1 \KwTo \Len}{
-	\If{$\W_{\J} \not= \String_{\Start+\J}$}{
-		\lIf{$\K > 0$}{
-			\K \Assign $\K-1$\;
-		}\lElse{
-			\emph{return, the string was not found}%
-		}%
-	}%
-}%
-findString(\Node,$\W+\Len$,\K)
 \end{algorithm}

@@ -5,18 +5,18 @@
 \label{fig:aaaa}
 \end{figure}
 
-Suffix trees have a number of nodes proportional to the size of the string (which we will refer to as $n$). Dotted trees have more nodes. The worst case is a string of the form $a^n = aaa\dots$ which generates a one-dotted tree taking $\mathcal{O}(n^2)$ nodes (illustrated in Figure~\ref{fig:aaaa}). For a larger number of errors $k$, this string leads to $\mathcal{O}(n^{k+1})$ nodes. We can do better, however, by considering the expected case.
+Suffix trees have a number of nodes proportional to the size of the string (which we will refer to as $n$). Dotted trees have more nodes. The worst case is a string of the form $a^n = aaa\dots$ which generates a one-dotted tree taking $\mathcal{O}(n^2)$ nodes (illustrated in Figure~\ref{fig:aaaa}). For a larger number of errors $k$, this string leads to $\mathcal{O}(n^{k+1})$ nodes. An analysis of the average case, however, leads to a much better result. 
 
-\begin{definition}[Maximum Path Lenght]
-$l$ is the string depth of the deepest branching node in the tree:
+\begin{definition}[Maximum Path Length, Suffix Depth]
+$l$ is the string depth of the deepest branching node in the tree.
+%
+%\[ l = \max_{\overline{w} \in \mathcal{T}} |w| \mbox{ and $\overline{w}$ isn't a leaf} \]
+%\end{definition}
 
-\[ l = \max_{\overline{w} \in \mathcal{T}} |w| \mbox{ and $\overline{w}$ isn't a leaf} \]
-\end{definition}
-
-\begin{definition}[Suffix-Depth]
+%\begin{definition}[Suffix-Depth]
 For any node $\overline{w}$ its suffix-depth is the number of nodes which must be followed to reach the root, which is $|w|$. It is obvious that $l$ is a maximum on the suffix-depth of nodes.
 \end{definition}
 
-We now show $N_k = \mathcal{O}(nl^k)$ using induction. It is a known fact that $N_0 = \mathcal{O}(n)$. The algorithm for turning a k-error into a (k+1)-error dotted tree, can be looked at the following way\,\footnote{We are here considering that the second \textit{foreach} loop of Algorithm~\ref{algo:construct-k} runs in a specific order which is in fact difficult to code for. However, as an analysis tool, it is a valid assumption.}: First it makes an almost exact copy of the k-error dotted tree and as the error tree at the root and it clears all the other error trees. Then it proceeds in stages, making a (possibly incomplete) copy of this tree spread amongst the nodes at suffix-depth 1. It proceeds to the other nodes in increasing suffix-depths up to $l$. At each such step, the number of nodes is increased by a maximum of $N_k$. Therefore, we start with $N_k$ nodes, make an almost full copy, and copy that at most $l$ times, $N_{k+1}=\mathcal{O}(N_k(l+1))$. Assuming $N_k=\mathcal{O}(nl^k)$ by induction we conclude $N_{k+1}=\mathcal{O}(nl^{k+1})$.
+We now show $N_k = \mathcal{O}(nl^k)$ using induction. It is a known fact that $N_0 = \mathcal{O}(n)$. The algorithm for turning a $k$-error into a $(k+1)$-error dotted tree, can be looked at the following way\,\footnote{We are here considering that the second \textit{foreach} loop of Algorithm~\ref{algo:construct-k} runs in a specific order which is in fact difficult to code for. However, as an analysis tool, it is a valid assumption.}: First it makes an almost exact copy of the k-error dotted tree as the error tree at the root and it clears all the other error trees. Then it proceeds in stages, making a (possibly incomplete) copy of this tree spread amongst the nodes at suffix-depth 1. It proceeds to the other nodes in increasing suffix-depths up to $l$. At each such step, the number of nodes is increased by a maximum of $N_k$. Therefore, we start with $N_k$ nodes, make an almost full copy, and copy that at most $l$ times, $N_{k+1}=\mathcal{O}(N_k(l+1))$. Assuming $N_k=\mathcal{O}(nl^k)$ by induction we conclude $N_{k+1}=\mathcal{O}(nl^{k+1})$.
 
-So far, we have achieved little since in the worst case $l=n-1$ as shown above. However, the expected case is $l=\mathcal{O}(\log n)$~\cite{apostolico92selfalignments,szpankowski:unexpected} and we have $N_k=\mathcal{O}(n\log^k n)$.
+So far, we have achieved little since in the worst case $l=n-1$ ($s=a^n$). However, the expected case is $l=\mathcal{O}(\log n)$~\cite{apostolico92selfalignments,szpankowski:unexpected} and we have $N_k=\mathcal{O}(n\log^k n)$.
