@@ -8,12 +8,8 @@
 Suffix trees have a number of nodes proportional to the size of the string (which we will refer to as $n$). Dotted trees have more nodes. The worst case is a string of the form $a^n = aaa\dots$ which generates a one-dotted tree taking $\mathcal{O}(n^2)$ nodes (illustrated in Figure~\ref{fig:aaaa}). For a larger number of errors $k$, this string leads to $\mathcal{O}(n^{k+1})$ nodes. An analysis of the average case, however, leads to a much better result. 
 
 \begin{definition}[Maximum Path Length, Suffix Depth]
-$l$ is the string depth of the deepest branching node in the tree.
-%
-%\[ l = \max_{\overline{w} \in \mathcal{T}} |w| \mbox{ and $\overline{w}$ isn't a leaf} \]
-%\end{definition}
+Let $l$ be the string depth of the deepest branching node in the tree~\footnote{For a node \Node, its string depth is $|w|$.}.
 
-%\begin{definition}[Suffix-Depth]
 For any node $\overline{w}$ its suffix-depth is the number of nodes which must be followed to reach the root, which is $|w|$. It is obvious that $l$ is a maximum on the suffix-depth of nodes.
 \end{definition}
 

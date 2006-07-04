@@ -29,6 +29,8 @@ If $s = wxy$, then $w$ is a \emph{prefix} of $s$, $x$ is a \emph{substring} of $
 
 \begin{definition}[Patricia tree]
 $T$ is a Patricia tree if $T$ is a rooted tree with edge labels from $\Sigma^+$. For each $a \in \Sigma$ and every node $n$ in $T$, there is at most one edge leaving $n$ whose label starts with $a$. Each node in a Patricia tree has a path leading to it which forms a string. If the node $n$ has the leading path $w$, we shall also refer to $n$ as $\overline{w}$.
+
+A \emph{compact} Patricia tree is one with no nodes with just one child.
 \end{definition}
 
 %The name Patricia is sometimes spelled PATRICIA, since it was formed from the initial of Practical Algorithm to Retrieve Information Coded in Alphanumeric~\cite{DBLP:journals/jacm/Morrison68}.
@@ -40,12 +42,12 @@ We say that the string $s$ matches the string $t$ at position $p$ with $k$ error
 \end{definition}
 
 \begin{definition}[Suffix Tree, Suffix Link]
-A \emph{suffix tree} for a string $S$ is a Patricia tree whose leaf nodes (those without children) have paths corresponding to all suffixes of the string $S\$ $. A suffix link in a suffix tree is a link from the node $\overline{aw}$ to the node $\overline{w}$. This link has the label $a$.
+A \emph{suffix tree} for a string $S$ is a compact Patricia tree whose leaf nodes (those without children) have paths corresponding to all suffixes of the string $S\$ $. A suffix link in a suffix tree is a link from the node $\overline{aw}$ to the node $\overline{w}$. This link has the label $a$.
 \end{definition}
 
 In a suffix tree, all internal nodes have a well defined suffix link. Both Ukkonen's~\cite{ukkonen92constructing} and McCreight's~\cite{mccreight} algorithms are linear time algorithms for constructing a suffix tree which includes suffix links. The suffix links are shown in Figure~\ref{fig:mississippi-0} as dashed arrows with the label in italic.
 
-Suffix trees are normally implemented by associating with each node two indices into the original string which are the start and end position of its incoming edge.
+Suffix trees are normally implemented by associating with each node two indices into the original string which are the start and end position of its incoming edge. This allows the structure to be kept in $\bigO(n)$ space.
 
 \begin{definition}[Point in a suffix tree]
 A \emph{point} in a suffix tree is either a node in the tree or a point in the middle of an edge.

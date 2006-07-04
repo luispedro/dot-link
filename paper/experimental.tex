@@ -48,4 +48,4 @@ Figure~\ref{fig:search-vary-N} shows searching for a 15~character long sequences
 %
 We generated 100\,KB long strings using a uniform distribution. We varied the alphabet from binary through 100 and constructed a~2-error tree. As above, searches were for 15~character long strings, averaged over 10\,000 repetitions.
 
-As predicted, the time to construct one node in the tree (shown in Figure~\ref{subfig:nodes-vary-E-ratio}) grows in a roughly linear fashion. The search time (shown in Figure~\ref{fig:search-vary-E}) does not grow significantly with alphabet size.
+As predicted, the time to construct one node in the tree (shown in Figure~\ref{subfig:nodes-vary-E-ratio}) grows in a roughly linear fashion. The search time (shown in Figure~\ref{fig:search-vary-E}) does not grow significantly with alphabet size. The slight increase can be explained both by the fact that our implementations did not access child node in $\bigO(1)$ using a hash table but used a simpler to implement linked list.
