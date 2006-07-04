@@ -1,13 +1,11 @@
-We have presented an indexing structure for approximate text matching which takes $\mathcal{O}(n\log^k n)$ space in the average case. This complexity was analyzed theoretically and observed experimentally. This structure allows matches in $\mathcal{O}(m^{k+1})$ time and can be constructed in $\mathcal{O}(kN|\Sigma|)$ time ($N$ being the actual number of nodes). The structure and the algorithms to construct it are very simple and are easily implemented.
-
-The biggest drawback of this structure is the amount of space it takes which might limit its applicability. Future research along these lines might address this issue (see below). 
+We have presented an indexing structure for approximate text matching which takes $\mathcal{O}(n\log^k n)$ space in the average case. This complexity was analyzed theoretically and observed experimentally. This structure reports the existence of a match in  $\mathcal{O}(3^k m^{k+1})$ and reports the positions where the matches occur in  $\mathcal{O}(3^k m^{k+1} + {\it ed})$ time.  It can be constructed in $\mathcal{O}(kN|\Sigma|)$ time ($N$ being the actual number of nodes). The structure and the algorithms to construct it are very simple and are easily implemented.  The fact that the structure uses $\mathcal{O}({\it ed})$ time (instead of $\mathcal{O}({\it occur})$) to report the occurrences of a pattern may a disadvantage in some applications, where one occurrence may lead to many edit scripts. In other applications (e.g., searching in DNA strings for degenerated occurrences of long strings), this will not be a problem since each occurrence with $k$ errors will, in general, correspond to only one edit script.  
 
 \subsection{Future Work, Open Problems}\label{sec:future}
 
-In the example for the string \putstring{mississippi}, presented in Figure~\ref{fig:mississippi-1}, one can see that the tree below \putstring{s.i} and \putstring{ssi} are exactly the same. Whether such occurrences are the basis for a significant space saving and what algorithms might exploit them is an open question.
+One drawback of the structure we present is the amount of space it takes which might limit its applicability. One possible direction for tackling this problem is the following remark: In the example for the string \putstring{mississippi}, presented in Figure~\ref{fig:mississippi-1}, one can see that the tree below \putstring{s.i} and \putstring{ssi} are exactly the same. Whether such occurrences are the basis for a significant space saving and what algorithms might exploit them is an open question.  Another limitation that should be addressed in future work is related with the fact that the complexity for reporting occurrences depends on the number of edit scripts, and not on the number of occurrences.
 
-Along the same lines, the structure's definition might be extended to structures such as the suffix-DAG presented by Gusfield~\cite[\S\,7.7]{gusfield:algorithms}. An algorithm to efficiently construct it over these suffix-DAGs is another open problem.
+Along the same lines, the structure's definition might be extended to structures such as the suffix-DAG presented by Gusfield~\cite[\S\,7.7]{gusfield:algorithms}. An algorithm to efficiently construct such a structure over these suffix-DAGs is another open problem. 
 
 \subsection{Acknowledgments}
-
-We thank Lu\'{\i}s~Russo and Sara~Madeira for several productive discussions.
+%
+We thank Lu\'{\i}s~Russo and Sara~Madeira for several productive discussions. This work was support in part by project \textsc{posi/sri/47778/2002 BioGrid}.
