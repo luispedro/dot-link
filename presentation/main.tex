@@ -28,10 +28,10 @@
 
 \begin{document}
 \frame{\titlepage}
-\frame{\tableofcontents}
+\frame{\frametitle{Table of Contents}\tableofcontents}
 \section{Suffix Trees}
 \frame{
-%\frametitle{Suffixes of a String}
+\frametitle{Suffixes of a String}
 
 \begin{block}{$\mathcal{T}=$mississippi}
 
@@ -55,8 +55,7 @@
 }
 
 \frame{
-
-%\frametitle{Suffix Tree}
+\frametitle{Suffix Tree}
 
 \begin{block}{Suffix Tree for $\mathcal{T}=$mississippi}
 \begin{overprint}
@@ -74,7 +73,7 @@
 
 
 \frame{
-%\frametitle{Searching in Suffix Trees}
+\frametitle{Searching in Suffix Trees}
 
 \begin{block}{%
 $\mathcal{T}=$ mississippi\$\\
@@ -87,7 +86,7 @@ $\mathcal{P}=$ ssi}
 \onslide<4>
 \puttree{search-ii}
 
-\flushright{}ssi found!
+\flushright{}\emph{ssi} found!
 \end{overprint}
 \end{block}
 
@@ -95,7 +94,7 @@ $\mathcal{P}=$ ssi}
 
 \section{Approximate Matching}
 \frame{
-\frametitle{Approximatte Matching}
+\frametitle{Approximate Matching}
 
 \begin{overprint}
 \begin{block}<1->{Substituition (aka Hamming) distance}
@@ -115,6 +114,7 @@ $\mathcal{T}=$\texttt{\ mi\alert<3>{ssi}\alert<4>{ssi}ppi}\$\\
 }
 
 \frame{
+\frametitle{Approximate Matching}
 \begin{block}{Traditional Way}
 Search for \emph{all the possible strings}
 
@@ -129,6 +129,7 @@ Number of possibilities: $\mathcal{O}(m|\Sigma|^{C_m^k})$
 }
 
 \frame{
+\frametitle{Intituion}
 
 \begin{block}<1->{First Intuition}
 \begin{itemize}
@@ -151,23 +152,18 @@ Number of possibilities: $\mathcal{O}(m|\Sigma|^{C_m^k})$
 }
 
 \frame{
-%\frametitle{First Intituion (Text Transformation)}
+\frametitle{First Intituion (Text Transformation)}
 
 \begin{block}{Same Transformation on $\mathcal{T}=$mississippi}
-\begin{itemize}
-\item \texttt{mississippi}
-\item \texttt{.ississippi}
-\item \texttt{m.ssissippi}
-\item \texttt{mi.sissippi}
-\item \texttt{mis.issippi}
-\item \texttt{miss.ssippi}
-\item \texttt{missi.sippi}
-\item \texttt{missis.ippi}
-\item \texttt{mississ.ppi}
-\item \texttt{mississi.pi}
-\item \texttt{mississip.i}
-\item \texttt{mississipp.}
-\end{itemize}
+\centering
+\begin{tabular}{ll}
+\texttt{mississippi} & \texttt{.ississippi} \\
+\texttt{m.ssissippi} & \texttt{mi.sissippi} \\
+\texttt{mis.issippi} & \texttt{miss.ssippi} \\
+\texttt{missi.sippi} & \texttt{missis.ippi} \\
+\texttt{mississ.ppi} & \texttt{mississi.pi} \\
+\texttt{mississip.i} & \texttt{mississipp.}
+\end{tabular}
 \flushright{}Na\"\i{}ve tree: $\mathcal{O}(n^{k+1})$ nodes
 \end{block}
 
@@ -201,7 +197,9 @@ Number of possibilities: $\mathcal{O}(m|\Sigma|^{C_m^k})$
 \centering \includegraphics[height=.4\textheight,angle=270]{fully-implicit}
 \end{block}
 }
+
 \frame{
+\frametitle{Dotted Suffix Tree}
 \begin{block}{Resulting Tree: Dotted Suffix Tree}
 \puttree{mississippi-1-no-sl}
 \end{block}
