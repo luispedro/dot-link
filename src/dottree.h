@@ -5,7 +5,7 @@
 #include <iostream>
 #include <string>
 #include <cassert>
-#include <ext/mt_allocator.h>
+//#include <ext/mt_allocator.h>
 
 namespace dottree {
 typedef unsigned int uint;
@@ -109,7 +109,7 @@ struct node {
 	private:
 		static unsigned cur_alloc_;
 		static unsigned max_alloc_;
-		static __gnu_cxx::__mt_alloc<node> alloc_;
+		//static __gnu_cxx::__mt_alloc<node> alloc_;
 
 		friend class tree;
 		unsigned head_;
@@ -130,7 +130,8 @@ struct node_wsl : public node {
 			assert(s == sizeof(node_wsl));
 			++cur_alloc_;
 			if (cur_alloc_ > max_alloc_) max_alloc_ = cur_alloc_;
-			return alloc_.allocate(s);
+			return ::operator new(s);
+			//return alloc_.allocate(s);
 		}
 		void operator delete(void* p) {
 			
@@ -139,7 +140,7 @@ struct node_wsl : public node {
 	private:
 		static unsigned cur_alloc_;
 		static unsigned max_alloc_;
-		static __gnu_cxx::__mt_alloc<node_wsl> alloc_;
+		//static __gnu_cxx::__mt_alloc<node_wsl> alloc_;
 		node* suffixlink_;
 };
 struct position {
@@ -345,7 +346,7 @@ struct tree {
 		void print_leafvector() const;
 };
 
-std::auto_ptr<tree> build_tree(const char* str, char dollar = '$');
+std::auto_ptr<tree> build_tree(const char* str, char dollar = '\0');
 }
 
 template <typename T, typename U>

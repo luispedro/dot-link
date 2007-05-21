@@ -4,8 +4,8 @@ unsigned dottree::node::cur_alloc_;
 unsigned dottree::node::max_alloc_;
 unsigned dottree::node_wsl::cur_alloc_;
 unsigned dottree::node_wsl::max_alloc_;
-__gnu_cxx::__mt_alloc<dottree::node> dottree::node::alloc_;
-__gnu_cxx::__mt_alloc<dottree::node_wsl> dottree::node_wsl::alloc_;
+//__gnu_cxx::__mt_alloc<dottree::node> dottree::node::alloc_;
+//__gnu_cxx::__mt_alloc<dottree::node_wsl> dottree::node_wsl::alloc_;
 
 unsigned dottree::node::allocated_nodes() {
 	return max_alloc_ + dottree::node_wsl::allocated_nodes(); 
@@ -28,11 +28,12 @@ class mcreight_builder {
 		mcreight_builder(const char* str, char dollar):
 			tree_(0),
 			str_(str),
+			dollar_(dollar),
 			suffixless_(0)
 		{ }
 
 		std::auto_ptr<dottree::tree> build() {
-			tree_ = std::auto_ptr<dottree::tree>(new dottree::tree(str_,strlen(str_),dollar_));
+			tree_ = std::auto_ptr<dottree::tree>(new dottree::tree(str_,strlen(str_) + (dollar_? 0 : 1),dollar_));
 			tree_->root_ = new dottree::node_wsl(0, 0);
 			checked_cast<dottree::node_wsl*>(tree_->root_)->suffixlink(tree_->root_);
 			dottree::position pos(tree_->root_,dottree::nodep_or_idx(tree_->root_), 0);
@@ -256,7 +257,7 @@ void dottree::print_all::visit_node(dottree::position p) {
 }
 
 std::auto_ptr<dottree::tree> dottree::build_tree(const char* orig, char dollar) {
-	assert(!strchr(orig,dollar));
+	assert(!dollar || !strchr(orig,dollar));
 	unsigned len = strlen(orig);
 
 	char* fixed = static_cast<char*>(malloc(len + 2));
