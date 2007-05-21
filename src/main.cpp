@@ -75,6 +75,7 @@ int main(int argc, char* argv[])
 	if(argc < 3) usage();
 	int k = atoi( argv[ 1 ] );
 	char* str = read_file( argv[ 2 ] );
+	if (!str) return 1;
 	
 	try { 
 		Timer full( "full-tree-construction" );
@@ -87,6 +88,7 @@ int main(int argc, char* argv[])
 		full.stop();
 		dots.stop();
 		//tree->dfs(new dottree::print_leafs);
+		//tree->dfs(new dottree::print_all);
 	} catch ( const std::exception& e ) {
 		std::cerr << "Error [construction]: (exception): " << e.what() << std::endl;
 		return 1;
