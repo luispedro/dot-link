@@ -181,7 +181,7 @@ class node_visitor {
 		virtual ~node_visitor() { }
 		virtual void visit_leaf(unsigned) = 0;
 		virtual void visit_node(position) = 0;
-		virtual void start() { }
+		virtual void start(const tree*) { }
 		virtual void down() { }
 		virtual void up() { }
 		virtual void finished() { }
@@ -195,10 +195,13 @@ class print_leafs : public node_visitor {
 };
 class print_all: public node_visitor {
 	public:
-		explicit print_all(const tree* t):
+		explicit print_all(const tree* t = 0):
 			tree_(t),
 			out_(std::cout)
 		{}
+		void start(const tree* t) {
+			tree_ = t;
+		}
 		void visit_node(position p);
 		void visit_leaf(unsigned h) {
 		
@@ -294,12 +297,12 @@ struct tree {
 		nodep_or_idx root() const { return nodep_or_idx(root_); }
 
 		void dfs(node_visitor* visitor) const {
-			visitor->start();
+			visitor->start(this);
 			dfs(root_, root(), visitor);
 			visitor->finished();
 		}
 		void dfs(position p, node_visitor* visitor) const {
-			visitor->start();
+			visitor->start(this);
 			if (p.at_end()) {
 				dfs(p.curnode().as_ptr(),children(p.curnode()),visitor);
 			} else {
