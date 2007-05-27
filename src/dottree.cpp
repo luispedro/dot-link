@@ -4,8 +4,6 @@ unsigned dottree::node::cur_alloc_;
 unsigned dottree::node::max_alloc_;
 unsigned dottree::node_wsl::cur_alloc_;
 unsigned dottree::node_wsl::max_alloc_;
-//__gnu_cxx::__mt_alloc<dottree::node> dottree::node::alloc_;
-//__gnu_cxx::__mt_alloc<dottree::node_wsl> dottree::node_wsl::alloc_;
 
 unsigned dottree::node::allocated_nodes() {
 	return max_alloc_ + dottree::node_wsl::allocated_nodes(); 

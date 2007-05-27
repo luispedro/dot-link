@@ -5,7 +5,6 @@
 #include <iostream>
 #include <string>
 #include <cassert>
-//#include <ext/mt_allocator.h>
 
 namespace dottree {
 typedef unsigned int uint;
@@ -109,7 +108,6 @@ struct node {
 	private:
 		static unsigned cur_alloc_;
 		static unsigned max_alloc_;
-		//static __gnu_cxx::__mt_alloc<node> alloc_;
 
 		friend class tree;
 		unsigned head_;
@@ -131,7 +129,6 @@ struct node_wsl : public node {
 			++cur_alloc_;
 			if (cur_alloc_ > max_alloc_) max_alloc_ = cur_alloc_;
 			return ::operator new(s);
-			//return alloc_.allocate(s);
 		}
 		void operator delete(void* p) {
 			
@@ -140,7 +137,6 @@ struct node_wsl : public node {
 	private:
 		static unsigned cur_alloc_;
 		static unsigned max_alloc_;
-		//static __gnu_cxx::__mt_alloc<node_wsl> alloc_;
 		node* suffixlink_;
 };
 struct position {
