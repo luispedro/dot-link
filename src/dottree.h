@@ -219,8 +219,9 @@ class print_all: public node_visitor {
 
 struct tree {
 	public:
-		tree(const char* str, unsigned len, char dollar):
+		tree(const char* str, unsigned len, char dollar, bool own_string = true):
 			string_(str),
+			str_own_(own_string),
 			length_(len),
 			dollar_(dollar)
 		{
@@ -229,7 +230,7 @@ struct tree {
 		}
 		~tree() {
 			delete_subtree(root_);
-			free(const_cast<char*>(string_));
+			if (str_own_) free(const_cast<char*>(string_));
 			delete [] leafs_;
 		}
 		const char* string() const { return string_; }
@@ -322,6 +323,7 @@ struct tree {
 
 		int match(const char* ch) const;
 		const char* string_;
+		bool str_own_;
 		unsigned length_;
 		node* root_;
 		char dollar_;
@@ -346,7 +348,7 @@ struct tree {
 		void print_leafvector() const;
 };
 
-std::auto_ptr<tree> build_tree(const char* str, char dollar = '\0');
+std::auto_ptr<tree> build_tree(const char* str, char dollar = '\0', bool copy_string = true);
 }
 
 template <typename T, typename U>

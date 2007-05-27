@@ -25,15 +25,16 @@ std::ostream& operator << (std::ostream& out, const position& p) {
 namespace {
 class mcreight_builder {
 	public:
-		mcreight_builder(const char* str, char dollar):
+		mcreight_builder(const char* str, char dollar, bool str_own):
 			tree_(0),
 			str_(str),
+			str_own_(str_own),
 			dollar_(dollar),
 			suffixless_(0)
 		{ }
 
 		std::auto_ptr<dottree::tree> build() {
-			tree_ = std::auto_ptr<dottree::tree>(new dottree::tree(str_,strlen(str_) + (dollar_? 0 : 1),dollar_));
+			tree_ = std::auto_ptr<dottree::tree>(new dottree::tree(str_,strlen(str_) + (dollar_? 0 : 1),dollar_,str_own_));
 			tree_->root_ = new dottree::node_wsl(0, 0);
 			checked_cast<dottree::node_wsl*>(tree_->root_)->suffixlink(tree_->root_);
 			dottree::position pos(tree_->root_,dottree::nodep_or_idx(tree_->root_), 0);
@@ -120,6 +121,7 @@ class mcreight_builder {
 			
 		std::auto_ptr<dottree::tree> tree_;
 		const char* str_;
+		bool str_own_;
 		char dollar_;
 		dottree::node_wsl* suffixless_;
 };
@@ -256,15 +258,22 @@ void dottree::print_all::visit_node(dottree::position p) {
 	out_ << std::endl;
 }
 
-std::auto_ptr<dottree::tree> dottree::build_tree(const char* orig, char dollar) {
-	assert(!dollar || !strchr(orig,dollar));
-	unsigned len = strlen(orig);
-
-	char* fixed = static_cast<char*>(malloc(len + 2));
-	strcpy(fixed,orig);
-	fixed[len] = dollar;
-	fixed[len + 1] = '\0';
-	mcreight_builder builder(fixed, dollar);
+std::auto_ptr<dottree::tree> dottree::build_tree(const char* orig, char dollar, bool copy_string) {
+	const char* fixed;
+	if (copy_string) {
+		unsigned len = strlen(orig);
+		assert(!dollar || !strchr(orig,dollar));
+		char* copy = static_cast<char*>(malloc(len + 2));
+		strcpy(copy,orig);
+		copy[len] = dollar;
+		copy[len + 1] = '\0';
+		fixed = copy;
+	} else {
+		// Either dollar is '\0' or it occurs in the string, but only at the last position
+		assert(!dollar || (strchr(orig,dollar) && !*(strchr(orig,dollar)+1)));
+		fixed=orig;
+	}
+	mcreight_builder builder(fixed, dollar,copy_string);
 	std::auto_ptr<dottree::tree> res = builder.build();
 	//std::cout << "Final Tree:\n";
 	//res->print(std::cout);
