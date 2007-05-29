@@ -11,6 +11,7 @@ unsigned dottree::node::allocated_nodes() {
 
 namespace dottree {
 std::ostream& operator << ( std::ostream& out, const nodep_or_idx& n ) {
+	if (n.is_null()) return out << "null";
 	if ( n.is_ptr() ) return out << "ptr(" << n.as_ptr() << ")";
 	return out << "idx(" << n.as_index() << ")";
 }
@@ -260,11 +261,14 @@ std::auto_ptr<dottree::tree> dottree::build_tree(const char* orig, char dollar, 
 	const char* fixed;
 	if (copy_string) {
 		unsigned len = strlen(orig);
-		assert(!dollar || !strchr(orig,dollar));
+		assert(!dollar || !strchr(orig,dollar) || (strchr(orig,dollar) && !*(strchr(orig,dollar)+1)));
 		char* copy = static_cast<char*>(malloc(len + 2));
 		strcpy(copy,orig);
-		copy[len] = dollar;
-		copy[len + 1] = '\0';
+		if (orig[len-1] != dollar) {
+			copy[len] = dollar;
+			copy[len + 1] = '\0';
+		}
+
 		fixed = copy;
 	} else {
 		// Either dollar is '\0' or it occurs in the string, but only at the last position
