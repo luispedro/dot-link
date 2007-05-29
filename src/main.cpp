@@ -81,7 +81,9 @@ int main(int argc, char* argv[])
 		Timer full( "full-tree-construction" );
 		Timer dots( "add-dot-links" );
 		full.start();
-		tree = dottree::build_tree(str);
+		const char* dollar = strchr(str,'$');
+		if (dollar && !*(dollar+1)) tree = dottree::build_tree(str,'$');
+		else tree = dottree::build_tree(str);
 		std::cout << boost::format("Nodes 0-order: %s\n") % dottree::node::allocated_nodes();
 		dots.start();
 		add_dotlinks(tree.get(),k);
