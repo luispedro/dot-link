@@ -78,6 +78,7 @@ struct node {
 
 		nodep_or_idx children(nodep_or_idx c) { std::swap(c,children_); return c; }
 		bool is_leaf() const { return children_.is_null(); }
+		bool is_dotnode() const { return head_ == dot_node_marker; }
 		
 		unsigned sdepth() const { return sdepth_; }
 		unsigned sdepth(unsigned s) { std::swap(s, sdepth_); return s; }
@@ -280,6 +281,10 @@ struct tree {
 		bool is_leaf(nodep_or_idx n) const {
 			return head(n) + sdepth(n) == length();
 		}
+
+		bool is_dotnode(nodep_or_idx n) const {
+			return head(n) == dot_node_marker;
+		}		
 
 		nodep_or_idx children(nodep_or_idx n) const {
 			if (is_leaf(n)) return nodep_or_idx();
