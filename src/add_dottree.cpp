@@ -33,7 +33,7 @@ class print_paths: public dottree::node_visitor {
 			out_(std::cout)
 		{}
 		void visit_node(dottree::position p) {
-			if (tree_->head(p.curnode()) == dot_node_marker) {
+			if (tree_->is_dotnode(p.curnode())) {
 				path_.push_back(".");
 			} else {
 				path_.push_back(std::string(tree_->string(),tree_->start(p), tree_->length(p)));
@@ -66,7 +66,7 @@ node* make_dot_node(unsigned sd) {
 }
 
 bool has_dot_link(dottree::tree* t, node* n) {
-	return t->children(n).valid() && t->head(t->children(n)) == dot_node_marker;
+	return t->children(n).valid() && t->is_dotnode(t->children(n));
 }
 
 node* copy_simple_(dottree::tree* t, nodep_or_idx n, int kdepth) {
@@ -113,7 +113,7 @@ node* copy_recursive(dottree::tree* t, const nodep_or_idx n, const char cond, in
 	}
 	if (!childrencopy) return copy_recursive(t,t->next(n), cond,kdepth);
 	dottree::node* res;
-	if (childrencopy->next().is_null() && t->head(n) != dot_node_marker) {
+	if (childrencopy->next().is_null() && !t->is_dotnode(n)) {
 		res = childrencopy;
 	} else {
 		res = copy_simple(t,n, kdepth);
@@ -141,7 +141,7 @@ void remove_dot_links_recur(dottree::tree* t, node* n) {
 	remove_dot_link(t,n);
 	for (nodep_or_idx cur = t->children(n); cur.valid(); cur = t->next(cur)) {
 		if (cur.is_ptr()) {
-			if (t->head(cur) != dot_node_marker) remove_dot_link(t,cur.as_ptr());
+			if (!t->is_dotnode(cur)) remove_dot_link(t,cur.as_ptr());
 			remove_dot_links_recur(t,cur.as_ptr());
 		}
 	}
@@ -165,7 +165,7 @@ void add_dotlink(dottree::tree* t, node* n) {
 
 void add_dotlink_recur(dottree::tree* t, node* n) {
 	for(nodep_or_idx cur = t->children(n); cur.valid(); cur = t->next(cur)) {
-		if (t->head(cur) != dot_node_marker && cur.is_ptr()) {
+		if (!t->is_dotnode(cur) && cur.is_ptr()) {
 			add_dotlink(t,cur.as_ptr());
 			add_dotlink_recur(t,cur.as_ptr());
 		}
