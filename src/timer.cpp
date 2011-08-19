@@ -7,6 +7,7 @@
 #include <string.h>
 #include <errno.h>
 #include <cassert>
+#include <cstdlib>
 #include <iostream>
 
 namespace {
@@ -38,7 +39,7 @@ void Timer::start() {
 		if ( !Clk_Tck ) Clk_Tck = sysconf( _SC_CLK_TCK )/100;
 	} else {
 		std::cerr << "Error: " << strerror( errno ) << '\n';
-		exit( 1 );
+		std::exit( 1 );
 	}
 }
 

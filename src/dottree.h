@@ -4,6 +4,7 @@
 #include <memory>
 #include <iostream>
 #include <string>
+#include <cstring>
 #include <cassert>
 
 namespace dottree {
