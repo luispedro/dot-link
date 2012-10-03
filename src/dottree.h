@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <cstring>
+#include <cstdlib>
 #include <cassert>
 
 namespace dottree {
@@ -38,7 +39,7 @@ struct nodep_or_idx {
 		}
 		void reset() { d = 0; assert(is_null()); }
 		void set(unsigned v) { d = (v << 1) | 1; assert(is_int()); }
-		void set(node* p) { d = reinterpret_cast<unsigned>(p); assert(as_ptr() == p); }
+		void set(node* p) { d = reinterpret_cast<unsigned long>(p); assert(as_ptr() == p); }
 
 		bool is_ptr() const { return !is_int(); }
 		bool is_int() const { return d & 1; }
@@ -228,7 +229,7 @@ struct tree {
 		}
 		~tree() {
 			delete_subtree(root_);
-			if (str_own_) free(const_cast<char*>(string_));
+			if (str_own_) std::free(const_cast<char*>(string_));
 			delete [] leafs_;
 		}
 		const char* string() const { return string_; }
